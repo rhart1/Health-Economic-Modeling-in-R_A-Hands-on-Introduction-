@@ -55,7 +55,7 @@ All parts of the course will have practical demonstrations and exercises for att
 It is recommended that you read through this document prior to attending the short course, and action the necessary points. There are further recommended materials provided; these will be discussed in the course, but can be completed after the session by attendees. 
 
 
-# Pre-course requirements
+# Pre-course requirements 
 
 ## Download R {#DownloadR}
 
@@ -107,5 +107,5 @@ This [\textcolor{colourblue}{DataCamp guide}](https://www.datacamp.com/community
 ## Background and instructions for Github
 As mentioned previously, Git is software that manages version control for code, and GitHub is the interface to view and manage the changes over time. This [\textcolor{colourblue}{online github guide}](https://guides.github.com/activities/hello-world/) is useful for detailing how to use Git and takes the reader through creating a repository, branching, and making changes. 
 
-Additionally, the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) guide referenced in the [Download R]{#DownloadR} section above also mentions GitHub and R Markdown in the 'Optional Software' section for some background and useful reading.
+Additionally, the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) guide referenced in the ['Download R'](#DownloadR) section above also mentions GitHub and R Markdown in the 'Optional Software' section for some background and useful reading.
 
