@@ -1,0 +1,25 @@
+
+@import url(https://fonts.googleapis.com/css?family=Arimo);
+@import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700);
+
+.title-slide {
+  background-image: url(www/TitleISPOR.PNG);
+  background-size: cover;
+  color: black;
+}
+
+
+.remark-slide-content:not(.title-slide){
+  background-image: url(www/ContentISPOR.PNG);
+  background-size: cover;
+  color: black;
+}
+
+
+body { font-family: 'Droid Serif', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif; }
+h1, h2, h3 {
+  font-family: 'Arimo';
+  font-weight: normal;
+}
+.remark-code, .remark-inline-code { font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace; }
