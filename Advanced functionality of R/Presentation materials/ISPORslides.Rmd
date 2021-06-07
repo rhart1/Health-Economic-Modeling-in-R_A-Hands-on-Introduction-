@@ -227,7 +227,7 @@ Patient_plot
 ```
 
 ---
-## <br>Organising model
+## <br>Organising the model
 ```{r eval=TRUE, tidy=FALSE}
 #Wrapping the dataframes of the model into the hesim_data() function,
 
@@ -243,7 +243,7 @@ hesim_dat <- hesim_data(
 
 ---
 
-## <br>Organising model
+## <br>Organising the model
 ```{r eval=TRUE, tidy=FALSE}
 # ~~ Setting up labels for state and strategy IDs ---------------
 labs_indiv <- get_labels(hesim_dat)
@@ -370,7 +370,8 @@ head(transmod_data)
 ```{r eval=TRUE, tidy=FALSE}
 # ~ Wrapping inputs in hesim functions for use in model -------------
 # ~~ Efficacy -----------------
-transmod <- create_IndivCtstmTrans(wei_fits, transmod_data,
+transmod <- create_IndivCtstmTrans(object = wei_fits, 
+                                   input_data = transmod_data,
                                    trans_mat = tmat, n = n_samples,
                                    uncertainty = "normal",
                                    clock = "reset",
@@ -471,6 +472,18 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
 
 ---
 ### <br>Starting your own models
+
+What is in this model? 
+<br><br>
+--
+
+- Dataframes of inputs
+- Functions from packages with descriptive and freely available documentation
+- Graphs and tables displaying input data and results
+<br><br>
+
+--
+
 Where do you start?
 <br><br>
 --
@@ -478,17 +491,9 @@ Where do you start?
 - Break model down into manageable chunks
 - Use existing examples to guide you
 
-<br><br>
---
-
-What is in this model? 
-<br><br>
---
-
-- It is just dataframes, a few graphs and some pre-made functions put together by following freely available documentation
-
 ---
-### <br>You've made your model... now what?
+
+### <br>You've made your model. What's next?
 
 --
 
@@ -712,7 +717,7 @@ Familiarize yourself with the layout of the app, looking at all the functionalit
 ### <br>ui.R
 Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *ui.R* script.
 
-The ui script has all the front-end layout
+The ui script has all the front-end layout.
 
 <br><br>
 The ui uses the `shinysdashboard` package, allowing users to define a 'header', a 'sidebar' and a 'body'. This package is well documented with good examples and tutorials https://rstudio.github.io/shinydashboard/
@@ -721,7 +726,7 @@ The ui uses the `shinysdashboard` package, allowing users to define a 'header', 
 
 --
 
-Note that the full width of any area in shiny is 12 (e.g. box(), column())
+Note that the full width of any area in shiny is 12 (e.g. box(), column()).
 
 ---
 ## <br>Designing an app: Layout
@@ -753,7 +758,7 @@ Once you know 1) what you want to present and 2) what you want your user to reac
 
 - Map out your code visually, indicating where reactive inputs feed into functions<br><br>
   - What code sections or functions need to be dependent on particular events (e.g. the push of a button), and what sections do not need controlled reactivity?<br><br>
-  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model) these can use eventReactive() to link these larger downstream functionalities to a button
+  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model) these can use eventReactive() to link these larger downstream functionalities to a button.
 
 ---
 ## <br>Designing an app: Reactivity
@@ -821,23 +826,23 @@ Shiny apps can be made available and deployed in a variety of ways, for example:
 
 ## <br>Now you have a go!
 
-The 'utilities' tab in the shiny app is currently left blank. Put the xxxxxx table in there with some text
-- Go into the ui, find the tab (use the navigation)
-- Write text and add the graph (using the xxxx function) - remember the commas! (use xxx as an example)
-- Go to the server, render the graph
+The 'utilities' tab in the shiny app is currently left blank. Print the utility table to this tab with a label or text.
+- Go into the ui, find the tab (use the navigation pane)
+- Add the graph using the `tableOutput` function. Call the output `"Utility_out"`, and add an underlined title using tags$u() - remember the commas! (use the Costs tab tables as an example)
+- Go to the server, render the graph using renderTable()
 - Run the app!
 
-Add the model diagram to the RMD (from either the main script or the shiny app)
-- Identify the data that you want to export to the RMD, add it to the params in the code
-- Add the data to the params list in RMD.
-- Make a title using `##`, (where??) then add some text
+Add the model diagram to the RMarkdown (either PDF or html), to be called from the shiny app
+- Identify the data that you want to export to the RMarkdown, add it to the params in the code
+- Add the data to the params list in RMarkdown.
+- Make a title using `#` or `##` before the Results section then add some text
 - Add a code chunk, render the model diagram
+
+The app and RMarkdown scripts with these changes are in the 'Exercise answers' folder for self-marking.
 
 ---
 class:center
 
-<br><br>
-## Thank you for joining this Virtual ISPOR 2021 Short Course 
+## <br><br>Thank you for joining this <br>Virtual ISPOR 2021 Short Course 
 
-<br>
-### Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD
+### <br>Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD

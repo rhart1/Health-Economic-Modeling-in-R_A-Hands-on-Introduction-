@@ -256,7 +256,7 @@ Patient_plot
 &lt;img src="ISPORslides_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
-## &lt;br&gt;Organising model
+## &lt;br&gt;Organising the model
 
 ```r
 #Wrapping the dataframes of the model into the hesim_data() function,
@@ -273,7 +273,7 @@ hesim_dat &lt;- hesim_data(
 
 ---
 
-## &lt;br&gt;Organising model
+## &lt;br&gt;Organising the model
 
 ```r
 # ~~ Setting up labels for state and strategy IDs ---------------
@@ -427,12 +427,12 @@ head(transmod_data)
 
 ```
 ##    strategy_id patient_id strategy_name      age female
-## 1:           1          1           SOC 44.42293      1
-## 2:           1          2           SOC 45.05279      0
-## 3:           1          3           SOC 39.12546      1
-## 4:           1          4           SOC 49.36805      0
-## 5:           1          5           SOC 49.27934      1
-## 6:           1          6           SOC 54.51559      0
+## 1:           1          1           SOC 58.85076      1
+## 2:           1          2           SOC 44.83824      0
+## 3:           1          3           SOC 47.66231      0
+## 4:           1          4           SOC 53.03952      1
+## 5:           1          5           SOC 31.79500      1
+## 6:           1          6           SOC 36.42826      0
 ```
 
 ---
@@ -441,7 +441,8 @@ head(transmod_data)
 ```r
 # ~ Wrapping inputs in hesim functions for use in model -------------
 # ~~ Efficacy -----------------
-transmod &lt;- create_IndivCtstmTrans(wei_fits, transmod_data,
+transmod &lt;- create_IndivCtstmTrans(object = wei_fits, 
+                                   input_data = transmod_data,
                                    trans_mat = tmat, n = n_samples,
                                    uncertainty = "normal",
                                    clock = "reset",
@@ -492,12 +493,12 @@ head(ictstm$disprog_)
 
 ```
 ##    sample strategy_id patient_id grp_id from to final time_start time_stop
-## 1:      1           1          1      1    1  2     0   0.000000  4.358559
-## 2:      1           1          1      1    2  3     1   4.358559 11.318062
-## 3:      1           1          2      1    1  3     1   0.000000 10.515282
-## 4:      1           1          3      1    1  3     1   0.000000 11.278637
-## 5:      1           1          4      1    1  3     1   0.000000  6.754697
-## 6:      1           1          5      1    1  2     0   0.000000  3.741317
+## 1:      1           1          1      1    1  3     1   0.000000  2.692145
+## 2:      1           1          2      1    1  3     1   0.000000  6.067524
+## 3:      1           1          3      1    1  3     1   0.000000 10.557962
+## 4:      1           1          4      1    1  3     1   0.000000  5.133861
+## 5:      1           1          5      1    1  2     0   0.000000  6.346778
+## 6:      1           1          5      1    2  3     1   6.346778 17.079761
 ```
 
 ---
@@ -517,9 +518,9 @@ head(ictstm$stateprobs_)
 ## 1:      1           1      1        1 0.00000000 1.000
 ## 2:      1           1      1        1 0.08333333 1.000
 ## 3:      1           1      1        1 0.16666667 1.000
-## 4:      1           1      1        1 0.25000000 1.000
+## 4:      1           1      1        1 0.25000000 0.999
 ## 5:      1           1      1        1 0.33333333 0.998
-## 6:      1           1      1        1 0.41666667 0.998
+## 6:      1           1      1        1 0.41666667 0.996
 ```
 
 ```r
@@ -548,12 +549,12 @@ head(ictstm$qalys_)
 
 ```
 ##    sample strategy_id grp_id state_id dr    qalys      lys
-## 1:      1           1      1        1  0 5.116743 6.416413
-## 2:      1           1      1        2  0 3.167976 5.219079
-## 3:      1           2      1        1  0 5.452314 6.837220
-## 4:      1           2      1        2  0 2.953576 4.865866
-## 5:      1           3      1        1  0 5.891427 7.387871
-## 6:      1           3      1        2  0 3.320481 5.470324
+## 1:      1           1      1        1  0 4.802479 6.124422
+## 2:      1           1      1        2  0 2.936828 5.212276
+## 3:      1           2      1        1  0 5.416154 6.907020
+## 4:      1           2      1        2  0 2.917100 5.177263
+## 5:      1           3      1        1  0 6.046026 7.710272
+## 6:      1           3      1        2  0 2.864805 5.084450
 ```
 
 ---
@@ -567,12 +568,12 @@ head(ictstm$costs_)
 
 ```
 ##    sample strategy_id grp_id state_id dr category      costs
-## 1:      1           1      1        1  0     Drug  12832.827
-## 2:      1           1      1        2  0     Drug   6311.644
-## 3:      1           2      1        1  0     Drug  82046.646
-## 4:      1           2      1        2  0     Drug   5885.840
-## 5:      1           3      1        1  0     Drug 110818.062
-## 6:      1           3      1        2  0     Drug   6615.239
+## 1:      1           1      1        1  0     Drug  12248.845
+## 2:      1           1      1        2  0     Drug   6303.407
+## 3:      1           2      1        1  0     Drug  82884.235
+## 4:      1           2      1        2  0     Drug   6261.241
+## 5:      1           3      1        1  0     Drug 115654.075
+## 6:      1           3      1        2  0     Drug   6150.015
 ```
 
 ---
@@ -602,58 +603,58 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.87 (7.21, 8.61) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 8.57 (7.71, 9.25) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 9.16 (8.37, 9.89) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.89 (7.21, 8.72) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.64 (7.77, 9.37) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.23 (8.38, 10.25) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 18,177 (16,997, 19,503) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 89,894 (84,314, 95,831) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 121,329 (113,822, 130,512) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,380 (17,324, 19,629) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 91,603 (86,154, 98,553) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 123,829 (115,889, 133,697) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 65,560 (9,002, 189,981) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 65,720 (9,348, 198,599) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 67,767 (9,480, 197,141) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 53,398 (7,938, 135,892) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 53,928 (7,531, 129,626) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 55,520 (7,738, 135,116) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 83,737 (26,756, 208,399) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 155,614 (97,142, 288,372) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 189,097 (129,553, 319,369) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 71,778 (26,514, 154,561) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 145,531 (99,698, 218,893) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 179,348 (129,706, 260,194) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 17,149 (16,089, 18,342) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 85,730 (80,616, 91,187) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 115,325 (108,469, 123,656) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,335 (16,387, 18,451) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 87,284 (82,313, 93,588) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 117,589 (110,417, 126,450) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 59,998 (8,292, 172,326) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 59,747 (8,552, 178,658) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 61,298 (8,640, 176,316) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 48,949 (7,268, 123,320) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 49,098 (6,828, 117,340) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 50,296 (6,979, 120,706) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 77,148 (25,074, 189,697) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 145,477 (92,530, 264,270) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 176,623 (123,030, 292,459) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 66,284 (24,845, 140,911) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 136,382 (94,676, 202,497) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 167,885 (123,102, 239,362) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 6.58 (6.06, 7.10) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.09 (6.45, 7.58) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.49 (6.93, 8.04) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.61 (6.08, 7.22) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.13 (6.49, 7.64) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.54 (6.93, 8.25) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -665,6 +666,18 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
 
 ---
 ### &lt;br&gt;Starting your own models
+
+What is in this model? 
+&lt;br&gt;&lt;br&gt;
+--
+
+- Dataframes of inputs
+- Functions from packages with descriptive and freely available documentation
+- Graphs and tables displaying input data and results
+&lt;br&gt;&lt;br&gt;
+
+--
+
 Where do you start?
 &lt;br&gt;&lt;br&gt;
 --
@@ -672,17 +685,9 @@ Where do you start?
 - Break model down into manageable chunks
 - Use existing examples to guide you
 
-&lt;br&gt;&lt;br&gt;
---
-
-What is in this model? 
-&lt;br&gt;&lt;br&gt;
---
-
-- It is just dataframes, a few graphs and some pre-made functions put together by following freely available documentation
-
 ---
-### &lt;br&gt;You've made your model... now what?
+
+### &lt;br&gt;You've made your model. What's next?
 
 --
 
@@ -910,7 +915,7 @@ Familiarize yourself with the layout of the app, looking at all the functionalit
 ### &lt;br&gt;ui.R
 Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *ui.R* script.
 
-The ui script has all the front-end layout
+The ui script has all the front-end layout.
 
 &lt;br&gt;&lt;br&gt;
 The ui uses the `shinysdashboard` package, allowing users to define a 'header', a 'sidebar' and a 'body'. This package is well documented with good examples and tutorials https://rstudio.github.io/shinydashboard/
@@ -919,7 +924,7 @@ The ui uses the `shinysdashboard` package, allowing users to define a 'header', 
 
 --
 
-Note that the full width of any area in shiny is 12 (e.g. box(), column())
+Note that the full width of any area in shiny is 12 (e.g. box(), column()).
 
 ---
 ## &lt;br&gt;Designing an app: Layout
@@ -951,7 +956,7 @@ Once you know 1) what you want to present and 2) what you want your user to reac
 
 - Map out your code visually, indicating where reactive inputs feed into functions&lt;br&gt;&lt;br&gt;
   - What code sections or functions need to be dependent on particular events (e.g. the push of a button), and what sections do not need controlled reactivity?&lt;br&gt;&lt;br&gt;
-  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model) these can use eventReactive() to link these larger downstream functionalities to a button
+  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model) these can use eventReactive() to link these larger downstream functionalities to a button.
 
 ---
 ## &lt;br&gt;Designing an app: Reactivity
@@ -1020,22 +1025,26 @@ Shiny apps can be made available and deployed in a variety of ways, for example:
 
 ## &lt;br&gt;Now you have a go!
 
-The 'utilities' tab in the shiny app is currently left blank. Put the xxxxxx table in there with some text
-- Go into the ui, find the tab (use the navigation)
-- Write text and add the graph (using the xxxx function) - remember the commas! (use xxx as an example)
-- Go to the server, render the graph
+The 'utilities' tab in the shiny app is currently left blank. Print the utility table to this tab with a label or text.
+- Go into the ui, find the tab (use the navigation pane)
+- Add the graph using the `tableOutput` function. Call the output `"Utility_out"`, and add an underlined title using tags$u() - remember the commas! (use the Costs tab tables as an example)
+- Go to the server, render the graph using renderTable()
 - Run the app!
 
-Add the model diagram to the RMD (from either the main script or the shiny app)
-- Identify the data that you want to export to the RMD, add it to the params in the code
-- Add the data to the params list in RMD.
-- Make a title using `##`, (where??) then add some text
+Add the model diagram to the RMarkdown (either PDF or html), to be called from the shiny app
+- Identify the data that you want to export to the RMarkdown, add it to the params in the code
+- Add the data to the params list in RMarkdown.
+- Make a title using `#` or `##` before the Results section then add some text
 - Add a code chunk, render the model diagram
+
+The app and RMarkdown scripts with these changes are in the 'Exercise answers' folder for self-marking.
 
 ---
 class:center
 
-##Thanks
+## &lt;br&gt;&lt;br&gt;Thank you for joining this &lt;br&gt;Virtual ISPOR 2021 Short Course 
+
+### &lt;br&gt;Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

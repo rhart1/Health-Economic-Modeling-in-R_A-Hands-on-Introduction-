@@ -237,14 +237,7 @@ server <- function(input, output, session) {
     dist = "beta")
   
   # ~~ Output to shiny -------------
-  output$Utility_out <- renderTable(
-    utility_tbl,
-    striped = TRUE,
-    bordered = TRUE,
-    colnames = TRUE,
-    sanitize.text.function = function(x) x)
-  #print(utility_tbl)
-  
+  # EXERCISE - fill in here ----------------------------
   
   # Setting up the model --------------
   # ~ Taking in inputs from shiny interface ---------------------------

@@ -105,9 +105,9 @@ ui <-
           selected = "States and transitions",
           width = 9,side = "right",
           tabPanel(title = "Utilities",
-                   fluidRow(
-                     column(6, tableOutput("Utility_out"))
-                   )),
+                   # EXERCISE - fill in here ----------------------------
+                   #This is left blank for filling in during the exercise
+          ),
           tabPanel(title = "Costs",
                    fluidRow(
                      column(8, tags$u("Drug costs per strategy, state and time"),br(),tableOutput("Drugcost_out")),

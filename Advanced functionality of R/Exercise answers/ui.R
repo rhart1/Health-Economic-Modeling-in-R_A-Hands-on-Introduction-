@@ -105,8 +105,10 @@ ui <-
           selected = "States and transitions",
           width = 9,side = "right",
           tabPanel(title = "Utilities",
+                   # ANSWER CODE CHANGES ARE HERE ----------------------------
                    fluidRow(
-                     column(6, tableOutput("Utility_out"))
+                     column(12,"Text can be written here to explain how the inputs are used if the coder chooses",br(),br()),
+                     column(6, tags$u("Utility inputs"),br(),tableOutput("Utility_out"))
                    )),
           tabPanel(title = "Costs",
                    fluidRow(

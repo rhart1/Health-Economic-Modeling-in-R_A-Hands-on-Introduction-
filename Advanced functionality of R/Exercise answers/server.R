@@ -237,6 +237,7 @@ server <- function(input, output, session) {
     dist = "beta")
   
   # ~~ Output to shiny -------------
+  # ANSWER CODE CHANGES ARE HERE ----------------------------
   output$Utility_out <- renderTable(
     utility_tbl,
     striped = TRUE,
@@ -409,7 +410,10 @@ server <- function(input, output, session) {
   
   # ~ Create report -------------------
   # This location is relative to the location of app.R
-  Markdown_location <- "./../R Markdown scripts/"
+  Markdown_location <- "./"
+  
+  # ANSWER CODE CHANGES HERE -----------------------------
+  # Model_Diagram added to the Export_params for html and pdf document
   
   output$Create_htmlreport <- downloadHandler(
       filename = "hesim-html-report_shiny.html",
@@ -431,7 +435,8 @@ server <- function(input, output, session) {
           # Main results
           Stateprobs            = ictstm()$stateprobs_,
           Summarisedf           = ce_sim_ictstm,
-          labs_indiv            = labs_indiv
+          labs_indiv            = labs_indiv,
+          Model_Diagram         = Model_Diagram
         )
 
         # html document
@@ -465,7 +470,8 @@ server <- function(input, output, session) {
         # Main results
         Stateprobs            = ictstm()$stateprobs_,
         Summarisedf           = ce_sim_ictstm,
-        labs_indiv            = labs_indiv
+        labs_indiv            = labs_indiv,
+        Model_Diagram         = Model_Diagram
       )
       
       # pdf document

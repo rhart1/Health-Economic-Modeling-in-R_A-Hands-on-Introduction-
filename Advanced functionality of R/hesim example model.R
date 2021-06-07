@@ -20,6 +20,7 @@ library(heemod)     # Can produce a really simple model diagram - also has other
 library(diagram)    # Assists with creating the diagram from heemod
 library(magrittr)   # Structuring data sequences with left -> right formatting instead of nested functions
 
+
 # Informing inputs --------------
 # ~ States and transitions ---------
 # ~~ Define matrix ---------------
@@ -58,6 +59,8 @@ strategies <- data.table(
   strategy_id = 1:3,
   strategy_name = c("SOC", "New 1", "New 2")
   )
+
+print(strategies)
 
 # ~ Patients -------------
 # ~~ Create patient sample to model -------------
@@ -196,7 +199,8 @@ head(transmod_data)
 
 # ~ Wrapping inputs in hesim functions for use in model -------------
 # ~~ Efficacy -----------------
-transmod <- create_IndivCtstmTrans(wei_fits, transmod_data,
+transmod <- create_IndivCtstmTrans(object = wei_fits, 
+                                   input_data = transmod_data,
                                    trans_mat = tmat, n = n_samples,
                                    uncertainty = "normal",
                                    clock = "reset",
