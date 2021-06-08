@@ -1,8 +1,0 @@
-xaringan:::inf_mr()
-remotes::install_github("mitchelloharawild/icons")
-icons::download_academicons()
-icons::download_fontawesome()
-icons::download_google_material()
-install.packages("magick")
-install.packages("magick")
-xaringan:::inf_mr()
