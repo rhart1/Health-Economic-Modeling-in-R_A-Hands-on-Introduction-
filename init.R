@@ -1,11 +1,7 @@
 
 # Please read and run this script prior to taking part in the workshop on 17th June 2021
-# TODO This is work in progres
 
-
-# Please have an R version 4.0.5 or later 
-# TODO include instructions on this
-# TODO may need to include package versions in this too?
+# Please have an R version 4.0.5 or later - instructions for this are in the pre-read documents
 
 # The following function has been written to look through a list of required packages and install
 # any packages that have not been previously installed. It will then load the required libraries into

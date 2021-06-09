@@ -10,7 +10,7 @@
 # install.packages("survminer")
 # install.packages("heemod")
 # install.packages("magrittr")
-library(hesim)      # Containing the mock trial data and the functions formodel construction
+library(hesim)      # Containing the mock trial data and the functions for model construction
 library(data.table) # Used for organising the data in this example
 library(flexsurv)   # used for fitting parametric models to the trial data
 library(survminer)  # useful for easily presenting Kaplan–Meier plots. It also loads `ggplot2` as a dependent, which is a versatile package for producing 
@@ -20,6 +20,9 @@ library(heemod)     # Can produce a really simple model diagram - also has other
 library(diagram)    # Assists with creating the diagram from heemod
 library(magrittr)   # Structuring data sequences with left -> right formatting instead of nested functions
 
+#If there are issues with downloading packages or running parts of the model, please refer to the session info of the development
+#environment used to create this to crosscheck attached packages.
+#readRDS("./Advanced functionality of R/SessionInfo.rds")
 
 # Informing inputs --------------
 # ~ States and transitions ---------
