@@ -2,7 +2,7 @@
 title: "<br/><br/>Advanced functionality of R"
 subtitle: "Virtual ISPOR 2021"
 author: "Rose Hart"
-institute: "BresMed Health Solutions, Sheffield, UK"
+institute: "BresMed Health Solutions Ltd., Sheffield, UK"
 date: "17 June 2021"
 output:
   xaringan::moon_reader:
@@ -22,7 +22,7 @@ options(htmltools.dir.version = FALSE)
 
 ## <br>Overview
 
-`hesim` - an R package for implement and analyzing health-economic simulation models
+`hesim` - an R package for implementing and analysing health economic simulation models
 <br><br>
 
 --
@@ -46,7 +46,7 @@ options(htmltools.dir.version = FALSE)
 
 `hesim` supports three types of health economic models:
 
-(i) **Cohort discrete time state transition models (cDTSTMs)** -  Markov cohort models and can be time-homogeneous or time-inhomogeneous
+(i) **Cohort discrete time state transition models (cDTSTMs)** - These are Markov cohort models and can be time-homogeneous or time-inhomogeneous
 
 (ii) **N-state partitioned survival models (PSMs)** - Area under the curve model
 
@@ -73,11 +73,21 @@ Please open the *Advanced functionality of R* folder and open the *hesim example
 
 There are three parts of this session: <br><br>
 --
-1. The *hesim example model.R* script contains an example model code - this is heavily based on the example in the [CRAN vignette](https://cran.r-project.org/web/packages/hesim/vignettes/intro.html) https://cran.r-project.org/web/packages/hesim/vignettes/intro.html - we will go through this line by line <br><br>
+
+1. The *hesim example model.R* script contains an example model code 
+
+   This is heavily based on the example in the [CRAN vignette](https://cran.r-project.org/web/packages/hesim/vignettes/intro.html) https://cran.r-project.org/web/packages/hesim/vignettes/intro.html 
+
+   We will go through this line by line <br>
+
 --
+
 2. Output the results of the model into RMarkdown PDF and HTML report examples <br><br>
+
 --
+
 3. Demonstrates the model as a `shiny` application <br><br>
+
 
 ---
 ## <br>hesim example model
@@ -91,7 +101,7 @@ There are three parts of this session: <br><br>
 # install.packages("survminer")
 # install.packages("heemod")
 # install.packages("magrittr")
-library("hesim")      # Containing the mock trial data and the functions formodel construction
+library("hesim")      # Containing the mock trial data and the functions for model construction
 library("data.table") # Used for organising the data in this example
 library("flexsurv")   # used for fitting parametric models to the trial data
 library("survminer")  # useful for easily presenting Kaplan–Meier plots. It also loads `ggplot2` as a dependent, which is a versatile package for producing 
@@ -165,7 +175,7 @@ Model_Diagram <- define_transition( #this function is part of the heemod package
 
 ---
 ### <br>Creating simple model diagram
-```{r eval=TRUE, tidy=FALSE, out.width='\\textwidth', fig.height = 7, fig.align='center'}
+```{r eval=TRUE, tidy=TRUE, out.width='\\textwidth', fig.height = 6, fig.align='center'}
 
 plot(Model_Diagram)
 ```
@@ -189,6 +199,7 @@ states <- data.table(
 ```{r eval=TRUE, tidy=FALSE}
 # ~ Strategies ----------------------
 # ~~ Outline strategy and IDs ----------------
+# Note: SOC = standard of care
 strategies <- data.table(
   strategy_id = 1:3,
   strategy_name = c("SOC", "New 1", "New 2")
@@ -227,7 +238,7 @@ Patient_plot
 ```
 
 ---
-## <br>Organising the model
+## <br>Organizing the model
 ```{r eval=TRUE, tidy=FALSE}
 #Wrapping the dataframes of the model into the hesim_data() function,
 
@@ -243,7 +254,7 @@ hesim_dat <- hesim_data(
 
 ---
 
-## <br>Organising the model
+## <br>Organizing the model
 ```{r eval=TRUE, tidy=FALSE}
 # ~~ Setting up labels for state and strategy IDs ---------------
 labs_indiv <- get_labels(hesim_dat)
@@ -299,11 +310,11 @@ for (i in 1:length(wei_fits)){
 }
 
 wei_fits <- flexsurvreg_list(wei_fits) 
-#This is now a list of three sets of Weibull parameters, one for each transition
+#This is now a list of three sets of Weibull parameters, one for each transition.
 ```
 
 ---
-## <br>Drug Costs
+## <br>Drug costs
 ```{r echo=FALSE, tidy=FALSE, message = FALSE}
 drugcost_dt <- matrix(c(
   1, 1, 1, 0.00, 0.25,  2000,
@@ -331,7 +342,7 @@ head(drugcost_tbl)
 ```
 
 ---
-## <br>Other Costs
+## <br>Other costs
 ```{r eval=TRUE, tidy=FALSE}
 # ~~ Medical costs ---------------
 medcost_tbl <- stateval_tbl(
@@ -411,7 +422,7 @@ ictstm <- IndivCtstm$new(trans_model = transmod,
 ```{r eval=TRUE, tidy=FALSE}
 # Run the disease simulation ----------------
 # ~ Run simulation -------------
-# This runs the disease simulation, and assumed that the max patient age is 100 (after which they automatically transfer to 'Death' state)
+# This runs the disease simulation, and it is assumed that the max patient age is 100 (after which they automatically transfer to 'Death' state)
 ictstm$sim_disease(max_age = 100, progress = FALSE)
 # This is the event data simulated for each patient
 head(ictstm$disprog_)
@@ -526,7 +537,7 @@ Therefore, you will need to consider the following points for your project:
 ## <br>R Markdown
 `rmarkdown` - a file format for making documents with R
 <br><br> 
-There are two examples of this, one in html and one in pfd
+There are two examples of this, one in html and one in pfd.
 
 Please open the *Advanced functionality of R* folder and open the *R Markdown scripts* folder. There are two scripts there.
 
@@ -593,7 +604,7 @@ If you are unable to generate these documents at present, the generated html and
 
 Creating an R shiny app considerably increases the accessibility of your R code. However, it is a further learning curve and can be time consuming. 
 
-At it's most basic, a shiny app consists of 3 scripts:
+At it's most basic, a shiny app consists of three scripts:
 - app.R 
   - The application is called from this script
 - server.R
@@ -626,7 +637,7 @@ Having your R code as a shiny app enables users to interact with the R code with
 
 --
 
-An object which is reactive (created using reactive()) is a function. This means that when referring to it later in the script, the syntax changes and brackets are needed (e.g. ictstm in the standard script becomes ictstm() in the server.R script)
+An object that is reactive (created using reactive()) is a function. This means that when referring to it later in the script, the syntax changes and brackets are needed (e.g. ictstm in the standard script becomes ictstm() in the server.R script)
 
 ---
 ### <br>Defining shiny inputs and outputs
@@ -656,7 +667,7 @@ numericInputIcon(
 ### <br>Defining shiny inputs and outputs
 
 **output list**
-  - The results of your functions which you want to then display front-end are defined in the outputs list
+  - The results of your functions that you want to then display front-end are defined in the outputs list
   - As with inputs, there are a variety of functions that can be used depending on the type of output you want to display
   - Each has an id. The location of the output is defined in the ui, and then the output content is defined in the server
 
@@ -688,7 +699,7 @@ The server script has all the model functionality
 
 Click the document outline toggle in the top right corner of console to see server.R layout  <img src="www/Picture4.png" width="40">
 
-Compare this to the layout of the *hesim example model.R* script
+Compare this with the layout of the *hesim example model.R* script
 
 --
 
@@ -720,7 +731,7 @@ Please open the *hesim shiny app* folder within the *Advanced functionality of R
 The ui script has all the front-end layout.
 
 <br><br>
-The ui uses the `shinysdashboard` package, allowing users to define a 'header', a 'sidebar' and a 'body'. This package is well documented with good examples and tutorials https://rstudio.github.io/shinydashboard/
+The ui uses the `shinydashboard` package, allowing users to define a 'header', a 'sidebar' and a 'body'. This package is well documented with good examples and tutorials https://rstudio.github.io/shinydashboard/
 
 <img src="www/Picture7.png" width="200">
 
@@ -739,7 +750,7 @@ The questions you need to ask yourself (and your project team) when designing an
 
 1. What do you want to show?
 
-  - Graphs and Tables
+  - Graphs and tables
   - Intermediate calculations
   - Explanatory text
 
@@ -757,8 +768,8 @@ The questions you need to ask yourself (and your project team) when designing an
 Once you know 1) what you want to present and 2) what you want your user to react with, you should then plan out your reactivity:
 
 - Map out your code visually, indicating where reactive inputs feed into functions<br><br>
-  - What code sections or functions need to be dependent on particular events (e.g. the push of a button), and what sections do not need controlled reactivity?<br><br>
-  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model) these can use eventReactive() to link these larger downstream functionalities to a button.
+  - Which code sections or functions need to be dependent on particular events (e.g. the push of a button), and which sections do not need controlled reactivity?<br><br>
+  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model). These can use eventReactive() to link these larger downstream functionalities to a button.
 
 ---
 ## <br>Designing an app: Reactivity
@@ -773,7 +784,7 @@ Once you know 1) what you want to present and 2) what you want your user to reac
 ---
 ## <br>Exporting RMarkdown documents from shiny
 
-It is possible to output graphs and tables from active model directly into a shiny application.
+It is possible to output graphs and tables from an active model directly into a shiny application.
 
 --
 
@@ -833,10 +844,10 @@ The 'utilities' tab in the shiny app is currently left blank. Print the utility 
 - Run the app!
 
 Add the model diagram to the RMarkdown (either PDF or html), to be called from the shiny app
-- Identify the data that you want to export to the RMarkdown, add it to the params in the code
+- Identify the data that you want to export to the RMarkdown script, add it to the `params` list in the code
 - Add the data to the params list in RMarkdown.
 - Make a title using `#` or `##` before the Results section then add some text
-- Add a code chunk, render the model diagram
+- Add a code chunk and render the model diagram
 
 The app and RMarkdown scripts with these changes are in the 'Exercise answers' folder for self-marking.
 
