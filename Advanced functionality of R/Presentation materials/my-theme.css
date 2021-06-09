@@ -5,15 +5,30 @@
 
 .title-slide {
   background-image: url(www/TitleISPOR.PNG);
-  background-size: cover;
+  background-size: contain;
   color: black;
+  font-size: 1.15rem;
+  padding: 16px 64px 16px 64px; /* 16px 64px 16px 64px; */
+  width: 100%;
+  height: 100%;
 }
-
 
 .remark-slide-content:not(.title-slide){
   background-image: url(www/ContentISPOR.PNG);
-  background-size: cover;
+  background-size: contain;
+  background-color: var(--background-color);
+  font-size: 1.15rem;
+  padding: 16px 64px 16px 64px; /* 16px 64px 16px 64px; */
+  width: 100%;
+  height: 100%;
   color: black;
+}
+
+.remark-slide-content {
+  padding-top: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-bottom: 10px;
 }
 
 

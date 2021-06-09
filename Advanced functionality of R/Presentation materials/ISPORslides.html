@@ -438,12 +438,12 @@ head(transmod_data)
 
 ```
 ##    strategy_id patient_id strategy_name      age female
-## 1:           1          1           SOC 51.93363      1
-## 2:           1          2           SOC 47.32945      1
-## 3:           1          3           SOC 40.18720      0
-## 4:           1          4           SOC 45.24073      0
-## 5:           1          5           SOC 50.64014      1
-## 6:           1          6           SOC 36.39361      0
+## 1:           1          1           SOC 34.35809      1
+## 2:           1          2           SOC 48.16391      0
+## 3:           1          3           SOC 50.88353      0
+## 4:           1          4           SOC 55.38570      0
+## 5:           1          5           SOC 39.95220      0
+## 6:           1          6           SOC 40.08055      1
 ```
 
 ---
@@ -504,12 +504,12 @@ head(ictstm$disprog_)
 
 ```
 ##    sample strategy_id patient_id grp_id from to final time_start time_stop
-## 1:      1           1          1      1    1  3     1   0.000000  4.365645
-## 2:      1           1          2      1    1  2     0   0.000000  3.618526
-## 3:      1           1          2      1    2  3     1   3.618526  8.186439
-## 4:      1           1          3      1    1  2     0   0.000000  5.605429
-## 5:      1           1          3      1    2  3     1   5.605429 12.470360
-## 6:      1           1          4      1    1  3     1   0.000000  1.400948
+## 1:      1           1          1      1    1  2     0   0.000000  7.222511
+## 2:      1           1          1      1    2  3     1   7.222511 14.326370
+## 3:      1           1          2      1    1  2     0   0.000000  2.953728
+## 4:      1           1          2      1    2  3     1   2.953728 11.053102
+## 5:      1           1          3      1    1  2     0   0.000000  4.024639
+## 6:      1           1          3      1    2  3     1   4.024639  6.802632
 ```
 
 ---
@@ -528,10 +528,10 @@ head(ictstm$stateprobs_)
 ##    sample strategy_id grp_id state_id          t  prob
 ## 1:      1           1      1        1 0.00000000 1.000
 ## 2:      1           1      1        1 0.08333333 1.000
-## 3:      1           1      1        1 0.16666667 0.997
-## 4:      1           1      1        1 0.25000000 0.996
-## 5:      1           1      1        1 0.33333333 0.995
-## 6:      1           1      1        1 0.41666667 0.995
+## 3:      1           1      1        1 0.16666667 0.999
+## 4:      1           1      1        1 0.25000000 0.999
+## 5:      1           1      1        1 0.33333333 0.999
+## 6:      1           1      1        1 0.41666667 0.997
 ```
 
 ```r
@@ -560,12 +560,12 @@ head(ictstm$qalys_)
 
 ```
 ##    sample strategy_id grp_id state_id dr    qalys      lys
-## 1:      1           1      1        1  0 4.710103 5.944405
-## 2:      1           1      1        2  0 3.451765 5.671144
-## 3:      1           2      1        1  0 5.597038 7.063765
-## 4:      1           2      1        2  0 3.495080 5.742310
-## 5:      1           3      1        1  0 6.425375 8.109171
-## 6:      1           3      1        2  0 3.381961 5.556459
+## 1:      1           1      1        1  0 4.789554 6.134089
+## 2:      1           1      1        2  0 2.674424 5.214280
+## 3:      1           2      1        1  0 5.703993 7.305232
+## 4:      1           2      1        2  0 2.411887 4.702417
+## 5:      1           3      1        1  0 6.248068 8.002042
+## 6:      1           3      1        2  0 2.459511 4.795268
 ```
 
 ---
@@ -579,12 +579,12 @@ head(ictstm$costs_)
 
 ```
 ##    sample strategy_id grp_id state_id dr category      costs
-## 1:      1           1      1        1  0     Drug  11888.810
-## 2:      1           1      1        2  0     Drug   6858.698
-## 3:      1           2      1        1  0     Drug  84765.184
-## 4:      1           2      1        2  0     Drug   6944.322
-## 5:      1           3      1        1  0     Drug 121637.568
-## 6:      1           3      1        2  0     Drug   6719.725
+## 1:      1           1      1        1  0     Drug  12268.178
+## 2:      1           1      1        2  0     Drug   6307.611
+## 3:      1           2      1        1  0     Drug  87662.780
+## 4:      1           2      1        2  0     Drug   5688.726
+## 5:      1           3      1        1  0     Drug 120030.625
+## 6:      1           3      1        2  0     Drug   5800.521
 ```
 
 ---
@@ -614,58 +614,58 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.87 (7.19, 8.56) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 8.62 (7.78, 9.46) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 9.26 (8.43, 10.04) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.92 (7.17, 8.61) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.66 (7.79, 9.51) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.27 (8.46, 10.08) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 18,223 (16,865, 19,359) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 90,355 (85,080, 96,138) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 122,761 (115,197, 129,994) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,221 (16,978, 19,399) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,561 (84,292, 96,783) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 122,651 (113,878, 131,956) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 66,140 (7,161, 179,155) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 66,565 (7,382, 190,214) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 68,523 (7,476, 196,310) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 73,819 (7,206, 255,475) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 73,420 (7,760, 240,382) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 75,276 (7,891, 249,918) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 84,363 (25,193, 197,499) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 156,920 (96,430, 282,502) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 191,284 (129,861, 322,038) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 92,040 (25,328, 274,415) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 163,980 (98,275, 333,732) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 197,927 (128,878, 370,501) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 17,192 (15,975, 18,201) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 86,140 (81,310, 91,421) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 116,616 (109,723, 123,169) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,189 (16,076, 18,238) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 86,336 (80,611, 91,959) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 116,524 (108,549, 124,906) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 60,477 (6,605, 162,851) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 60,423 (6,748, 171,361) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 61,858 (6,891, 175,388) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 67,355 (6,676, 230,839) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 66,486 (7,150, 216,100) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 67,791 (7,248, 222,717) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 77,668 (23,633, 180,145) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 146,563 (91,715, 259,267) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 178,474 (123,081, 294,628) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 84,545 (23,949, 248,660) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 152,822 (93,587, 304,981) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 184,315 (122,319, 337,319) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 6.59 (6.07, 7.10) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.11 (6.48, 7.69) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.55 (6.94, 8.12) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.62 (6.06, 7.12) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.15 (6.53, 7.77) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.56 (7.00, 8.12) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
