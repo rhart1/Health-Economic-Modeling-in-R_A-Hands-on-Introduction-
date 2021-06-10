@@ -1,0 +1,49 @@
+BCEA-package            BCEA: A package for Bayesian Cost-Effectiveness
+                        Analysis
+BCEAweb                 BCEAweb
+CEriskav                Cost-effectiveness analysis including a
+                        parameter of risk aversion
+CreateInputs            CreateInputs
+Smoking                 Data set for the Bayesian model for the
+                        cost-effectiveness of smoking cessation
+                        interventions
+Vaccine                 Data set for the Bayesian model for the
+                        cost-effectiveness of influenza vaccination
+bcea                    Bayesian Cost-Effectiveness Analysis
+ceac.plot               Cost-Effectiveness Acceptability Curve (CEAC)
+                        plot
+ceaf.plot               Cost-Effectiveness Acceptability Frontier
+                        (CEAF) plot
+ceef.plot               Cost-Effectiveness Efficiency Frontier (CEAF)
+                        plot
+ceplane.plot            Cost-effectiveness plane plot
+contour.bcea            Contour method for objects in the class 'bcea'
+contour2                Specialised contour plot for objects in the
+                        class "bcea"
+diag.evppi              diag.evppi
+eib.plot                Expected Incremental Benefit (EIB) plot
+evi.plot                Expected Value of Information (EVI) plot
+evppi                   Expected Value of Perfect Partial Information
+                        (EVPPI) for selected parameters
+ib.plot                 Incremental Benefit (IB) distribution plot
+info.rank               Info-rank plot
+make.report             make.report
+mce.plot                Plots the probability that each intervention is
+                        the most cost-effective
+mixedAn                 Cost-effectiveness analysis when multiple
+                        (possibly non cost-effective) interventions are
+                        present on the market
+multi.ce                Cost-effectiveness analysis with multiple
+                        comparison
+plot.CEriskav           Summary plot of the health economic analysis
+                        when risk aversion is included
+plot.bcea               Summary plot of the health economic analysis
+plot.evppi              plot.evppi
+plot.mixedAn            Summary plot of the health economic analysis
+                        when the mixed analysis is considered
+sim.table               Table of simulations for the health economic
+                        model
+struct.psa              Structural PSA
+summary.bcea            Summary method for objects in the class 'bcea'
+summary.mixedAn         Summary methods for objects in the class
+                        'mixedAn' (mixed analysis)
