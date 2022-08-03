@@ -2,6 +2,7 @@
 # See https://shiny.rstudio.com/gallery/ for examples of shiny app layouts and functionalties
 
 library("shiny")
+library("hesim")
 options(encoding = "UTF-8")
 
 App_location <- "./Advanced functionality of R/hesim shiny app/"

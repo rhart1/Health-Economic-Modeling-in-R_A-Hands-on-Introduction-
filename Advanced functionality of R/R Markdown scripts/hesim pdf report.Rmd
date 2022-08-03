@@ -1,7 +1,7 @@
 ---
 title: "hesim pdf report"
-author: "ISPOR virtual workshop 2021"
-date: "17/06/2021"
+author: "ISPOR virtual workshop"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output: 
   bookdown::pdf_document2: 
     number_sections: no
@@ -140,6 +140,7 @@ Tables can also be displayed in R Markdown documents in a similar way to figures
 
 Note that the `echo = FALSE` parameter can be added to code chunks to prevent printing of the R code that generated the output.
 
+\newpage
 \blandscape
 ```{r TableSummary, echo = FALSE}
 Tableout <- summary(params$Summarisedf, labels = params$labs_indiv) %>% format()
@@ -149,6 +150,7 @@ kbl(Tableout, booktabs = T, position = "!ht", centering = T, caption = "Summary 
 ```
 \elandscape
 
+\newpage
 # Discussion
 The purpose of R Markdown is to make reporting from R automated and accessible for modelers and intended audience. However, it is always important to leave room for thoughtful interpretation and messaging. It is recommended that you note throughout your document where further results interpretation is needed upon document finalization. Useful formatting tips include:
 
