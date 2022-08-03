@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="Rose Hart" />
     <meta name="date" content="2021-06-17" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <script src="libs/kePrint/kePrint.js"></script>
     <link href="libs/lightable/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="my-theme.css" type="text/css" />
@@ -13,11 +14,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # <br/><br/>Advanced functionality of R
+]
+.subtitle[
 ## Virtual ISPOR 2021
+]
+.author[
 ### Rose Hart
+]
+.institute[
 ### BresMed Health Solutions Ltd., Sheffield, UK
+]
+.date[
 ### 17 June 2021
+]
 
 ---
 
@@ -98,18 +109,22 @@ There are three parts of this session: &lt;br&gt;&lt;br&gt;
 
 
 ```r
-# Load packages --------------- These will need installing if they have not been
-# used before install.packages('hesim') install.packages('data.table')
-# install.packages('flexsurv') install.packages('survminer')
-# install.packages('heemod') install.packages('magrittr')
-library("hesim")  # Containing the mock trial data and the functions for model construction
-library("data.table")  # Used for organising the data in this example
-library("flexsurv")  # used for fitting parametric models to the trial data
+# Load packages ---------------
+# These will need installing if they have not been used before
+# install.packages("hesim")
+# install.packages("data.table")
+# install.packages("flexsurv")
+# install.packages("survminer")
+# install.packages("heemod")
+# install.packages("magrittr")
+library("hesim")      # Containing the mock trial data and the functions for model construction
+library("data.table") # Used for organising the data in this example
+library("flexsurv")   # used for fitting parametric models to the trial data
 library("survminer")  # useful for easily presenting Kaplan–Meier plots. It also loads `ggplot2` as a dependent, which is a versatile package for producing 
-# almost any type of graph
-library("heemod")  # Can produce a really simple model diagram - also has other useful 
-# functions for partitioned survival modelling
-library("magrittr")  # Structuring data sequences with left -&gt; right formatting instead of nested functions
+                      # almost any type of graph
+library("heemod")     # Can produce a really simple model diagram - also has other useful 
+                      # functions for partitioned survival modelling
+library("magrittr")   # Structuring data sequences with left -&gt; right formatting instead of nested functions
 ```
 
 
@@ -187,7 +202,7 @@ Model_Diagram &lt;- define_transition( #this function is part of the heemod pack
 ```
 
 ---
-### &lt;br&gt;Creating simple model diagram
+### &lt;br&gt; Creating a simple model diagram
 
 ```r
 plot(Model_Diagram)
@@ -197,7 +212,7 @@ plot(Model_Diagram)
 ## Loading required namespace: diagram
 ```
 
-&lt;img src="ISPORslides_files/figure-html/unnamed-chunk-5-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-5-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ## &lt;br&gt;Define states and transitions (cont.)
@@ -264,7 +279,7 @@ Patient_plot &lt;- ggplot(patients, aes(x = age, fill = as.factor(female))) +
 Patient_plot
 ```
 
-&lt;img src="ISPORslides_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ## &lt;br&gt;Organizing the model
@@ -354,7 +369,7 @@ trialdata_plot &lt;- ggsurvplot(
 trialdata_plot
 ```
 
-&lt;img src="ISPORslides_files/figure-html/unnamed-chunk-14-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-14-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ### &lt;br&gt;Fit the survival data
@@ -438,12 +453,12 @@ head(transmod_data)
 
 ```
 ##    strategy_id patient_id strategy_name      age female
-## 1:           1          1           SOC 34.35809      1
-## 2:           1          2           SOC 48.16391      0
-## 3:           1          3           SOC 50.88353      0
-## 4:           1          4           SOC 55.38570      0
-## 5:           1          5           SOC 39.95220      0
-## 6:           1          6           SOC 40.08055      1
+## 1:           1          1           SOC 45.71526      1
+## 2:           1          2           SOC 55.92342      0
+## 3:           1          3           SOC 52.51790      1
+## 4:           1          4           SOC 47.56598      1
+## 5:           1          5           SOC 47.76237      1
+## 6:           1          6           SOC 48.86596      1
 ```
 
 ---
@@ -504,12 +519,12 @@ head(ictstm$disprog_)
 
 ```
 ##    sample strategy_id patient_id grp_id from to final time_start time_stop
-## 1:      1           1          1      1    1  2     0   0.000000  7.222511
-## 2:      1           1          1      1    2  3     1   7.222511 14.326370
-## 3:      1           1          2      1    1  2     0   0.000000  2.953728
-## 4:      1           1          2      1    2  3     1   2.953728 11.053102
-## 5:      1           1          3      1    1  2     0   0.000000  4.024639
-## 6:      1           1          3      1    2  3     1   4.024639  6.802632
+## 1:      1           1          1      1    1  3     1   0.000000  4.372644
+## 2:      1           1          2      1    1  3     1   0.000000  4.053958
+## 3:      1           1          3      1    1  2     0   0.000000  2.287221
+## 4:      1           1          3      1    2  3     1   2.287221 14.515718
+## 5:      1           1          4      1    1  2     0   0.000000  5.568338
+## 6:      1           1          4      1    2  3     1   5.568338 11.901399
 ```
 
 ---
@@ -530,8 +545,8 @@ head(ictstm$stateprobs_)
 ## 2:      1           1      1        1 0.08333333 1.000
 ## 3:      1           1      1        1 0.16666667 0.999
 ## 4:      1           1      1        1 0.25000000 0.999
-## 5:      1           1      1        1 0.33333333 0.999
-## 6:      1           1      1        1 0.41666667 0.997
+## 5:      1           1      1        1 0.33333333 0.997
+## 6:      1           1      1        1 0.41666667 0.996
 ```
 
 ```r
@@ -546,7 +561,7 @@ Results_plot &lt;- autoplot(ictstm$stateprobs_, labels = labs_indiv,
 Results_plot 
 ```
 
-![](ISPORslides_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+![](ISPORslides2021_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 
 ---
 ## &lt;br&gt;Generate the results: QALYs
@@ -560,12 +575,12 @@ head(ictstm$qalys_)
 
 ```
 ##    sample strategy_id grp_id state_id dr    qalys      lys
-## 1:      1           1      1        1  0 4.789554 6.134089
-## 2:      1           1      1        2  0 2.674424 5.214280
-## 3:      1           2      1        1  0 5.703993 7.305232
-## 4:      1           2      1        2  0 2.411887 4.702417
-## 5:      1           3      1        1  0 6.248068 8.002042
-## 6:      1           3      1        2  0 2.459511 4.795268
+## 1:      1           1      1        1  0 4.563513 5.970049
+## 2:      1           1      1        2  0 3.255572 5.056079
+## 3:      1           2      1        1  0 5.308074 6.944094
+## 4:      1           2      1        2  0 3.004787 4.666597
+## 5:      1           3      1        1  0 5.786333 7.569758
+## 6:      1           3      1        2  0 3.485827 5.413678
 ```
 
 ---
@@ -579,12 +594,12 @@ head(ictstm$costs_)
 
 ```
 ##    sample strategy_id grp_id state_id dr category      costs
-## 1:      1           1      1        1  0     Drug  12268.178
-## 2:      1           1      1        2  0     Drug   6307.611
-## 3:      1           2      1        1  0     Drug  87662.780
-## 4:      1           2      1        2  0     Drug   5688.726
-## 5:      1           3      1        1  0     Drug 120030.625
-## 6:      1           3      1        2  0     Drug   5800.521
+## 1:      1           1      1        1  0     Drug  11940.099
+## 2:      1           1      1        2  0     Drug   6113.495
+## 3:      1           2      1        1  0     Drug  83329.130
+## 4:      1           2      1        2  0     Drug   5645.067
+## 5:      1           3      1        1  0     Drug 113546.372
+## 6:      1           3      1        2  0     Drug   6546.213
 ```
 
 ---
@@ -614,58 +629,58 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.92 (7.17, 8.61) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 8.66 (7.79, 9.51) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 9.27 (8.46, 10.08) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.89 (7.18, 8.54) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.59 (7.94, 9.24) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.25 (8.39, 9.93) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 18,221 (16,978, 19,399) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 90,561 (84,292, 96,783) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 122,651 (113,878, 131,956) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,210 (16,924, 19,349) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,386 (84,488, 96,651) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 123,017 (115,760, 131,115) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 73,819 (7,206, 255,475) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 73,420 (7,760, 240,382) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 75,276 (7,891, 249,918) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61,772 (5,462, 164,145) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 62,927 (5,885, 165,445) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 65,701 (6,392, 157,566) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 92,040 (25,328, 274,415) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 163,980 (98,275, 333,732) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 197,927 (128,878, 370,501) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 79,982 (23,771, 182,866) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 153,314 (94,497, 254,998) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 188,718 (124,860, 281,844) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 17,189 (16,076, 18,238) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 86,336 (80,611, 91,959) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 116,524 (108,549, 124,906) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,182 (16,033, 18,203) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 86,181 (80,770, 91,899) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 116,867 (110,298, 124,152) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 67,355 (6,676, 230,839) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 66,486 (7,150, 216,100) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 67,791 (7,248, 222,717) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 56,730 (5,105, 149,994) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 57,429 (5,551, 150,380) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 59,634 (6,003, 142,700) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 84,545 (23,949, 248,660) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 152,822 (93,587, 304,981) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 184,315 (122,319, 337,319) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 73,912 (22,331, 167,640) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 143,610 (90,117, 235,774) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 176,500 (118,857, 260,804) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 6.62 (6.06, 7.12) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.15 (6.53, 7.77) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.56 (7.00, 8.12) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.60 (6.07, 7.08) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.10 (6.60, 7.58) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.55 (6.93, 8.04) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -1104,6 +1119,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

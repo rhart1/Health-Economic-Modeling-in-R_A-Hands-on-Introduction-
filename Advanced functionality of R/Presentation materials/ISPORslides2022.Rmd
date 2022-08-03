@@ -1,11 +1,12 @@
 ---
 title: "<br/><br/>Advanced functionality of R"
-subtitle: "Virtual ISPOR 2021"
+subtitle: "ISPOR Europe 2022 - in-person short course"
 author: "Rose Hart"
-institute: "BresMed Health Solutions Ltd., Sheffield, UK"
-date: "17 June 2021"
+institute: "Lumanity Inc., Sheffield, UK"
+date: "6 November 2022"
 output:
   xaringan::moon_reader:
+    self_contained: true
     css: my-theme.css
     lib_dir: libs
     fig_crop: no
@@ -174,7 +175,7 @@ Model_Diagram <- define_transition( #this function is part of the heemod package
 ```
 
 ---
-### <br>Creating simple model diagram
+### <br> Creating a simple model diagram
 ```{r eval=TRUE, tidy=TRUE, out.width='\\textwidth', fig.height = 6, fig.align='center'}
 
 plot(Model_Diagram)
