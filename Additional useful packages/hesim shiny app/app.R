@@ -5,7 +5,7 @@ library("shiny")
 library("hesim")
 options(encoding = "UTF-8")
 
-App_location <- "./Advanced functionality of R/hesim shiny app/"
+App_location <- "./Additional useful packages/hesim shiny app/"
 
 runApp(appDir = file.path(getwd(),App_location),     # This looks for the ui.R, server.R and www folder within the wd. Do not rename these.
        launch.browser = TRUE,                    # This line will open the application in the user's default browser

@@ -780,7 +780,7 @@ Export_params &lt;- list(
   labs_indiv            = labs_indiv
 )
 
-Markdown_location &lt;- "./Advanced functionality of R/R Markdown scripts/"
+Markdown_location &lt;- "./Additional useful packages/R Markdown scripts/"
 ```
 
 ---
@@ -792,7 +792,7 @@ Markdown_location &lt;- "./Advanced functionality of R/R Markdown scripts/"
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim html report.Rmd"),
   output_format = 'bookdown::html_document2',
-  output_file = "./Advanced functionality of R/hesim-html-report.html",
+  output_file = "./Additional useful packages/hesim-html-report.html",
   params = Export_params,
   envir = environment()
 )
@@ -801,7 +801,7 @@ rmarkdown::render(
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim pdf report.Rmd"),
   output_format = 'bookdown::pdf_document2',
-  output_file = "./Advanced functionality of R/hesim-pdf-report.pdf", 
+  output_file = "./Additional useful packages/hesim-pdf-report.pdf", 
   params = Export_params,
   envir = environment()
 )

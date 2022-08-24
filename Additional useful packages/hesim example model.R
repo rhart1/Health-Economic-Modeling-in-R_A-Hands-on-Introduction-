@@ -22,7 +22,7 @@ library(magrittr)   # Structuring data sequences with left -> right formatting i
 
 #If there are issues with downloading packages or running parts of the model, please refer to the session info of the development
 #environment used to create this to crosscheck attached packages.
-#readRDS("./Advanced functionality of R/SessionInfo.rds")
+#readRDS("./Additional useful packages/SessionInfo.rds")
 
 # Informing inputs --------------
 # ~ States and transitions ---------
@@ -276,13 +276,13 @@ Export_params <- list(
   labs_indiv            = labs_indiv
 )
 
-Markdown_location <- "./Advanced functionality of R/R Markdown scripts/"
+Markdown_location <- "./Additional useful packages/R Markdown scripts/"
 
 # html document
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim html report.Rmd"),
   output_format = 'bookdown::html_document2',
-  output_file = "./Advanced functionality of R/hesim-html-report.html",
+  output_file = "./Additional useful packages/hesim-html-report.html",
   params = Export_params,
   envir = environment()
 )
@@ -291,7 +291,7 @@ rmarkdown::render(
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim pdf report.Rmd"),
   output_format = 'bookdown::pdf_document2',
-  output_file = "./Advanced functionality of R/hesim-pdf-report.pdf", 
+  output_file = "./Additional useful packages/hesim-pdf-report.pdf", 
   params = Export_params,
   envir = environment()
 )

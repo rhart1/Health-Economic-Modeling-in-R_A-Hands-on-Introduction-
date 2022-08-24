@@ -68,7 +68,7 @@ If attendees have a GitHub account and are happy with cloning or forking a proje
 ![These are the options for accessing the materials, which can be found on the GitHub repository page](Images/Picture1.png)
 
 ### Opening materials
-Once attendees have the materials folder via ZIP or GitHub, the project needs to be opened in RStudio as a **project**. For those who are unfamiliar with project files, they are self-contained work areas that can be managed by version control software (Git). When a user opens a project, the working directory (file location) is set automatically to the location of the project, meaning that scripts that reference other scripts (this is common in shiny apps or markdown documents, and will be covered in the 'Advanced functionality of R' part of the course).
+Once attendees have the materials folder via ZIP or GitHub, the project needs to be opened in RStudio as a **project**. For those who are unfamiliar with project files, they are self-contained work areas that can be managed by version control software (Git). When a user opens a project, the working directory (file location) is set automatically to the location of the project, meaning that scripts that reference other scripts (this is common in shiny apps or markdown documents, and will be covered in the 'Additional useful packages' part of the course).
 
 To open the materials as a project, within RStudio, please go to 'File' -> 'Open project in New Session', then find the location where you have the materials file saved. You need to click on the '.Rproj' file. 
 

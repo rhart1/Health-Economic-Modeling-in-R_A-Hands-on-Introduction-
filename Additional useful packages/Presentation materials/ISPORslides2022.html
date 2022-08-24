@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>  Advanced functionality of R</title>
+    <title>  Additional useful packages for R modelling</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rose Hart" />
     <meta name="date" content="2022-11-06" />
@@ -15,7 +15,7 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# <br/><br/>Advanced functionality of R
+# <br/><br/>Additional useful packages for R modelling
 ]
 .subtitle[
 ## ISPOR Europe 2022 - in-person short course
@@ -78,7 +78,7 @@ Publication: https://www.researchgate.net/publication/349424271
 
 
 
-One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R) (*hesim example model.R* script in the *Advanced functionality of R* folder)
+One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R) (*hesim example model.R* script in the *Additional useful packages* folder)
 
 
 ---
@@ -121,7 +121,7 @@ Therefore, you will need to consider the following points for your project:
 &lt;br&gt;&lt;br&gt; 
 There are two examples of this, one in html and one in pfd.
 
-Please open the *Advanced functionality of R* folder and open the *R Markdown scripts* folder. There are two scripts there.
+Please open the *Additional useful packages* folder and open the *R Markdown scripts* folder. There are two scripts there.
 
 - Looking through, there are differences between a standard R script and an rmd script
 
@@ -158,7 +158,7 @@ Export_params &lt;- list(
   labs_indiv            = labs_indiv
 )
 
-Markdown_location &lt;- "./Advanced functionality of R/R Markdown scripts/"
+Markdown_location &lt;- "./Additional useful packages/R Markdown scripts/"
 ```
 
 ---
@@ -170,7 +170,7 @@ Markdown_location &lt;- "./Advanced functionality of R/R Markdown scripts/"
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim html report.Rmd"),
   output_format = 'bookdown::html_document2',
-  output_file = "./Advanced functionality of R/hesim-html-report.html",
+  output_file = "./Additional useful packages/hesim-html-report.html",
   params = Export_params,
   envir = environment()
 )
@@ -179,13 +179,13 @@ rmarkdown::render(
 rmarkdown::render(
   input = file.path(Markdown_location,"hesim pdf report.Rmd"),
   output_format = 'bookdown::pdf_document2',
-  output_file = "./Advanced functionality of R/hesim-pdf-report.pdf", 
+  output_file = "./Additional useful packages/hesim-pdf-report.pdf", 
   params = Export_params,
   envir = environment()
 )
 ```
 
-If you are unable to generate these documents at present, the generated html and pdf documents are in the *Advanced functionality of R* folder at the top level.
+If you are unable to generate these documents at present, the generated html and pdf documents are in the *Additional useful packages* folder at the top level.
 
 ---
 ## &lt;br&gt;Shiny
@@ -285,7 +285,7 @@ output$Results_graph &lt;- renderPlot({
 
 ---
 ### &lt;br&gt;app.R
-Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *app.R* script.
+Please open the *hesim shiny app* folder within the *Additional useful packages* folder. Open the *app.R* script.
 
 If you have all the packages previously installed, you should be able to run the app either by clicking the 'Run App' button in the top right hand corner, &lt;img src="www/Picture6.png" width="150"&gt; or by highlighting all the text and pressing **Ctrl + Enter**
 
@@ -710,12 +710,12 @@ head(transmod_data)
 
 ```
 ##    strategy_id patient_id strategy_name      age female
-## 1:           1          1           SOC 36.51638      1
-## 2:           1          2           SOC 45.74410      0
-## 3:           1          3           SOC 43.93683      0
-## 4:           1          4           SOC 36.97534      0
-## 5:           1          5           SOC 34.58706      0
-## 6:           1          6           SOC 55.13592      1
+## 1:           1          1           SOC 36.99535      0
+## 2:           1          2           SOC 59.46044      1
+## 3:           1          3           SOC 41.71527      0
+## 4:           1          4           SOC 53.55823      1
+## 5:           1          5           SOC 48.53881      0
+## 6:           1          6           SOC 49.25702      1
 ```
 
 ---
@@ -776,12 +776,12 @@ head(ictstm$disprog_)
 
 ```
 ##    sample strategy_id patient_id grp_id from to final time_start time_stop
-## 1:      1           1          1      1    1  3     1   0.000000  4.179852
-## 2:      1           1          2      1    1  2     0   0.000000  4.560477
-## 3:      1           1          2      1    2  3     1   4.560477 10.130037
-## 4:      1           1          3      1    1  2     0   0.000000  3.480498
-## 5:      1           1          3      1    2  3     1   3.480498 19.548254
-## 6:      1           1          4      1    1  2     0   0.000000 11.832339
+## 1:      1           1          1      1    1  2     0   0.000000  8.013956
+## 2:      1           1          1      1    2  3     1   8.013956 17.762510
+## 3:      1           1          2      1    1  2     0   0.000000  2.716719
+## 4:      1           1          2      1    2  3     1   2.716719 12.923379
+## 5:      1           1          3      1    1  2     0   0.000000 13.446073
+## 6:      1           1          3      1    2  3     1  13.446073 19.352496
 ```
 
 ---
@@ -799,11 +799,11 @@ head(ictstm$stateprobs_)
 ```
 ##    sample strategy_id grp_id state_id          t  prob
 ## 1:      1           1      1        1 0.00000000 1.000
-## 2:      1           1      1        1 0.08333333 0.999
-## 3:      1           1      1        1 0.16666667 0.999
-## 4:      1           1      1        1 0.25000000 0.998
-## 5:      1           1      1        1 0.33333333 0.997
-## 6:      1           1      1        1 0.41666667 0.997
+## 2:      1           1      1        1 0.08333333 1.000
+## 3:      1           1      1        1 0.16666667 1.000
+## 4:      1           1      1        1 0.25000000 1.000
+## 5:      1           1      1        1 0.33333333 0.999
+## 6:      1           1      1        1 0.41666667 0.995
 ```
 
 ```r
@@ -832,12 +832,12 @@ head(ictstm$qalys_)
 
 ```
 ##    sample strategy_id grp_id state_id dr    qalys      lys
-## 1:      1           1      1        1  0 4.467017 5.680795
-## 2:      1           1      1        2  0 3.000179 4.890856
-## 3:      1           2      1        1  0 5.450218 6.931151
-## 4:      1           2      1        2  0 3.047891 4.968636
-## 5:      1           3      1        1  0 6.081035 7.733374
-## 6:      1           3      1        2  0 3.027969 4.936159
+## 1:      1           1      1        1  0 4.703351 6.014411
+## 2:      1           1      1        2  0 2.958210 5.380778
+## 3:      1           2      1        1  0 5.531780 7.073765
+## 4:      1           2      1        2  0 2.910276 5.293588
+## 5:      1           3      1        1  0 6.102445 7.803503
+## 6:      1           3      1        2  0 3.116683 5.669028
 ```
 
 ---
@@ -851,12 +851,12 @@ head(ictstm$costs_)
 
 ```
 ##    sample strategy_id grp_id state_id dr category      costs
-## 1:      1           1      1        1  0     Drug  11361.590
-## 2:      1           1      1        2  0     Drug   5914.327
-## 3:      1           2      1        1  0     Drug  83173.812
-## 4:      1           2      1        2  0     Drug   6007.063
-## 5:      1           3      1        1  0     Drug 116000.606
-## 6:      1           3      1        2  0     Drug   5968.016
+## 1:      1           1      1        1  0     Drug  12028.823
+## 2:      1           1      1        2  0     Drug   6505.983
+## 3:      1           2      1        1  0     Drug  84885.182
+## 4:      1           2      1        2  0     Drug   6399.780
+## 5:      1           3      1        1  0     Drug 117052.538
+## 6:      1           3      1        2  0     Drug   6854.883
 ```
 
 ---
@@ -886,58 +886,58 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.86 (7.18, 8.63) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 8.61 (7.95, 9.55) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 9.15 (8.47, 10.07) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.90 (7.05, 8.71) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.64 (7.85, 9.40) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.24 (8.33, 10.10) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 18,120 (17,181, 19,194) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 90,149 (85,333, 94,835) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 121,587 (114,767, 129,815) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,190 (17,104, 19,302) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,817 (85,612, 95,250) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 123,058 (114,694, 130,681) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 58,514 (8,433, 151,308) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 59,060 (9,563, 155,068) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 60,359 (10,152, 149,831) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 47,916 (7,050, 143,499) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 48,166 (7,557, 135,865) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 49,732 (7,772, 135,604) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 76,634 (26,089, 169,918) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 149,209 (96,474, 246,423) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 181,945 (126,682, 273,375) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 66,107 (24,766, 162,149) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 138,983 (95,746, 225,738) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 172,790 (124,404, 255,895) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 17,100 (16,262, 18,055) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 85,966 (81,560, 90,231) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 115,573 (109,319, 122,974) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,162 (16,176, 18,144) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 86,573 (81,786, 90,625) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 116,896 (109,336, 123,798) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 53,617 (7,939, 138,050) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 53,762 (8,947, 140,136) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 54,684 (9,404, 134,792) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 43,945 (6,600, 130,471) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 43,877 (7,036, 122,035) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 45,093 (7,220, 121,279) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 70,717 (24,676, 155,597) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 139,728 (91,932, 227,192) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 170,257 (120,562, 252,124) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61,108 (23,352, 148,037) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 130,450 (91,224, 207,693) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 161,989 (118,385, 235,650) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 6.58 (6.07, 7.14) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.11 (6.62, 7.80) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.49 (7.01, 8.13) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.61 (5.97, 7.24) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.13 (6.54, 7.68) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.55 (6.89, 8.12) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -945,7 +945,7 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
 ---
 ### &lt;br&gt;Shiny apps: server.R
 
-Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *server.R* script.
+Please open the *hesim shiny app* folder within the *Additional useful packages* folder. Open the *server.R* script.
 
 The server script has all the model functionality
 
@@ -967,7 +967,7 @@ The main differences are the 'output to shiny' sections, where the images that w
 ---
 
 ### &lt;br&gt;Shiny apps: ui.R
-Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *ui.R* script.
+Please open the *hesim shiny app* folder within the *Additional useful packages* folder. Open the *ui.R* script.
 
 The ui script has all the front-end layout.
 

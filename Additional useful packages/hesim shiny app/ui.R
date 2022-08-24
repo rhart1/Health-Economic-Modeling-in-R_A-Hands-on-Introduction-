@@ -85,7 +85,7 @@ ui <-
             column(12,hr()),
             column(12,
                    actionButton("Run_model",
-                                "Re-run the model", icon("refresh"),
+                                "Re-run the model", icon("sync"),
                                 style = "color: #ffffff; background-color: #222D32; border-color: #1C75BB"), align = 'center'),
             column(12,br()),
             column(12,
@@ -105,11 +105,9 @@ ui <-
           selected = "States and transitions",
           width = 9,side = "right",
           tabPanel(title = "Utilities",
-                   # ANSWER CODE CHANGES ARE HERE ----------------------------
-                   fluidRow(
-                     column(12,"Text can be written here to explain how the inputs are used if the coder chooses",br(),br()),
-                     column(6, tags$u("Utility inputs"),br(),tableOutput("Utility_out"))
-                   )),
+                   # EXERCISE - fill in here ----------------------------
+                   #This is left blank for filling in during the exercise
+          ),
           tabPanel(title = "Costs",
                    fluidRow(
                      column(8, tags$u("Drug costs per strategy, state and time"),br(),tableOutput("Drugcost_out")),
