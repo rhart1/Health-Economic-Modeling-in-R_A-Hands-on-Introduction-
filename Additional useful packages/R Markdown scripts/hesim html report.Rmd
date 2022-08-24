@@ -1,6 +1,6 @@
 ---
 title: "hesim html example report"
-author: "ISPOR virtual workshop"
+author: "ISPOR short course"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   bookdown::html_document2:
