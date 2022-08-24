@@ -41,6 +41,49 @@ options(htmltools.dir.version = FALSE)
 <center><img src="www/Picture1.png" width="600"></center>
 
 ---
+### <br> Session objectives
+
+By the end of this session you should:
+
+--
+
+1) Be aware of additional useful packages in R that can be useful for building models, documenting them, and distributing them to a technical or non-technical audience
+<br>
+
+
+2) Know how to set up a default shiny app and rmarkdown script, and know locations of examples for further learning
+<br>
+
+
+3) Have considered learning pathways and objectives specific to your work requirements
+<br>
+
+
+<center><img src="www/image.jpg" width="300"></center>
+
+---
+## <br>Group discussion
+
+
+In groups of two or three (those seated around you), please discuss the following questions and come up with at least 1 point for each:
+<br><br>
+
+--
+
+1) What do you most want to learn how to do in R?
+
+2) What are the key barriers to you developing and using R?
+
+<br><br>
+
+--
+
+
+<br><br>
+<b>You have 5 minutes</b>
+
+
+---
 ## <br>The hesim package
 
 `hesim` supports three types of health economic models:
@@ -302,33 +345,34 @@ Shiny apps can be made available and deployed in a variety of ways, for example:
 
 <br><br>
 
+---
+### <br> Session objectives (re-visited)
+
+By the end of this session you should:
+
+--
+
+1) Be aware of additional useful packages in R that can be useful for building models, documenting them, and distributing them to a technical or non-technical audience
+<br>
+
+
+2) Know how to set up a default shiny app and rmarkdown script, and know locations of examples for further learning
+<br>
+
+
+3) Have considered learning pathways and objectives specific to your work requirements
+<br>
+
+
+<center><img src="www/image.jpg" width="300"></center>
+
+---
 
 ---
 class:center
 
 ## <br><br><br><br>Discussion and questions 
 
-
----
-## <br>Further discussion
-
-
-In groups of two or three (those seated around you), please discuss the following questions and come up with at least 1 point for each:
-<br><br>
-
---
-
-1) What do you most want to learn how to do in R?
-
-2) What are the key barriers to you developing and using R?
-
-<br><br>
-
---
-
-
-<br><br>
-<b>You have 5 minutes</b>
 
 ---
 class:center
