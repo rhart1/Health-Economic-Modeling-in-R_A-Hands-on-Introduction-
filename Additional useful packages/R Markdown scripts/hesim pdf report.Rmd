@@ -1,6 +1,6 @@
 ---
 title: "hesim pdf report"
-author: "ISPOR virtual workshop"
+author: "ISPOR short course"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: 
   bookdown::pdf_document2: 
