@@ -1,0 +1,15 @@
+default-jdk
+gfortran 
+libudunits2-dev 
+libgdal-dev
+libv8-dev
+libssl-dev
+libsasl2-dev
+autoconf
+automake
+libudunits2-dev
+libicu-dev
+libeigen3-dev
+gcc-multilib 
+g++-multilib
+jags
