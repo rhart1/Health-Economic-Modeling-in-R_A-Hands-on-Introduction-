@@ -1,0 +1,43 @@
+contributes: 
+  format:
+# HTML setup
+     revealjs:
+# Allows fontawesome and academicons
+       header-includes: |
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+# Specifies the theme
+       theme: ["ucl-stats.scss"]
+       slide-number: true
+       chalkboard:
+        buttons: false
+        theme: whiteboard
+       preview-links: auto
+       width: 1800
+       height: 1000
+# Creates a footer by glueing together various bits of text & icons
+       footer: |
+          &copy; {{< meta params.author >}} ({{< meta params.affiliation >}}) &nbsp; | &nbsp;
+          {{< meta social >}} &nbsp; | &nbsp;
+          {{< meta params.shorttitle >}} &nbsp; | &nbsp;
+          {{< meta params.shortlocation >}} &nbsp; | &nbsp; {{< meta shortdate-link >}}
+
+# Includes various LaTeX macros
+       include-in-header: "latex_macros.html"
+
+# Adds extra css styles
+       css: "styles.css"
+
+# Beamer setup       
+     beamer: 
+       aspectratio: 169
+       navigation: horizontal
+       theme: Boadilla
+#       pdf-engine: pdflatex
+       include-in-header: 
+          text: |
+            \usefonttheme[onlymath]{serif}
+            \newenvironment{figure*}{\begin{figure}}{\end{figure}}
+            \newenvironment{table*}{\begin{table}}{\end{table}}
+       
