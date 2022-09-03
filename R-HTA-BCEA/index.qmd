@@ -165,7 +165,7 @@ For each module, we may need/use different/specific packages! (the "R-HTA-verse"
 ::::
 
 
-
+<!-- 
 ## Fun with colours & spaces
 
 ### With a subtitle
@@ -388,6 +388,8 @@ Learn more: [Tabsets](https://quarto.org/docs/presentations/revealjs/#tabsets)
 This block activates speaker's notes &ndash; and this slides shows how you can include full websites inside the slide using this code
 :::
 ::::
+
+-->
 
 ## References 
 

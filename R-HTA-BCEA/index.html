@@ -28,70 +28,6 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     div.csl-bib-body { }
     div.csl-entry {
       clear: both;
@@ -530,9 +466,6 @@ Best opening sentence <a href="https://twitter.com/hashtag/ISPOREurope?src=hash&
 <script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </center>
 <p>…Just so you know what you’re about to get into… <span class="emoji" data-emoji="wink">😉</span></p>
-<div style="position: absolute; left: 70%; top: 85%; font-size: .85rem; color: red;">
-<p><em>Can also play with absolute placement of text/elements using native <code>css</code>…</em></p>
-</div>
 </section>
 <section id="health-technology-assessment-hta" class="slide level2" data-transition="fade-in slide-out" data-transition-speed="slow">
 <h2>Health technology assessment (HTA)</h2>
@@ -624,120 +557,152 @@ Best opening sentence <a href="https://twitter.com/hashtag/ISPOREurope?src=hash&
 
 </div>
 </section>
-<section id="fun-with-colours-spaces" class="slide level2">
-<h2>Fun with colours &amp; spaces</h2>
-<h3 id="with-a-subtitle">With a subtitle</h3>
-<p>This shows how to use colours in the slides. A bunch are pre-defined in the <code>.css</code> file and can be used simply as:</p>
-<ul>
-<li>The <span class="red"><strong>predictive</strong></span> distribution can be computed as follows.</li>
-</ul>
-<div class="fragment">
-<p>More can be created by simply modifying the <code>.css</code> file to add more <code>HEX</code> codes.</p>
-<ul>
-<li><p>For example use</p>
-<pre><code>{css}
-.uclblue {
-  color: #002855;
-}</code></pre>
-<p>(though this colour is already defined)</p></li>
-<li><p>The default is in <a href="assets/css/styles.css" target="_blank"><code>assets/css/styles.css</code></a> template or create new ones…</p></li>
-</ul>
-<p><span style="display:block; margin-top: 20px ;"></span></p>
-<p>Can add vertical space using the command</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="st">`</span><span class="at">r vspace("XXX")</span><span class="st">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>where <code>XXX</code> is a suitable unit, eg <code>"20px"</code>.</p>
-</div>
-</section>
-<section id="some-maths" class="slide level2">
-<h2>Some maths</h2>
-<p>We can also include maths, using standard <span class="math inline">\(\rm\LaTeX\)</span>:</p>
-<p><span class="math display">\[\class{myblue}{p(y\mid\mathcal{D}) = \int p(y\mid\bm\theta)p(\boldsymbol\theta\mid\mathcal{D})d\boldsymbol\theta} \]</span></p>
-<p>To use colours with <span class="math inline">\(\rm\LaTeX\)</span>, needs a little hack: <code>$\class{color}{expression}$</code></p>
-<p>You can define a probabilistic assumption as <span class="myblue"><span class="math display">\[y \mid \bm\theta \sim \dpois(\bm\theta) \]</span></span> but in line it would look like this <span class="math inline">\(\color{MidnightBlue}{y\sim \dnorm(\mu,\sigma^2)}\)</span> or <span class="red"><span class="math inline">\(y\sim \dt(\mu,\sigma^2)\)</span></span></p>
-<p>These use the predefined <span class="math inline">\(\rm\LaTeX\)</span> macros, saved in the file <a href="assets/macros/latex_macros.html" target="_blank"><code>assets/macros/latex_macros.html</code></a>. More can be (re)defined by simply adding to the file, which gets pre-loaded at the beginning of the resulting <code>.html</code> output</p>
-<p><span style="display:block; margin-top: 2rem ;"></span> For instance, the command <code>$\dnorm$</code> translates to the text Normal (typeset in the current font)</p>
-</section>
-<section id="some-maths-1" class="slide level2" data-visibility="uncounted">
-<h2>Some maths</h2>
-<p>In case you have more text with the same title and don’t want to increase the slide counter… (just add <code>{visibility="uncounted"}</code> to the slide title)</p>
-<ul>
-<li>Similarly, just adding <code>{visibility="hidden"}</code> to the slide title makes it hidden</li>
-</ul>
-<div class="fragment">
-<ul>
-<li>Fontawesome works using <code>shortcodes</code>, for example<br>
-</li>
-</ul>
-<pre><code>[{{&lt; fa smile &gt;}}]{.red65blue}</code></pre>
-<p>renders as <span class="red65blue"><i class="fa-solid fa-smile"></i></span></p>
-<ul>
-<li>Other utilities (eg from <code>ai</code>) can be included using pure <code>HTML</code>, eg</li>
-</ul>
-<pre><code>&lt;i class="ai ai-pubmed"&gt;&lt;/i&gt;</code></pre>
-<p>produces <i class="ai ai-pubmed"></i></p>
-</div>
-</section>
-<section id="other-latex-stuff" class="slide level2">
-<h2>Other LaTeX stuff</h2>
-<p>There’s also a file <a href="assets/macros/latex_colours.tex" target="_blank"><code>assets/macros/latex_colours.tex</code></a>, which can be used in LaTeX chunks, eg</p>
-<pre><code>\input{assets/macros/latex_colours.tex}
+
+<!-- 
+## Fun with colours & spaces
+
+### With a subtitle
+
+This shows how to use colours in the slides. A bunch are pre-defined in the `.css` file and can be used simply as:
+
+- The [**predictive**]{.red} distribution can be computed as follows.
+
+. . .
+
+More can be created by simply modifying the `.css` file to add more `HEX` codes.
+
+- For example use
+
+   ```
+   {css}
+   .uclblue {
+     color: #002855;
+   }
+   ```
+   (though this colour is already defined)
+
+- The default is in [`assets/css/styles.css`](assets/css/styles.css){target="_blank"} template or create new ones...
+
+<span style="display:block; margin-top: 20px ;"></span>
+
+Can add vertical space using the command 
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+`r vspace("XXX")`
+```
+:::
+
+where `XXX` is a suitable unit, eg `"20px"`.
+
+
+## Some maths
+
+We can also include maths, using standard $\rm\LaTeX$:
+
+$$\class{myblue}{p(y\mid\mathcal{D}) = \int p(y\mid\bm\theta)p(\boldsymbol\theta\mid\mathcal{D})d\boldsymbol\theta} $$
+
+To use colours with $\rm\LaTeX$, needs a little hack: `$\class{color}{expression}$`
+
+You can define a probabilistic assumption as
+[$$y \mid \bm\theta \sim \dpois(\bm\theta) $$]{.myblue}
+but in line it would look like this $\color{MidnightBlue}{y\sim \dnorm(\mu,\sigma^2)}$ or [$y\sim \dt(\mu,\sigma^2)$]{.red}
+
+These use the predefined $\rm\LaTeX$ macros, saved in the file [`assets/macros/latex_macros.html`](assets/macros/latex_macros.html){target="_blank"}. More can be (re)defined by simply adding to the file, which gets pre-loaded at the beginning of the resulting `.html` output
+
+<span style="display:block; margin-top: 2rem ;"></span>
+For instance, the command `$\dnorm$` translates to the text Normal (typeset in the current font)
+
+
+## Some maths {visibility="uncounted"}
+
+In case you have more text with the same title and don't want to increase the slide counter... (just add `{visibility="uncounted"}` to the slide title)
+
+- Similarly, just adding `{visibility="hidden"}` to the slide title makes it hidden
+
+. . .
+
+- Fontawesome works using `shortcodes`, for example  
+```
+[{{< fa smile >}}]{.red65blue}
+```
+renders as []{.red65blue}
+
+- Other utilities (eg from `ai`) can be included using pure `HTML`, eg
+
+```
+<i class="ai ai-pubmed"></i>
+```
+produces <i class="ai ai-pubmed"></i>
+
+## Other LaTeX stuff
+
+There's also a file [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"}, which can be used in LaTeX chunks, eg
+```
+\input{assets/macros/latex_colours.tex}
 \begin{center}
 \begin{tikzpicture}
 ...
-</code></pre>
-<ul>
-<li>This would be an <code>{r}</code> chunk with header like this:</li>
-</ul>
-<pre><code>{r}
+
+```
+
+- This would be an `{r}` chunk with header like this: 
+```
+{r}
 #| engine: "tikz"
 #| echo: false
-#| opts: list(width="85%",title="INSERT TEXT HERE")</code></pre>
-<ul>
-<li><p>Then all the colours and, possibly other advanced LaTeX macro defined in <a href="assets/macros/latex_colours.tex" target="_blank"><code>assets/macros/latex_colours.tex</code></a> are accessible by <code>tikz</code> chunks</p></li>
-<li><p>But also, the “extension” <code>"color.js"</code> (loaded in <a href="assets/macros/latex_colours.tex" target="_blank"><code>assets/macros/latex_colours.tex</code></a>) enables semi-standard LaTeX colouring</p></li>
-<li><p>For example <code>$\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)$</code> renders as <span class="math inline">\(\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)\)</span>, which essentially looks the same as when using <code>$\class{color}{math formula}$</code> or even <code>[math formula]{.color}</code> (assuming <code>color</code> is defined!)</p></li>
-</ul>
-</section>
-<section id="numbered-lists-references" class="slide level2">
-<h2>Numbered lists &amp; references</h2>
-<ul>
-<li>This is a bullet list and <span class="math inline">\(\class{spanish-yellow}{\theta \sim \dgamma(\alpha,\beta)}\)</span> <span class="citation" data-cites="Baio:2012">(<a href="#/references" role="doc-biblioref" onclick="">Baio, 2012</a>)</span>
-<ul>
-<li>Test</li>
-</ul></li>
-<li>And another
-<ol type="1">
-<li>With a numbered item <span class="citation" data-cites="Baio:2019">(<a href="#/references" role="doc-biblioref" onclick="">Baio, 2020</a>)</span></li>
-<li>And another</li>
-</ol></li>
-<li>With more items</li>
-</ul>
-<p>Can reset the counter of a list</p>
-<pre><code>&lt;ol style="counter-reset: fancy-counter 9;"&gt;
-  &lt;li&gt;Number Ten&lt;/li&gt;
-  &lt;li&gt;Number Eleven&lt;/li&gt;
-&lt;/ol&gt;</code></pre>
-<p>which renders as</p>
-<ol style="counter-reset: fancy-counter 9;">
-<li>
-Number Ten
-</li>
-<li>
-Number Eleven
-</li>
-</ol>
-</section>
-<section id="a-page-with-left-right-columns" class="slide level2">
-<h2>A page with left &amp; right columns</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p>Some content here</p>
-<div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
+#| opts: list(width="85%",title="INSERT TEXT HERE")
+```
 
+- Then all the colours and, possibly other advanced LaTeX macro defined in [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"} are accessible by `tikz` chunks
+
+
+- But also, the "extension" `"color.js"` (loaded in [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"}) enables semi-standard LaTeX colouring
+
+- For example `$\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)$` renders as
+$\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)$, which essentially looks the same as when using `$\class{color}{math formula}$` or even `[math formula]{.color}` (assuming `color` is defined!)
+
+
+## Numbered lists & references
+- This is a bullet list and $\class{spanish-yellow}{\theta \sim \dgamma(\alpha,\beta)}$ [@Baio:2012]
+   - Test
+
+- And another
+   1. With a numbered item [@Baio:2019]
+   2. And another
+
+- With more items
+
+
+Can reset the counter of a list
+```
+<ol style="counter-reset: fancy-counter 9;">
+  <li>Number Ten</li>
+  <li>Number Eleven</li>
+</ol>
+```
+which renders as
+
+<ol style="counter-reset: fancy-counter 9;">
+  <li>Number Ten</li>
+  <li>Number Eleven</li>
+</ol>
+
+
+## A page with left & right columns
+
+:::: {.columns}
+::: {.column width="40%"}
+
+Some content here
+
+::: {.content-visible when-format="html"}
+
+::: {.cell layout-align="center"}
+::: {.cell-output-display}
+
+`````{=html}
 <table class="table" style="font-size: 28px; margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -765,28 +730,39 @@ Number Eleven
 </tbody>
 </table>
 
-</div>
-</div>
-</div>
-</div><div class="column" style="width:60%;">
-<p>Just a test to see what happens here even if the text is really long</p>
-</div>
-</div>
-</section>
-<section id="or-panelsets" class="slide level2 scrollable">
-<h2>Or panelsets</h2>
-<div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Plot</a></li><li><a href="#tabset-1-2">Data</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1">
-<div class="cell" data-layout-align="center">
+`````
 
-</div>
-</div>
-<div id="tabset-1-2">
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
+:::
+:::
 
+:::
+:::
+
+::: {.column width="60%"}
+Just a test to see what happens here even if the text is really long
+:::
+::::
+
+
+## Or panelsets {.scrollable}
+
+::: {.panel-tabset}
+
+## Plot
+
+
+::: {.cell layout-align="center"}
+
+:::
+
+
+## Data
+
+
+::: {.cell layout-align="center"}
+::: {.cell-output-display}
+
+`````{=html}
 <table>
  <thead>
   <tr>
@@ -1256,76 +1232,71 @@ Number Eleven
 </tbody>
 </table>
 
-</div>
-</div>
-</div>
-</div>
-</div>
-<p>Learn more: <a href="https://quarto.org/docs/presentations/revealjs/#tabsets">Tabsets</a></p>
-</section>
-<section id="more-on-graphs" class="slide level2">
-<h2>More on graphs</h2>
-<ul>
-<li><p>The file <a href="assets/setup.R" target="_blank"><code>assets/setup.R</code></a> contains a bunch of <code>R</code> commands to create functions and shortcuts that can be used with the normal <code>qmd</code> code</p></li>
-<li><p>Also, it contains some extra functions and customisation to tell <code>knitr</code> how to process the <code>qmd</code> file</p>
-<ul>
-<li>Specifically, in order to create an <a href="https://en.wikipedia.org/wiki/Alt_attribute">“alternative text”</a>, it uses a trick</li>
-<li>This essentially means that the width of any graph created by <code>R</code> is controlled by the extra “chunk” option</li>
-</ul>
-<pre><code>{r} 
-#| eval: false
-#| echo: true
-opts=list(...)</code></pre>
-<p>which contains various elements</p>
-<pre><code>{r} 
-#| eval: false
-#| echo: true
-opts=list(
- width="X%",
- title="SOME TEXT",
- alt="SOME TEXT",
- ...
-)</code></pre>
-<ul>
-<li><code>title</code> will produce the actual “alt text”, while <code>alt</code> will simply add some text to the <code>html</code> file (that can be read out for accessibility)</li>
-</ul></li>
-</ul>
-</section>
-<section id="section-2" class="slide level2 nobar" data-background-iframe="https://r-hta.org/" data-background-interactive="true">
-<h2></h2>
-<div class="footer">
+`````
 
-</div>
-<aside class="notes">
-<p>This block activates speaker’s notes – and this slides shows how you can include full websites inside the slide using this code</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
+:::
+:::
+
+:::   
+
+Learn more: [Tabsets](https://quarto.org/docs/presentations/revealjs/#tabsets)
+
+
+## More on graphs
+
+- The file [`assets/setup.R`](assets/setup.R){target="_blank"} contains a bunch of `R` commands to create functions and shortcuts that can be used with the normal `qmd` code
+
+- Also, it contains some extra functions and customisation to tell `knitr` how to process the `qmd` file
+   - Specifically, in order to create an ["alternative text"](https://en.wikipedia.org/wiki/Alt_attribute), it uses a trick
+   - This essentially means that the width of any graph created by `R` is controlled by the extra "chunk" option 
+   
+   ```
+   {r} 
+   #| eval: false
+   #| echo: true
+   opts=list(...)
+   ```
+   
+   which contains various elements
+   
+   ```
+   {r} 
+   #| eval: false
+   #| echo: true
+   opts=list(
+    width="X%",
+    title="SOME TEXT",
+    alt="SOME TEXT",
+    ...
+   )
+   ```
+   
+   - `title` will produce the actual "alt text", while `alt` will simply add some text to the `html` file (that can be read out for accessibility)
+
+
+:::: {.nobar}
+## {background-iframe="https://r-hta.org/" background-interactive=true}
+
+::: footer
+:::
+
+::: {.notes}
+This block activates speaker's notes &ndash; and this slides shows how you can include full websites inside the slide using this code
+:::
+::::
+
+-->
 <section id="references" class="slide level2 smaller scrollable">
 <h2>References</h2>
-<div id="refs" class="references csl-bib-body" role="doc-bibliography">
-<div id="ref-Baio:2012" class="csl-entry" role="doc-biblioentry">
-Baio, G. (2012) <em>Bayesian methods in health economics</em>. Boca Raton, FL: Chapman Hall, CRC. Available at: <a href="https://doi.org/10.1201/b13099">https://doi.org/10.1201/b13099</a>.
-</div>
-<div id="ref-Baio:2019" class="csl-entry" role="doc-biblioentry">
-Baio, G. (2020) <span>“survHE: Survival analysis for health economic evaluation and cost-effectiveness modeling,”</span> <em>Journal of Statistical Software, Articles</em>, 95(14), pp. 1–47. Available at: <a href="https://doi.org/10.18637/jss.v095.i14">https://doi.org/10.18637/jss.v095.i14</a>.
-</div>
+<div id="refs" role="doc-bibliography">
+
 </div>
 <p><span style="display:block; margin-top: 500px ;"></span></p>
 
 <aside><div>
 <p>See also <a href="https://quarto.org/docs/authoring/footnotes-and-citations.html">https://quarto.org/docs/authoring/footnotes-and-citations.html</a></p>
 </div></aside></section>
-<section id="section-3" class="slide level2 nobar" data-background-image="assets/images/reese.gif" data-background-size="cover">
+<section id="section-2" class="slide level2 nobar" data-background-image="assets/images/reese.gif" data-background-size="cover">
 <h2></h2>
 <div class="footer">
 
