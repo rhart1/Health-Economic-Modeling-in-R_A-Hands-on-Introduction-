@@ -1,0 +1,789 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Condensed&display=swap');
+@import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700&display=swap);
+@import url('https://fonts.googleapis.com/css?family=Inconsolata:400,700');
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,300,400,700);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap);
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+/* Font to do nice numbered items */
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+
+
+:root {
+  /* Fonts */
+  --text-font-family: 'Ubuntu', Arial, sans-serif; /*'Ubuntu';*/
+  --text-font-is-google: 1;
+  --text-font-family-fallback: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial;
+  --text-font-base: sans-serif;
+  --header-font-family: 'Ubuntu'; /*'Ubuntu';*/
+  --header-font-is-google: 1;
+  --code-font-family: 'Inconsolata';
+  --code-font-is-google: 1;
+  --base-font-size: 20px;
+  --text-font-size: 1rem;
+  --code-font-size: 1rem; /*0.9rem;*/
+  --code-inline-font-size: 1em;
+  --header-h1-font-size: 2.00rem;
+  --header-h2-font-size: 1.50rem;
+  --header-h3-font-size: 1.10rem;
+
+  /* Colors */
+  --text-color: #000000;
+  --header-color: #24568c;
+  --background-color: #FFFFFF;
+  --link-color: #C5283D;
+  --text-bold-color: #035AA6;
+  --code-highlight-color: rgba(255,255,0,0.5);
+  --inverse-text-color: #000000;
+  --inverse-background-color: #03A696;
+  --inverse-header-color: #000000;
+  --title-slide-background-color: #FFFFFF; /* #035AA6; */
+  --title-slide-text-color: #FFFFFF;
+  --header-background-color: #3434ad;
+  --header-background-text-color: #FFFFFF;
+  --primary: #035AA6;
+  --secondary: #03A696;
+  --white: #FFFFFF;
+  --black: #000000;
+
+  /* Lengths */
+  --pull-left: 47%;
+  --pull-right: 47%;
+}
+
+/* HTML text formatting in normal slides*/
+html {
+  font-size: var(--base-font-size);
+}
+
+/* Main body */
+body {
+  font-family: var(--text-font-family), var(--text-font-family-fallback), var(--text-font-base);
+  font-weight: normal;
+  color: var(--text-color);
+}
+
+/* Headers */
+h1 {
+  color: #FFFFFF;
+  font-weight: 300;
+  font-family: var(--header-font-family);
+  background-color: var(--header-background-color);
+  padding: 20px 20px 10px 30px;
+  margin: 0 -200px 10px -30px;
+  font-weight: 300;
+}
+h2, h3 {
+  font-family: var(--header-font-family);
+  font-weight: 400;
+  color: var(--header-color);
+}
+
+/* Slide content */
+.remark-slide-content {
+  background-color: var(--background-color);
+  font-size: 1rem;
+  padding: 20px 64px 10px 64px; /* 16px 64px 16px 64px; */
+  width: 100%;
+  height: 100%;
+  background-image: url("beamer/title_slide.png");
+  background-size: 100%;
+  background-position: 0% 0%;
+}
+.remark-slide-content h1 {
+  font-size: var(--header-h1-font-size);
+  font-weight: 30;
+}
+.remark-slide-content h2 {
+  font-size: var(--header-h2-font-size);
+}
+.remark-slide-content h3 {
+  font-size: var(--header-h3-font-size);
+}
+
+/* Code formatting */
+.remark-code, .remark-inline-code {
+  font-family: var(--code-font-family), Source Code Pro, Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+.remark-code {
+  font-size: var(--code-font-size);
+}
+.remark-inline-code {
+  font-size: var(--code-inline-font-size);
+}
+
+/* Slide numbering */
+.remark-slide-number {
+  color: #FFFFFF;
+  opacity: 1;
+  font-size: 0.75em;
+  /* Customise position of numbering */
+  margin-bottom: -10.0px;
+  margin-right: 5.0px;
+}
+
+/* This defines the format for bold text */
+strong {
+  font-weight: 450;
+}
+
+/* Hyperlinks */
+a, a > code {
+  color: var(--link-color);
+  text-decoration: none;
+}
+a:hover {
+  border-bottom: 10px;
+  background-color: #fcd000;
+}
+
+.footnote {
+  position: absolute;
+  bottom: 60px;
+  padding-right: 4em;
+  font-size: 0.9em;
+}
+.remark-code-line-highlighted {
+  background-color: var(--code-highlight-color);
+}
+
+/* "Inverse" formatting */
+.inverse {
+  background-color: var(--inverse-background-color);
+  color: var(--inverse-text-color);
+
+}
+.inverse h1, .inverse h2, .inverse h3 {
+  color: var(--inverse-header-color);
+}
+
+/* Customised title page */
+/* Title slide with box around the title */
+.title-slide h1 {
+  color: #FFFFFF;
+  font-family: 'Ubuntu';
+  font-size: 40px!important;
+  font-weight: 400;
+  box-sizing: border-box;
+  border-radius: 15px;
+  background-color: #3434ad;
+  padding: 35px 30px 35px 30px;
+  margin-left: 3%;
+  margin-right: 3%;
+}
+
+/* The other fields in the title box don't have a box */
+.title-slide {
+  background-image: url("beamer/title_slide.png");
+  background-size: 100%;
+  background-position: 0% 0%;
+}
+.title-slide h2 {
+  color: #000000;
+  font-weight: bold;
+  font-family: var(--header-font-family);
+}
+
+.title-slide h3 {
+  color: #000000!important;
+  font-size: 16pt;
+  font-weight: 400;
+  font-family: var(--header-font-family);
+}
+/* This makes the hyperlinks in the h3 text in normal font (not code) +
+*  ensures the link is underlined (but the line goes away when hovering over)
+*/
+.title-slide h3 > a {
+  color: #000000!important;
+  font-size: 16pt;
+  font-weight: 400;
+  font-family: var(--header-font-family);
+  border-bottom: 1px solid #005EB8;
+}
+.title-slide a:hover {
+  border-bottom: 10px;
+}
+.title-slide {
+  background-color: var(--title-slide-background-color);
+  text-align: center;
+  vertical-align: middle;
+}
+.title-slide .remark-slide-number {
+  /*display: none;*/
+  color: #FFFFFF;
+  opacity: 1;
+  font-size: 0.75em;
+  /* Customise position of numbering */
+  margin-bottom: -10.0px;
+  margin-right: 5.0px;
+}
+.title-slide html {
+  font-size: var(--base-font-size);
+  font-family: var(--code-font-family);
+}
+.title-slide a, a > code {
+  color: #035AA6!important;
+  text-decoration: none;
+  font-family: var(--code-font-family);
+}
+.title-small {
+  font-size: 85%;
+  line-height: 0.2;
+}
+
+/* Two-column layout */
+.left-column {
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+.left-column h2, .left-column h3 {
+  color: #035AA699;
+}
+.left-column h2:last-of-type, .left-column h3:last-child {
+  color: #035AA6;
+}
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 0em;
+}
+.pull-left {
+  float: left;
+  width: var(--pull-left);
+}
+.pull-right {
+  float: right;
+  width: var(--pull-right);
+}
+.pull-right ~ * {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Slide with three columns */
+.three-column {
+  float: left;
+  width: 31%;
+  padding: 10px;
+}
+.three-column h3 {
+  text-align: center
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+/* Image */
+img, video, iframe {
+  max-width: 100%;
+}
+
+/* Blockquote */
+blockquote {
+  border-left: solid 5px #03A69680;
+  padding-left: 1em;
+}
+
+/* Table formatting */
+.remark-slide table {
+  margin: auto;
+  border-top: 0px solid #768692; /*1px solid #666;*/
+  border-bottom: 0px solid #768692; /*1px solid #666;*/
+  font-family: var(--text-font-family)!important;
+}
+.remark-slide table thead th {
+  border-bottom: 0px solid #ddd; /*default: 3px */
+}
+th, td {
+  padding: 5px;
+}
+/* this defines the striping in the bootstrap table */
+.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) {
+  background: #FFFFFF; /*#E8EDEE; #e2e2f9; #CCEDEA;*/
+}
+table.dataTable tbody {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+table.dataTable.display tbody tr.odd {
+  background-color: var(--background-color);
+}
+table.dataTable.display tbody tr.even {
+  background-color: #CCEDEA;
+}
+table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
+  color: var(--text-color);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--text-color) !important;
+}
+
+/* Slide Header Background for h1 elements */
+.remark-slide-content.header_background > h1 {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 85%;
+  background: var(--header-background-color);
+  color: var(--header-background-text-color);
+  padding: 2rem 64px 1.5rem 64px;
+  margin-top: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+.remark-slide-content.header_background {
+  padding-top: 7rem;
+}
+
+@page { margin: 0; }
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+/* This allows incremental slides to be printed to pdf using
+ * see: https://stackoverflow.com/questions/56373198/get-xaringan-incremental-animations-to-print-to-pdf
+*/
+@media print {
+  .has-continuation {
+    display: block!important;
+  }
+}
+
+/* This defines the basic slides page - including the background image */
+.primary {
+  color: var(--primary);
+}
+.bg-primary {
+  background-color: var(--primary);
+}
+.secondary {
+  color: var(--secondary);
+}
+.bg-secondary {
+  background-color: var(--secondary);
+}
+.white {
+  color: var(--white);
+}
+.bg-white {
+  background-color: var(--white);
+}
+.black {
+  color: var(--black);
+}
+.bg-black {
+  background-color: var(--black);
+}
+
+/******************
+ * Slide margins
+****************/
+.remark-slide-content {
+  padding-top: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-bottom: 10px;
+}
+
+
+/******************
+ * Some font sizes
+ ****************/
+.large { font-size: 130% }
+.small { font-size: 70% }
+.tiny{font-size: 40%}
+
+.center-left {
+  position:          relative;
+  top:               50%;
+  transform:         translateY(50%);
+}
+.center-right {
+  position:          relative;
+  top:               50%;
+  transform:         translateY(10%);
+}
+
+/******************
+ * Align text
+ ****************/
+
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
+.subtitle {
+	float: right;
+	font-size: 50%;
+  position: relative;
+  transform: translateY(50%);  /*translateY(30%); */
+  /* NB: Need to make sure the subtitle text is moved up (top: 0% + margin-top: -25px) so that the text doesn't go over the UCL logo
+   *     Also, want to make the text font a bit thicker so that it is clearer the reader needs to look there...
+  */
+  top: 0%;
+  margin-top: -25px;
+  font-weight: 450;
+}
+
+.tab {
+  padding-left: 4em;
+}
+
+/*******************************************************************************************************************************
+ * Colours
+ * NB: In LaTeX, colors may be defined in rgb (0-1). Can scale up to RGB (0-255) by simply multiplying the three numbers by 255
+ *     then can use 'https://www.google.com/search?channel=fs&client=ubuntu&q=rgb+to+hex' to convert to HEX and can use here
+ ******************************************************************************************************************************/
+.red {
+  color: red;
+}
+.myred {
+  color: #e62b4f;
+}
+.myblue {
+  color: #24568c;
+}
+.purple {
+  color: #3e2f5b;
+}
+.orange {
+  color: #ff8811;
+}
+.olive {
+  color: #334f17;
+}
+.ubuntublue {
+  color: #035AA6;
+}
+.blue{
+  color: #0000FF;
+}
+.spanish-red {
+  color: #c60b1e;
+}
+.spanish-yellow {
+  color: #ffc400;
+}
+.blue90red60 {
+  color: #7e5dc9;
+}
+.blue60red90 {
+  color: #9350c7;
+}
+.lightgray {
+  color: #ededed; /*#d3d3d3*/
+}
+.uclblue {
+  /* https://www.ucl.ac.uk/cam/sites/cam/files/migrated-files/ucl-visual-identity-poster.pdf */
+  color: #002855;
+}
+.navbargrey{
+  color: #D5D5D5;
+}
+
+/******************
+ * Footers
+ ****************/
+
+/* A footer to be on the bottom-left corner of the page */
+.footer-left {
+    position: fixed;
+    top: 96.6%;
+    left: 0;
+    text-align: left;
+    width: 93%;
+    font-size: 70%;
+    color: white;
+}
+
+/* A footer to include social media icons & links */
+.footer-social {
+    position: fixed;
+    top: 96.8%;
+    padding-left: 5%;
+    padding-right: 5%;
+    text-align: center;
+    width: 20%;
+    font-size: 75%;
+    color: #D5D5D5;
+}
+.footer-social a:hover {
+  position: relative;
+  background-color: #fcd000;
+}
+
+/* A footer to sit in the middle of the bottom line */
+.footer-center {
+    position: fixed;
+    top: 97.3%;
+    padding-left: 25%;
+    padding-right: 25%;
+    text-align: center;
+    width: 45%;
+    font-size: 70%;
+    color: #D5D5D5;
+}
+.footer-right {
+    position: fixed;
+    top: 97.3%;
+    text-align: left;
+    width: 30%;
+    margin-left: 66%;
+    font-size: 70%;
+    color: #D5D5D5;
+}
+/* --- */
+
+
+/******************
+ * Coloured content boxes
+ ****************/
+.content-box {
+    box-sizing: border-box;
+    background-color: #e2e2e2;
+    box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
+}
+.content-box-subtitle {
+	float: right;
+	font-size: 50%;
+  position: relative;
+  transform: translateY(50%);  /*translateY(30%); */
+  /* NB: Need to make sure the subtitle text is moved up (top: 0% + margin-top: -25px) so that the text doesn't go over the UCL logo
+   *     Also, want to make the text font a bit thicker so that it is clearer the reader needs to look there...
+  */
+  top: 25%;
+  font-weight: 450;
+}
+.content-box-subtitle > a {
+  border-bottom: 1px solid #005EB8;
+}
+.content-box-subtitle a:hover {
+  border-bottom: 10px;
+}
+.content-box-blue,
+.content-box-gray,
+.content-box-grey,
+.content-box-army,
+.content-box-green,
+.content-box-purple,
+.content-box-red,
+.content-box-yellow,
+.content-box-orange {
+  box-sizing: border-box;
+  border-radius: 15px;
+  margin: 0 0 15px;
+  overflow: hidden;
+  padding: 10px 20px 10px 20px;
+  width: 100%;
+}
+/*
+ * Define a content box similar to the 'block' in 'Beamer/Boadilla'
+ * with a light blue background and rounded borders + a title bar
+*/
+.content-box-beamer {
+  color: #FFFFF;
+  font-size: 80%;
+  box-sizing: border-box;
+  border-radius: 15px;
+  background-color: #dae4f5;
+  padding: 0px 10px 5px 10px;
+  box-shadow: 10px 10px 5px  rgba(0,0,0,0.6);
+}
+/*
+ * This defines the title bar (for 'h3' titles)
+*/
+.content-box-beamer h3 {
+  background-color: #abb3d6;
+  border-radius: 15px 15px 0px 0px;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-bottom: 5px;
+  padding: 5px 10px 10px 10px;
+}
+.content-box-blue { background-color: #F0F8FF; }
+.content-box-gray { background-color: #e2e2e2; }
+.content-box-grey {	background-color: #F5F5F5; }
+.content-box-army {	background-color: #737a36; }
+.content-box-green { background-color: #d9edc2; }
+.content-box-purple { background-color: #e2e2f9; }
+.content-box-red { background-color: #ffcccc; }
+/* These two are from the UCL palettes */
+.content-box-yellow { background-color: #f6be00; }
+.content-box-orange { background-color: #ea7600; }
+/* --- */
+.content-box-blue .remark-inline-code,
+.content-box-blue .remark-inline-code,
+.content-box-gray .remark-inline-code,
+.content-box-grey .remark-inline-code,
+.content-box-army .remark-inline-code,
+.content-box-green .remark-inline-code,
+.content-box-purple .remark-inline-code,
+.content-box-red .remark-inline-code,
+.content-box-yellow .remark-inline-code,
+.content-box-orange .remark-inline-code {
+  background: none;
+}
+
+
+.full-width {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+/* This aligns the title of each frame in the blue box */
+.remark-slide-content > h1:first-of-type {
+  margin-top: -20px;
+}
+
+/* Final slide
+ * Creates a general page with no numbering and then can customise by
+ * giving it a separate '-name' name (eg '.thankyou-michelle')
+*/
+.thankyou .remark-slide-number {
+  display: none;
+}
+.thankyou-michelle {
+  background-image: url("thankyou/michelle.gif");
+  background-size: contain;
+}
+.thankyou-barney {
+  background-image: url("thankyou/barney.gif");
+  background-size: contain;
+}
+/* This prevents the center & right footer from showing in the "thank you" page */
+.thankyou-michelle .footer-left,
+.thankyou-michelle .footer-center,
+.thankyou-michelle .footer-social,
+.thankyou-michelle .footer-right,
+.thankyou-barney .footer-left,
+.thankyou-barney .footer-social,
+.thankyou-barney .footer-center,
+.thankyou-barney .footer-right {
+  display: none;
+}
+
+
+
+/* Fiddles with the default spacing between items in a list
+ * NB: margin is defined as top-right-bottom-left
+*/
+ul { padding: 0; margin: 0 0 1em 2em; list-style: disc; }
+/* This modifies the space between level 1 items */
+ul ul { margin-bottom: .5em;}
+
+/*  This bit here would make the 2nd level unordered items with a "dash" rather than a disc */
+ul ul {
+  margin-bottom: .5em;
+  margin-left: 0;
+  list-style: none;
+}
+/* This ensures that long lines are indented */
+ul ul > li {
+  display: table;
+}
+ul ul > li:before {
+  content: "–";
+  display: table-cell;
+  padding-right: 6px;
+  text-align: right;
+}
+/* --- */
+
+/* This modifies the space between level 1 item and level 2 item */
+p { margin: 0 0 0.25em }
+ul + ul { margin-top: 2em }
+
+/* This is for 'ordered lists' (numbered)*/
+ol { padding: 0; margin: 0 0 1em 2em; }
+/* This modifies the space between level 1 items */
+ol ol { margin-bottom: .5em }
+/* This modifies the space between level 1 item and level 2 item */
+p { margin: 0 0 0.25em }
+ol + ol { margin-top: 2em }
+
+
+
+/*
+/* This changes the default set up for numbered lists
+ * https://css-tricks.com/custom-list-number-styling/
+*/
+ol {
+  counter-reset: my-counter;
+  list-style: none;
+  padding-left: 10px;
+}
+ol > li {
+  margin: 0 0 0.5rem 0;
+  counter-increment: my-counter;
+  position: relative;
+}
+/* Need to apply this formatting to all 'li' in an ordered list **only**
+* in css you do this using the syntax 'ol > li', which means 'li' "contained" in 'ol'
+*/
+ol > li::before {
+  content: counter(my-counter);
+  color: #fcd000;
+  font-size: 1.5rem;
+  font-weight: normal;
+  font-family: "Nanum Pen Script";
+  position: absolute;
+  --size: 26px;
+  left: calc(-1 * var(--size) - 10px);
+  line-height: var(--size);
+  width: var(--size);
+  height: var(--size);
+  top: 0;
+  transform: rotate(-0deg);
+  background: #3434ad; /*black;*/
+  border-radius: 50%;
+  text-align: center;
+  box-shadow: 1px 4px 0 #999;
+}
+/* This code here would reset the counter and make it start from whatever point
+ * source: https://stackoverflow.com/questions/23699128/how-can-i-reset-a-css-counter-to-the-start-attribute-of-the-given-list
+ *
+<ol style="counter-reset: my-counter 9;">
+    <li>Number Ten</li>
+    <li>Number Eleven</li>
+    <li>Number Twelve</li>
+</ol>
+ *
+ * NB: Needs to use the HTML code directly into the Rmd files
+ *     Also, needs to reset the counter to '(n-1)' if I want the next bullet point to be 'n'
+*/
+
+/* Buttons for hyperlinks */
+.button {
+  background-color: #dae4f5; /* #abb3d6;*/
+  border: 0.5px solid #abb3d6;
+  border-radius: .3rem;
+  padding: .25rem;
+  font-size: .8rem;
+  line-height: .9;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 8px 5px 5px  rgba(0,0,0,0.6);
+}
