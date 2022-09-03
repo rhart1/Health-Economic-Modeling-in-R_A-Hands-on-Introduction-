@@ -1,9 +1,0 @@
-## Uses 'imagemagick' to change the colour of the background and signs in the UCL logo,
-## starting from a black/white/transparent file ('ucl-original.png')
-
-# 1. First convert the black background to a blue colour
-convert ucl-original.png -fuzz 40% -fill 'rgb(52,52,173)' -opaque 'rgb(0,0,0)' tmp.png
-# 2. Then replace the transparent background for the sign "UCL" (in this case to yellow-ish colour)
-convert tmp.png -background "rgb(252,208,90)" -flatten tmp.png
-# 3. Finally fill the white portico in the same colour as the "UCL" sign
-convert tmp.png -fuzz 40% -fill 'rgb(252,208,90)' -opaque 'rgb(255,255,255)' tmp.png
