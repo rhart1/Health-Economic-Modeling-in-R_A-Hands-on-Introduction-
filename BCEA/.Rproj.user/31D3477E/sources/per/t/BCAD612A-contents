@@ -1,0 +1,2943 @@
+---
+title: "How (Bayesian) statistical modelling can underpin health economic evaluation"
+author: Gianluca Baio
+date: 17 February 2021
+institute: "[Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London"
+params: 
+   conference: "HDRUK-Turing PhD programme on Health Data Science"
+   short_conference: "HDRUK-Turing PhD programme on HDS"
+   location: "ATI"
+   short_title: "Statistical modelling in health economics"
+output:
+  xaringan::moon_reader:
+    includes: 
+       in_header: "assets/latex_macros.html" 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       # after_body: "assets/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      highlightSpans: true
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "assets/ucl-powerpoint.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+xaringanExtra::use_clipboard()
+
+library(survHE)
+# Loads data and all
+data=read.csv(file="/home/gianluca/Dropbox/HE/IQVIA/Survival/data/Trial.csv",header=TRUE)
+data$TIME=data$aval
+data$EVENT=data$cnsr
+load("~/Dropbox/EcSan/ShortCourses/ICON/data_surv.Rdata")
+dat$TIME=dat$time
+dat$EVENT=dat$censored
+dat$treatment=factor(dat$arm,labels=c("Comparator","Intervention"))
+
+# Defines the path to the file with the .bib entries (in case there are references)
+bibfile=ReadBib("~/Dropbox/Perso/Office/CV/mypubs.bib",check = FALSE)
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+.title-small[
+`r icon::icon_style(icon::fontawesome("envelope",style = "solid"),scale=.8,fill="#00acee")`  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [http://www.statistica.it/gianluca/](http://www.statistica.it/gianluca/)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio](https://github.com/giabaio)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+`r icon::icon_style(icon::fontawesome("twitter"),scale=.8,fill="#00acee")`  [@gianlubaio](https://twitter.com/gianlubaio)     
+]
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r date`
+
+`r vspace("30px")`
+.title-small[
+This presentation is available at `r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")` [http://www.statistica.it/gianluca/slides/hdruk](http://www.statistica.it/gianluca/slides/hdruk)
+]
+
+<!-- This adds a footer (optional and with other possibilities...) -->
+.footer-left[
+`r samptux()` <span style="position: relative; bottom: 5px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio (UCL)</span>
+]
+
+---
+
+layout: true
+.footer-left[
+`r samptux()` <span style="position: relative; bottom: 5px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio (UCL)</span>
+]
+<!-- Can also add a center footer, eg to include the title of the talk -->
+.footer-center[
+`r rmarkdown::metadata$params$short_title`
+]
+<!-- And a right footer, to include the date -->
+.footer-right[
+`r rmarkdown::metadata$params$short_conference`, `r short_date`
+]
+
+---
+
+# Disclaimer...
+
+<center>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Best opening sentence <a href="https://twitter.com/hashtag/ISPOREurope?src=hash&amp;ref_src=twsrc%5Etfw">#ISPOREurope</a> from Gianluca Baio: “statisticians should rule the world and Bayesian statisticians should rule all statisticians” <a href="https://t.co/GN2w7liAcR">https://t.co/GN2w7liAcR</a></p>&mdash; Manuela Joore (@ManuelaJoore) <a href="https://twitter.com/ManuelaJoore/status/1191397718930939904?ref_src=twsrc%5Etfw">November 4, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+</center>
+
+`r vspace("40px")`
+...Just so you know:
+
+- That I am rubbish at using my phone keyboard and can't spell
+
+- What you're about to get into... `r emo::ji("wink")`
+
+---
+
+# Outline
+
+1. Health economic evaluation
+
+   - What is it?
+   - How does it work?   
+
+--
+
+2. Statistical modelling
+   - **Individual**-level data (vs aggregated-level data)
+   - The importance of being a Bayesian...
+
+--
+
+3. Some examples &ndash; you get to choose... `r emo::ji("wink")`
+   - Individual-level and partially observed data
+   - Survival modelling
+   - Value of information
+
+--
+
+4. Conclusions
+
+---
+
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+--
+
+`r include_fig("hta-scheme1.png",width="80%")`
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+
+`r include_fig("hta-scheme2.png",width="80%")`
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+`r include_fig("hta-scheme3.png",width="80%")`
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+
+`r include_fig("hta-scheme4.png",width="80%")`
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+```{r hta-psa, engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}
+\hspace{-.5cm}
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+  \begin{itemize}
+  \item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+    \item Varies with the type of available data (\& statistical approach!)
+  \end{itemize}
+};
+
+\draw(0.3,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+  \begin{itemize}
+  \item Combines the parameters to obtain a population average measure for costs and clinical benefits
+  \item Varies with the type of available data \& statistical model used
+  \end{itemize}
+};
+
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+  \begin{itemize}
+  \item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+  \item Dictates the best course of actions, given current evidence
+  \item Standardised process
+  \end{itemize}
+};
+
+\draw(-5,2.8) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](101){Uncertainty\\ analysis};
+  
+\draw(-2.15,2.85) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](){
+  \begin{itemize}
+  \item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+  \item Mandatory in many jurisdictions (including NICE, in the UK)
+  \item Fundamentally Bayesian!
+  \end{itemize}
+};
+  
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (1.north) -- (101.south);
+
+\draw(4.2,2.6) node[align=center,draw=none,fill=none]{\includegraphics[scale=.10]{img/PSA_scheme1.png}};
+%%\draw(4,2.8) node[align=center,draw=none,fill=none]{\includegraphics[scale=.48]{img/hta-psa-2.png}};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (101.290) -- (2.west);
+
+\end{tikzpicture}
+```
+
+`r include_fig("hta-psa-1.png",width="75%")`
+
+`r vspace("-14.6cm")`
+**Probabilistic Sensitivity Analysis (PSA)**
+
+---
+
+
+count: false
+# Health technology assessment (HTA)
+
+```{r two-stage, engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}
+\hspace{-.5cm}
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+  \begin{itemize}
+  \item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+    \item Varies with the type of available data (\& statistical approach!)
+  \end{itemize}
+};
+
+\draw(0.3,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+  \begin{itemize}
+  \item Combines the parameters to obtain a population average measure for costs and clinical benefits
+  \item Varies with the type of available data \& statistical model used
+  \end{itemize}
+};
+
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+  \begin{itemize}
+  \item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+  \item Dictates the best course of actions, given current evidence
+  \item Standardised process
+  \end{itemize}
+};
+
+\draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](101){Uncertainty\\ analysis};
+  
+\draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](){
+  \begin{itemize}
+  \item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+  \item Mandatory in many jurisdictions (including NICE, in the UK)
+  \item Fundamentally Bayesian!
+  \end{itemize}
+};
+  
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (1.north) -- (101.south);
+
+\draw(1.0,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive 1.\ Estimation (base-case)};
+\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive 2.\ Probabilistic sensitivity analysis};
+\draw(1.8,3) node[align=center,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](9){$\theta$};
+\draw(1.8,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](10){$y$};
+\draw(.5,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](11){$p(y\mid \theta)$};
+\draw(.5,3) node[align=center,draw,ellipse,double,fill=none,minimum width=.3cm,minimum height=.25cm,font=\sffamily\fontsize{6}{7}\selectfont](12){$\hat\theta=f(Y)$};
+  
+\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive 2.\ Probabilistic sensitivity analysis};
+\draw(2.9,2.0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont,color=red]{$\Rightarrow$};
+\draw(5.4,3) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](13){$\theta$};
+\draw(4.2,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](14){$p(\theta)\red\leftrightarrow\black g(\hat\theta)$};
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (13.south) to [out=270,in=45] (2.60);
+  
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (9.south) -- (10.north);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (11.north) -- (12.south);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red!60] (12.220) to [out=220,in=130] (2.120);
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+
+\end{tikzpicture}
+```
+
+`r include_fig("two-stage.png",width="75%")`
+
+.small["***Two-stage* approach**" ([Spiegelhalter et al, 2004](https://onlinelibrary.wiley.com/doi/book/10.1002/0470092602))]
+---
+
+count: false
+# Health technology assessment (HTA)
+
+```{r integrated,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+\hspace{-.5cm}
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+      \begin{itemize}
+      \item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+      \item Varies with the type of available data (\& statistical approach!)
+      \end{itemize}
+      };
+
+\draw(0.3,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+  \begin{itemize}
+  \item Combines the parameters to obtain a population average measure for costs and clinical benefits
+  \item Varies with the type of available data \& statistical model used
+  \end{itemize}
+  };
+
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+   \begin{itemize}
+   \item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+   \item Dictates the best course of actions, given current evidence
+   \item Standardised process
+\end{itemize}
+};
+
+\draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](101){Uncertainty\\ analysis};
+    
+\draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](){
+ \begin{itemize}
+ \item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+ \item Mandatory in many jurisdictions (including NICE, in the UK)
+ \item Fundamentally Bayesian!
+ \end{itemize}
+ };
+    
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (1.north) -- (101.south);
+\draw(2.7,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive Estimation \& PSA (one stage)};
+  \draw(2.3,3) node[align=center,circle,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](15){$\theta$};
+  \draw(2.3,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](16){$y$};
+  \draw(2.3,1) node[align=center,draw,fill=none,color=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.6	2cm,minimum height=.62cm,dashed]{};
+  \draw(1,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](17){$p(y\mid \theta)$};
+  \draw(1,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](18){$p(\theta)$};
+  \draw(4.3,3) node[align=center,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](19){$\red p(\theta\mid y)$};
+
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (15.south) -- (16.north);
+  \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin,color=red] (15.east) -- (19.west);
+  \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,color=red] (16.180) to [bend left=90] (15.180);
+  \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (19.south) to [out=280,in=45] (2.25);
+  
+
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+\end{tikzpicture}
+```
+
+`r include_fig("integrated.png",width="73%")`
+
+.small["***Integrated* approach**" ([Spiegelhalter et al, 2004](https://onlinelibrary.wiley.com/doi/book/10.1002/0470092602); [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/))]
+---
+
+# **Individual**-level data
+
+## HTA alongside RCTs
+
+```{r,echo=FALSE,include=FALSE}
+# This creates the table - then it's actually easier to include the resulting HTML for further customisation...
+dataset=tibble(
+  id=c(1,2,3),
+  trt=c(1,1,2),
+  sex=c("M","M","F"),
+  age=c(23,23,19),
+  other_dem=c("...","...","..."),
+  y0=c("\\(y_{10}\\)","\\(y_{20}\\)","\\(y_{30}\\)"),
+  y1=c("\\(y_{11}\\)","\\(y_{21}\\)","\\(y_{31}\\)"),
+  other_y=c("...","...","..."),
+  yJ=c("\\(y_{1J}\\)","\\(y_{2J}\\)","\\(y_{3J}\\)"),
+  u0=c(.32,.12,.49),
+  u1=c(.66,.16,.55),
+  other_u=c("...","...","..."),
+  uJ=c(.44,.38,.88),
+  c0=c(103,1204,16),
+  c1=c(241,1808,23),
+  other_c=c("...","...","..."),
+  cJ=c(80,877,22)
+)
+
+dataset %>% kable(col.names=c("ID","Trt",
+                              #"\\(\\color{orange}{\\text{Sex}}\\)",
+                              #"\\(\\color{orange}{Age}\\)",
+                              #"\\(\\color{orange}{\\ldots}\\)",
+                              "Sex","Age","...",
+                              "\\(\\color{olive}{y_0}\\)","\\(\\color{olive}{y_1}\\)","\\(\\color{olive}{\\ldots}\\)","\\(\\color{olive}{y_J}\\)",
+                              "\\(\\color{blue}{u_0}\\)","\\(\\color{blue}{u_1}\\)","\\(\\color{blue}{\\ldots}\\)","\\(\\color{blue}{u_J}\\)",
+                              "\\(\\color{red}{c_0}\\)","\\(\\color{red}{c_1}\\)","\\(\\color{red}{\\ldots}\\)","\\(\\color{red}{c_J}\\)"),
+                  format="html") %>%
+  kable_classic() %>% 
+  kable_styling(full_width=T) %>% 
+  add_header_above(
+    c(" "=2,"Demographics"=3,"Clinical outcomes"=4,"HRQL data"=4,"Resource use data"=4),
+    color=c("black","orange","olive","blue","red"),
+    bold=TRUE
+  ) %>% 
+  column_spec(3:5,color="orange") %>% column_spec(6:9,color="olive") %>% column_spec(10:13,color="blue") %>% column_spec(14:17,color="red") %>% 
+  row_spec(0,color=c("black","black","orange","orange"))
+
+```
+
+<table class=" lightable-classic table" style="font-family: Ubuntu; font-size: 14px; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="empty-cells: hide;" colspan="2"></th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; color: orange !important;" colspan="3"><div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">Demographics</div></th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; color: olive !important;" colspan="4"><div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">Clinical outcomes</div></th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; color: blue !important;" colspan="4"><div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">HRQL data</div></th>
+<th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; color: red !important;" colspan="4"><div style="border-bottom: 1px solid #111111; margin-bottom: -1px; ">Resource use data</div></th>
+</tr>
+  <tr>
+   <th style="text-align:center;color: black !important; font-weight: bold;"> ID </th>
+   <th style="text-align:center;color: black !important; font-weight: bold"> Trt </th>
+   <th style="text-align:center;color: orange !important;"> Sex </th>
+   <th style="text-align:center;color: orange !important;"> Age </th>
+   <th style="text-align:center;color: orange !important;"> \(\ldots\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{olive}{y_0}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{olive}{y_1}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{olive}{\ldots}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{olive}{y_J}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{blue}{u_0}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\color{blue}{u_1}\) </th>
+   <th style="text-align:center;color: blue !important;"> \(\ldots\) </th>
+   <th style="text-align:center;color: red !important;"> \(\color{blue}{u_J}\) </th>
+   <th style="text-align:center;color: red !important;"> \(\color{red}{c_0}\) </th>
+   <th style="text-align:center;color: red !important;"> \(\color{red}{c_1}\) </th>
+   <th style="text-align:center;color: red !important;"> \(\ldots\) </th>
+   <th style="text-align:center;color: red !important;"> \(\color{red}{c_J}\) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;color: orange !important;"> M </td>
+   <td style="text-align:center;color: orange !important;"> 23 </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{10}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{11}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{1J}\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.32 </td>
+   <td style="text-align:center;color: blue !important;"> 0.66 </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.44 </td>
+   <td style="text-align:center;color: red !important;"> 103 </td>
+   <td style="text-align:center;color: red !important;"> 241 </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> 80 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;color: orange !important;"> M </td>
+   <td style="text-align:center;color: orange !important;"> 23 </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{20}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{21}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{2J}\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.12 </td>
+   <td style="text-align:center;color: blue !important;"> 0.16 </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.38 </td>
+   <td style="text-align:center;color: red !important;"> 1204 </td>
+   <td style="text-align:center;color: red !important;"> 1808 </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> 877 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;color: orange !important;"> F </td>
+   <td style="text-align:center;color: orange !important;"> 19 </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{30}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{31}\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(y_{3J}\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.49 </td>
+   <td style="text-align:center;color: blue !important;"> 0.55 </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> 0.88 </td>
+   <td style="text-align:center;color: red !important;"> 16 </td>
+   <td style="text-align:center;color: red !important;"> 23 </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> 22 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> \(\ldots\) </td>
+   <td style="text-align:center;"> \(\ldots\) </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: orange !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: olive !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: blue !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+   <td style="text-align:center;color: red !important;"> \(\ldots\) </td>
+  </tr>
+  <th style="padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; font-weight: bold; color: black !important;" colspan="17"><div style="border-bottom: 1px solid #111111; margin-bottom: -1px; "></div></th>
+</tbody>
+</table>
+
+<p style="margin-left: 2em; margin-top: 10px">– \(\class{olive}{y_{ij}}=\) Survival time, event indicator (eg CVD), number of events, continuous measurement (eg blood pressure), ...</p>
+<p style="margin-left: 2em;">– \(\class{blue}{u_{ij}}=\) Utility-based score to value health (eg <a href="https://euroqol.org/">EQ-5D</a>, <a href="https://www.rand.org/health-care/surveys_tools/mos/36-item-short-form/scoring.html">SF-36</a>, <a href="https://en.wikipedia.org/wiki/Hospital_Anxiety_and_Depression_Scale">Hospital & Anxiety Depression Scale)</a>, ...</p>
+<p style="margin-left: 2em;">– \(\class{red}{c_{ij}}=\) Use of resources (drugs, hospital, GP appointments), ...</p>
+
+`r vspace("10px")`
+
+- Usually aggregate longitudinal measurements into a cross-sectional summary and for each individual consider the pair $\class{myblue}{(e_i,c_i)}$
+
+`r vspace("20px")`
+
+--
+
+- HTA preferably based on .red[**utility-based**] measures of effectiveness
+
+- Quality Adjusted Life Years (QALYs) are a measure of disease burden combining
+   - .blue90red60[**Quantity**] of life (the amount of time spent in a given health state)
+   - .blue60red90[**Quality**] of life (the utility attached to that state)
+   
+---
+
+# ("Standard") Statistical modelling 
+
+1. Compute individual QALYs and total costs as 
+$$\class{myblue}{e_i = \displaystyle\sum_{j=1}^{J} \left(u_{ij}+u_{i\hspace{.5pt}j-1}\right) \frac{\delta_{j}}{2}} \qquad `r sftext(" and ")` \class{myblue}{\qquad c_i = \sum_{j=0}^J c_{ij}} \qquad \left[`r sftext("with: ")` \class{myblue}{\delta_j = \frac{`r sftext("Time")`_j - `r sftext("Time")`_{j-1}}{`r sftext("Unit of time")`}}\right]$$
+
+--
+
+2. (Often implicitly) assume normality and linearity and model .olive[**independently**] individual QALYs and total costs by controlling for (**centered**) baseline values, eg
+$\class{myblue}{u^∗  = (u − \bar{u} )}$ and  $\class{myblue}{c^∗  = (c − \bar{c} )}$
+\begin{align}
+e_i & = \alpha_{e0} + \alpha_{e1} u^*_{0i} + \alpha_{e2} `r sftext("Trt")`_i + \varepsilon_{ei}\, [+ \ldots], \qquad \varepsilon_{ei} \sim \dnorm(0,\sigma_e) \\
+c_i & = \alpha_{c0} + \alpha_{c1} c^*_{0i} + \alpha_{c2} `r sftext("Trt")`_i + \varepsilon_{ci}\, [+ \ldots], \qquad\hspace{2pt} \varepsilon_{ci} \sim \dnorm(0,\sigma_c) 
+\end{align}
+
+--
+
+3. Estimate population average cost and effectiveness differentials 
+   - **Under this model specification**, these are $\class{myblue}{\Delta_e=\alpha_{e2}}$ and $\class{myblue}{\Delta_c=\alpha_{c2}}$
+
+--
+
+4. Quantify impact of uncertainty in model parameters on the decision making process
+    - In a fully frequentist analysis, this is done using resampling methods (eg bootstrap)
+
+---
+
+exclude: true
+
+# ("Standard") Statistical modelling
+
+`r vspace("-8px")`
+
+1. Build a population level model (eg decision tree/Markov model)
+
+  ```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+  \definecolor{myblue}{rgb}{0.14 0.34 0.55}
+  
+  \begin{tikzpicture}
+  \draw(-6,1) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}
+  {8}\selectfont](1){Prophylactic NIs?};
+  
+  \draw(-3,-1) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](2){No};
+  
+  \draw(-3,3) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](3){Yes};
+  
+  \draw(0,4) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](4){Yes \\$(p_1)$};
+  
+  \draw(0,2) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](5){No \\$(1-p_1)$};
+  
+  \draw(3,4) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](6){Cost with NIs + cost influenza};
+  
+  \draw(3,2) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](7){Cost with NIs};
+  
+  \draw(0,0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](8){Yes \\$(p_0)$};
+  
+  \draw(0,-2) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](9){No \\$(1-p_0)$};
+  
+  \draw(3,0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](10){Cost influenza};
+  
+  \draw(3,-2) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](11){Cost with no NIs};
+  
+  \draw(3,4.8) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{8}{9}\selectfont](12){\underline{Outcomes}};
+  
+  \node [rectangle,minimum size=1.5mm,inner sep=0pt,outer sep=3pt,fill=black] at (-4.75,1) (dec1){};
+  \node [circle,minimum size=1.5mm,inner sep=0pt,outer sep=3pt,fill=black] at (-2.65,3) (rand2){};
+  \node [circle,minimum size=1.5mm,inner sep=0pt,outer sep=3pt,fill=black] at (-2.68,-1) (rand3){};
+  
+  \draw(-10.7,0) node[align=left,draw=none,font=\fontsize{8}{9}\selectfont,color=myblue](13){$\mu_{e1}=-lp_1$};
+  \draw(-10.7,-.5) node[align=left,draw=none,font=\fontsize{8}{9}\selectfont,color=myblue](14){$\mu_{e0}=-lp_0$};
+  \draw(-9.1,-1) node[align=left,draw=none,font=\fontsize{8}{9}\selectfont,color=myblue](15){$\mu_{c1}=\left(c^{\rm{\it NI}}+c^{\rm{\it Inf}}\right)p_1 + c^{\rm{\it NI}}(1-p_1)$};
+  \draw(-9.1,-1.5) node[align=left,draw=none,font=\fontsize{8}{9}\selectfont,color=myblue](16){$\mu_{c0}=\left(c^{\rm{\it NI}}+c^{\rm{\it Inf}}\right)p_0 + c^{\rm{\it NI}}(1-p_0)$};
+  
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) |- (2.west);
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) |- (3.west);
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (3.east) |- (4.west);
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (3.east) |- (5.west);
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) |- (8.west);
+  \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) |- (9.west);
+  \end{tikzpicture}
+  ```
+    **NB**: in this case, the "data" are typically represented by summary statistics for the parameters of interest $\bm\theta= (p_0 , p_1 , l, \ldots)$, but may also have access to a combination of ILD and summaries
+
+--
+
+exclude: true
+
+`r vspace("-10px")`
+
+<ol style="counter-reset: my-awesome-counter 1;">
+<li> Use point estimates for the parameters to build the “base-case” (average) evaluation</li>
+
+<li>Use resampling methods (eg bootstrap) to propage uncertainty in the point estimates and perform uncertainty analysis</li>
+</ol>
+
+---
+
+background-image: url("img/what-is-wrong.gif")
+background-size: cover
+
+# 
+
+---
+
+name: whatswrong
+
+# What's wrong with that?...
+
+
+- Potential correlation between costs & clinical benefits .alignright[.orange[[**Individual level + Aggregated level Data**]]]
+   - Strong positive correlation: effective treatments are innovative and result from intensive and lengthy research $\Rightarrow$ are associated with higher unit costs
+   - Negative correlation: more effective treatments may reduce total care pathway costs e.g. by reducing hospitalisations, side effects, etc.
+   - Because of the way in which standard models are set up, bootstrapping generally only approximates the underlying level of correlation &ndash; .olive[**MCMC does a better job!**]
+
+--
+
+
+- Joint/marginal normality not realistic .alignright[.orange[[**Mainly ILD**]]]
+   - Costs usually skewed and benefits may be bounded in $[0; 1]$ 
+   - Can use transformation (e.g. logs) &ndash; but care is needed when back transforming to the natural scale
+   - Should use more suitable models (e.g. Beta, Gamma or log-Normal) &ndash; .olive[**generally easier under a Bayesian framework**]
+   - Particularly relevant in presence of partially observed data &ndash; more on this later!
+
+--
+
+
+- Particularly as the focus is on decision-making (rather than just inference), we need to use **all** available evidence to fully characterise current uncertainty on the model parameters and outcomes .alignright[.orange[[**ILD + ALD**]]]
+   - A Bayesian approach is helpful in combining different sources of information 
+   - .olive[**Propagating uncertainty is a fundamentally Bayesian operation!**]
+
+---
+
+name: ild-missing
+class: empty-slide
+
+# Individual-level and partially observed data
+
+`r vspace("4rem")`
+
+.small[.alignleft[`r icon::fontawesome("arrow-circle-left")` [Survival analysis](#survival)]]
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [Value of information](#voi)]]
+
+---
+
+name: factorisation
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = p(e)p(c\mid e) = p(c)p(e\mid c)}$
+
+---
+
+count: false
+
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = }\class{blue}{p(e)}\class{myblue}{p(c\mid e) = p(c)p(e\mid c)}$
+
+`r include_fig("bayesian_hta1-1.png",width="75%",title="TEXT HERE")`
+
+```{r bayesian_hta1,engine='tikz', echo=F, out.width="85%",crop = TRUE,opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\newcommand\blue{\color{blue}}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](1){$c_i$};
+\draw(-3,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](2){$\phi_{ic}$};
+\draw(-4,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](3){$\boldsymbol\tau_{c}$};
+\draw(-3,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](4){$\mu_c$};
+\draw(-4,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](5){$[\ldots]$};
+\draw(-1,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_i$};
+\draw(0,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{ie}$};
+\draw(-0,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\boldsymbol\tau_{e}$};
+\draw(-1,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_e$};
+\draw(-0,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$[\ldots]$};
+\draw(-2.25,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\beta_1$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.230) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,dotted] (10.south) -- (7.north);
+
+\draw[rounded corners=15pt,dashed,thick,color=blue] (-1.7,-.55) rectangle ++ (2.35,3.1) node[xshift=-1.1cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Marginal model for $e$};
+
+\draw(2.2,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue e_{i} \sim p(e\mid \phi_{ei},\boldsymbol\tau_e)$};
+\draw(2.2,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue g_e(\phi_{ei}) = \alpha_0 \, [+\ldots]$};
+\draw(2.2,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue \mu_e = g_e^{-1}(\alpha_0)$};
+
+\draw(-7.45,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$c_{i} \sim p(c\mid e,\phi_{ci},\boldsymbol\tau_c)$};
+\draw(-6.63,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$g_c(\phi_{ci}) = \beta_0 + \beta_1(e_{i}-\mu_e)\, [+\ldots]$};
+\draw(-7.8,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\mu_c=g_c^{-1}(\beta_0)$};
+
+\draw(2.1,.5) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\phi_{ei}=$ location};
+\draw(2.1,.25) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\boldsymbol\tau_{e}=$ ancillary};
+
+\draw(-7.3,.5) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\phi_{ci}=$ location};
+\draw(-7.3,.25) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\boldsymbol\tau_c=$ ancillary};
+
+\end{tikzpicture}
+```
+
+---
+
+count: false
+
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = }\class{blue}{p(e)}\class{red}{p(c\mid e)}\class{myblue}{ = p(c)p(e\mid c)}$
+
+`r include_fig("bayesian_hta2-1.png",width="75%",title="TEXT HERE")`
+
+```{r bayesian_hta2,engine='tikz', echo=F, out.width="85%",crop = TRUE,opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\newcommand\blue{\color{blue}}
+\newcommand\red{\color{red}}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_i$};
+\draw(-3,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ic}$};
+\draw(-4,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\boldsymbol\tau_{c}$};
+\draw(-3,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_c$};
+\draw(-4,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$[\ldots]$};
+\draw(-1,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_i$};
+\draw(0,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{ie}$};
+\draw(-0,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\boldsymbol\tau_{e}$};
+\draw(-1,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_e$};
+\draw(-0,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$[\ldots]$};
+\draw(-2.25,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\beta_1$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.230) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,dotted] (10.south) -- (7.north);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,auto,node distance=.0pt,thin,dotted] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin] (11.230) -- (2.60);
+
+
+\draw[rounded corners=15pt,dashed,thick,color=blue] (-1.7,-.55) rectangle ++ (2.35,3.1) node[xshift=-1.1cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Marginal model for $e$};
+
+\draw[rounded corners=15pt,thick,color=red] (-4.5,-0.4) rectangle ++ (4,2.8) node[xshift=-2.6cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Conditional model for $c$};
+
+\draw(2.2,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue e_{i} \sim p(e\mid \phi_{ei},\boldsymbol\tau_e)$};
+\draw(2.2,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue g_e(\phi_{ei}) = \alpha_0 \, [+\ldots]$};
+\draw(2.2,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue \mu_e = g_e^{-1}(\alpha_0)$};
+
+\draw(2.1,.5) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\phi_{ei}=$ location};
+\draw(2.1,.25) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\boldsymbol\tau_{e}=$ ancillary};
+
+\draw(-7.45,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red c_{i} \sim p(c\mid e,\phi_{ci},\boldsymbol\tau_c)$};
+\draw(-6.63,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red g_c(\phi_{ci}) = \beta_0 + \beta_1(\color{magenta}e_{i}-\mu_e\red)\, [+\ldots]$};
+\draw(-7.8,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red \mu_c=g_c^{-1}(\beta_0)$};
+
+
+\draw(-7.3,.5) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\phi_{ci}=$ location};
+\draw(-7.3,.25) node[align=left,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\boldsymbol\tau_c=$ ancillary};
+
+
+\end{tikzpicture}
+```
+
+---
+
+count: false
+
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = p(e)p(c\mid e) = p(c)p(e\mid c)}$
+
+`r include_fig("bayesian_hta3-1.png",width="75%",title="TEXT HERE")`
+
+```{r bayesian_hta3,engine='tikz', echo=F, out.width="85%",crop = TRUE,opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\newcommand\blue{\color{blue}}
+\newcommand\red{\color{red}}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_i$};
+\draw(-3,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ic}$};
+\draw(-4,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\boldsymbol\tau_{c}$};
+\draw(-3,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_c$};
+\draw(-4,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$[\ldots]$};
+\draw(-1,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_i$};
+\draw(0,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{ie}$};
+\draw(-0,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\boldsymbol\tau_{e}$};
+\draw(-1,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_e$};
+\draw(-0,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$[\ldots]$};
+\draw(-2.25,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\beta_1$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.230) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,dotted] (10.south) -- (7.north);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,auto,node distance=.0pt,thin,dotted] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin] (11.230) -- (2.60);
+
+
+\draw[rounded corners=15pt,dashed,thick,color=blue] (-1.7,-.55) rectangle ++ (2.35,3.1) node[xshift=-1.1cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Marginal model for $e$};
+
+\draw[rounded corners=15pt,thick,color=red] (-4.5,-0.4) rectangle ++ (4,2.8) node[xshift=-2.6cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Conditional model for $c$};
+
+\draw(2.2,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue e_{i} \sim p(e\mid \phi_{ei},\boldsymbol\tau_e)$};
+\draw(2.2,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue g_e(\phi_{ei}) = \alpha_0 \, [+\ldots]$};
+\draw(2.2,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue \mu_e = g_e^{-1}(\alpha_0)$};
+
+\draw(-7.45,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red c_{i} \sim p(c\mid e,\phi_{ci},\boldsymbol\tau_c)$};
+\draw(-6.63,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red g_c(\phi_{ci}) = \beta_0 + \beta_1(\color{magenta}e_{i}-\mu_e\red)\, [+\ldots]$};
+\draw(-7.8,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red \mu_c=g_c^{-1}(\beta_0)$};
+
+\draw(2.1,.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\phi_{ei}=$ marginal mean};
+\draw(2.2,.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\tau_{e}=$ marginal variance};
+\draw(-7.3,.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\phi_{ci}=$ conditional mean};
+\draw(-7.2,.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\tau_c=$ conditional variance};
+
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+- For example:
+\begin{align}
+\class{blue}{e_i \sim `r sftext("Normal")`(\phi_{ei},\tau_e)} && \class{blue}{\phi_{ei}} &\class{blue}{= \alpha_0 [+ \ldots]} && \class{blue}{\mu_e = \alpha_0} \\
+\class{red}{c_i\mid e_i \sim `r sftext("Normal")`(\phi_{ci},\tau_c)} && \class{red}{\phi_{ci}} &\class{red}{= \beta_0 + \beta_1(e_i -\mu_e)[+\ldots]} && \class{red}{\mu_ c = \beta_0}
+\end{align}
+
+---
+
+count: false
+
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = p(e)p(c\mid e) = p(c)p(e\mid c)}$ 
+
+`r include_fig("bayesian_hta4-1.png",width="75%",title="TEXT HERE")`
+
+```{r bayesian_hta4,engine='tikz', echo=F, out.width="85%",crop = TRUE,opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\newcommand\blue{\color{blue}}
+\newcommand\red{\color{red}}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_i$};
+\draw(-3,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ic}$};
+\draw(-4,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\boldsymbol\tau_{c}$};
+\draw(-3,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_c$};
+\draw(-4,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$[\ldots]$};
+\draw(-1,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_i$};
+\draw(0,1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{ie}$};
+\draw(-0,0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\boldsymbol\tau_{e}$};
+\draw(-1,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_e$};
+\draw(-0,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$[\ldots]$};
+\draw(-2.25,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=white](11){$\beta_1$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.230) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,dotted] (10.south) -- (7.north);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,auto,node distance=.0pt,thin,dotted] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin] (11.230) -- (2.60);
+
+
+\draw[rounded corners=15pt,dashed,thick,color=blue] (-1.7,-.55) rectangle ++ (2.35,3.1) node[xshift=-1.1cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Marginal model for $e$};
+
+\draw[rounded corners=15pt,thick,color=red] (-4.5,-0.4) rectangle ++ (4,2.8) node[xshift=-2.6cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Conditional model for $c$};
+
+\draw(2.2,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue e_{i} \sim p(e\mid \phi_{ei},\boldsymbol\tau_e)$};
+\draw(2.2,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue g_e(\phi_{ei}) = \alpha_0 \, [+\ldots]$};
+\draw(2.2,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\blue \mu_e = g_e^{-1}(\alpha_0)$};
+
+\draw(-7.45,2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red c_{i} \sim p(c\mid e,\phi_{ci},\boldsymbol\tau_c)$};
+\draw(-6.63,1.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red g_c(\phi_{ci}) = \beta_0 + \beta_1(\color{magenta}e_{i}-\mu_e\red)\, [+\ldots]$};
+\draw(-7.8,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\red \mu_c=g_c^{-1}(\beta_0)$};
+
+\draw(2.05,.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\phi_{ei}=$ marginal mean};
+\draw(1.95,.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\blue $\tau_{e}=$ marginal scale};
+\draw(-7.25,.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\phi_{ci}=$ conditional mean};
+\draw(-7.95,.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\tau_c=$ shape};
+\draw(-7.75,.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=.2cm,minimum height=.1cm](11){\red $\tau_c/\phi_{ci}=$ rate};
+
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+- For example:
+`r vspace("-30px")`
+\begin{align}
+\class{blue}{e_{i} \sim `r sftext("Beta")`(\phi_{ei}\tau_e,(1-\phi_{ei})\tau_e)} && \class{blue}{`r sftext("logit")`(\phi_{ei})} &\class{blue}{= \alpha_0 [+ \ldots]} && \class{blue}{\mu_e = \frac{`r sftext("exp")`(\alpha_0)}{1+`r sftext("exp")`(\alpha_0)}} \\
+\class{red}{c_i\mid e_i \sim `r sftext("Gamma")`(\tau_c,\tau_c/\phi_{ci})} && \class{red}{`r sftext("log")`(\phi_{ci})} &\class{red}{= \beta_0 + \beta_1(e_i -\mu_e)[+\ldots]} && \class{red}{\mu_ c = `r sftext("exp")`(\beta_0)}
+\end{align}
+
+---
+
+count: false
+
+# Bayesian HTA in action
+
+- In general, can represent the joint distribution as $\class{myblue}{p(e,c) = p(e)p(c\mid e) = p(c)p(e\mid c)}$ 
+
+`r include_fig("bayesian_hta4-1.png",width="75%",title="TEXT HERE")`
+
+`r vspace("-20px")`
+- For example:
+`r vspace("-30px")`
+\begin{align}
+\class{blue}{e_{i} \sim `r sftext("Beta")`(\phi_{ei}\tau_e,(1-\phi_{ei})\tau_e)} && \class{blue}{`r sftext("logit")`(\phi_{ei})} &\class{blue}{= \alpha_0 [+ \ldots]} && \class{blue}{\mu_e = \frac{`r sftext("exp")`(\alpha_0)}{1+`r sftext("exp")`(\alpha_0)}} \\
+\class{red}{c_i\mid e_i \sim `r sftext("Gamma")`(\tau_c,\tau_c/\phi_{ci})} && \class{red}{`r sftext("log")`(\phi_{ci})} &\class{red}{= \beta_0 + \beta_1(e_i -\mu_e)[+\ldots]} && \class{red}{\mu_ c = `r sftext("exp")`(\beta_0)}
+\end{align}
+
+`r vspace("-10px")`
+
+-  Combining "modules" and fully characterising uncertainty about deterministic functions of random quantities is relatively straightforward using MCMC 
+
+- Prior information can help stabilise inference (especially with sparse data!), eg
+   - Cancer patients are unlikely to survive as long as the general population
+   - ORs are unlikely to be greater than $\pm `r sftext("5")`$
+
+---
+
+# Missing data **in HTA**
+
+- Missing data are complicated in any context
+
+   - But are fairly established in medical/bio-statistical research
+  
+  
+-  In HTA it's even more complicated...
+
+   - Bivariate outcome, usually correlated
+   - Normality not reasonable (skewness)
+   - Other features of the data ("spikes")
+   - Main objective: decision-making, not inference!
+   
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MCAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+`r vspace("-20px")`
+
+`r include_fig("missing_HTA1.png",width="72%")`
+
+
+`r vspace("8px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0}}$
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0}}$
+
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.320) -- (12.150);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (5.230) -- (15.50);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+`r include_fig("missing_HTA2.png",width="72%")`
+
+
+`r vspace("11px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0} + \sum_{k=1}^K \gamma_{ek}x_{eik}}$
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0} + \sum_{h=1}^H \gamma_{ch}x_{cih}}$
+
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MNAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (5.230) -- (15.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.320) -- (12.150);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (6.20) -- (12.210);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (1.150) -- (15.320);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+`r include_fig("missing_HTA3.png",width="72%")`
+
+
+`r vspace("11px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0} + \sum_{k=1}^K \gamma_{ek}x_{eik} + \gamma_{eK+1}e_i;} \class{blue}{\quad \gamma_{eK+1}\sim`r sftext("Informative Prior")`}$ 
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0} + \sum_{h=1}^H \gamma_{ch}x_{cih} + \gamma_{cH+1}c_i;} \class{blue}{\quad \gamma_{cK+1}\sim`r sftext("Informative Prior")`}$
+
+---
+
+# Motivating example: MenSS trial
+
+- The MenSS pilot RCT evaluates the cost-effectiveness of a new digital intervention to reduce the incidence of STI in young men with respect to the SOC
+   - QALYs calculated from utilities (EQ-5D 3L)
+   - Total costs calculated from different components (no baseline)
+  
+ 
+--
+
+### Partially observed data
+
+`r include_fig("tab_menss.png",width="75%")`
+   
+---
+
+count: 
+# Motivating example: MenSS trial
+
+- The MenSS pilot RCT evaluates the cost-effectiveness of a new digital intervention to reduce the incidence of STI in young men with respect to the SOC
+   - QALYs calculated from utilities (EQ-5D 3L)
+   - Total costs calculated from different components (no baseline)
+
+
+### Skewness and "structural values"
+
+`r vspace("-30px")`
+
+`r include_fig("menss_data.png",width="48%")`
+
+---
+
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]     
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_{it}$};
+\draw(1.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(1.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_{et}$};
+\draw(1.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.20);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+
+\draw(4.5,3.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Marginal model for $e$}};
+\draw(4.5,2.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e_{it}\sim \mbox{Normal}(\phi_{eit},\psi_{et})$};
+\draw(4.5,2.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\phi_{eit}=\mu_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(4.05,2.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\white\phi_{eit}\black=\mu_{et}+\alpha_{t}u^*_{0it}$};
+\draw(-4.5,3.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e$}};
+\draw(-4.5,2.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$c_{it}\mid e_{it}\sim \mbox{Normal}(\phi_{cit},\psi_{ct})$};
+\draw(-4.5,2.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\phi_{cit}=\mu_{ct}+\beta_t(e_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("modelling_missing1.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]     
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e^*_{it}$};
+\draw(1.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(1.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_{et}$};
+\draw(1.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.20);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+
+\draw(4.5,1.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Marginal model for $e^*$}};
+\draw(4.3,1.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e^*_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\mbox{logit}(\phi_{eit})=\mu_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(4.15,0.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\white\phi_{eit}\black=\mu_{et}+\alpha_{t}u^*_{0it}$};
+\draw(-4.5,1.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e^*$}};
+\draw(-4.5,1.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("modelling_missing2.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](12){$e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin,color=gray!20] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=gray!20] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=gray!20] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin,color=gray!20] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=gray!20] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Mixture model for $e$};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](20){$e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](23){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Conditional model for $c\mid e^*$};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("modelling_missing4.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=red!50!blue!100](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](12){\red $e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=myblue](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=gray!20] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Mixture model for $e$}};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](20){\red $e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=red!50!blue!100](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](23){$\white\mbox{logit}(\phi_{eit})\black =\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=myblue](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Conditional model for $c\mid e^*$};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("modelling_missing5.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Mixture model for $e$}};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](20){$e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](23){$\white\mbox{logit}(\phi_{eit})\black=\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e^*$}};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("modelling_missing6.png",width="75%")`
+
+---
+
+# Bayesian multiple imputation (MAR)
+`r vspace("-5px")`
+
+`r include_fig("results.png",width="69%")`
+
+`r vspace("-20px")`
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [End](#end)]]
+---
+
+name: survival
+class: empty-slide
+
+# Survival analysis in HTA
+
+`r vspace("4rem")`
+
+.small[.alignleft[`r icon::fontawesome("arrow-circle-left")` [ILD and missing data](#ild-missing)]]
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [Value of information](#voi)]]
+
+---
+
+# Survival analysis in HTA
+
+`r vspace("1cm")`
+
+.pull-left[
+`r include_fig("survival.gif",width="85%")`
+]
+
+.pull-right[
+- Survival data are often the main outcome in clinical studies relevant for HTA
+
+- Example: Cancer drugs (progression-free or overall survival time) constitute approximately 40% of all NICE appraisals in the UK
+
+`r vspace("20px")`
+
+- Relatively standardised in "classical" bio-medical research &ndash; but need to .blue[**extrapolate**], for economic purposes   
+
+- Limited follow up from studies (especially trials) is not consistent with time horizon of economic models...
+
+]
+
+---
+
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[Trial data &ndash; [Kaplan-Meier](https://en.wikipedia.org/wiki/Kaplan–Meier_estimator) curves]
+]
+
+```{r survival_hta1,echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+m=fit.models(Surv(time,censored)~as.factor(arm),distr="weibull",data=dat)
+pl=plot(m,add.km=TRUE,t=seq(0,40))
+# Removes the model curves
+pl$layers[[1]]$data=pl$layers[[1]]$data %>% mutate(S=-100)
+# Removes the legend
+pl=pl+theme(legend.position = "none") 
+# Adds names of arms
+pl=pl+annotate("text",x=10,y=.25,label="Control") + annotate("text",x=15,y=.27,label="Intervention",hjust=-1)
+pl
+```
+
+`r include_fig("survival_hta1.png",width="60%",title="The Kaplan-Meier curves are non-parametric statistics used to estimate the survival function from lifetime data. They resemble closely the observed data")`
+
+---
+
+count: false
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[**Median** time:] $\class{ubuntublue}{t: S(t)=0.5}$
+]
+```{r survival_hta2,echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+scurves=make.surv(m,t=seq(0,40,.1))
+pl=plot(m,add.km=TRUE,lab.profile=c("Control","Intervention"))
+pl+xlim(0,40) + annotate("segment", 
+                         x=-Inf,y=.5,
+                         xend=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),yend=0.5,
+                         linetype=2,color="red"
+) + geom_point(aes(x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5),size=5,color="red") +
+    geom_point(aes(x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5),size=5,color="red") +
+    annotate("text",x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),hjust=1.5,vjust=1.5) +
+    annotate("text",x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),hjust=-.4,vjust=-1) 
+```
+
+`r include_fig("survival_hta2.png",width="60%",title="The median survival time is the time (on the x-axis) in correspondence of which the estimated survival curve is equal to 0.5. That is the point in the follow up at which 50% of the population have experienced the event")`
+
+---
+
+count: false
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[**Mean** time:] $\class{ubuntublue}{\displaystyle\int_0^\infty S(t)dt}$
+]
+```{r survival_hta3,echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+mean=numeric()
+mean[1]=m$models[[1]]$res["scale","est"]*gamma(1+1/m$models[[1]]$res["shape","est"])
+mean[2]=(m$models[[1]]$res["scale","est"]+exp(m$models[[1]]$res["as.factor(arm)1","est"]))*gamma(1+1/m$models[[1]]$res["shape","est"])
+pl=plot(m,add.km=TRUE,lab.profile=c("Control","Intervention"),t=seq(0,40),annotate=TRUE) +
+   annotate("text",x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=format(mean[1],digits=3,nsmall=2),hjust=1.5,vjust=1.5) +
+    annotate("text",x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=format(mean[2],digits=3,nsmall=2),hjust=-.4,vjust=-1) 
+pl
+```
+
+`r include_fig("survival_hta3.png",width="60%",title="Conversely, the mean survival time gives the point on the x-axis that balances the distribution of the times. Because the underlying time distributions is generally skewed, mean and median times tend to be different")`
+
+---
+
+# Extrapolation
+
+## A recipe for disaster?...
+
+.pull-left[
+`r include_fig("ristorante.png",width="74%")`
+]
+.pull-right[
+<iframe frameborder="no" src="https://www.independent.co.uk/life-style/food-and-drink/worst-mistakes-people-make-eating-italian-food-cooking-silvia-baldini-food-network-a7763651.html"
+style="
+    position: fixed;
+    top: -15px;
+    bottom: 0px;
+    right: -80px;
+    width: 75%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 999999;
+    height: 115%;
+    ms-transform: scale(0.45);
+   -moz-transform: scale(0.45);
+   -o-transform: scale(0.45);
+   -webkit-transform: scale(0.45);
+   transform: scale(0.70);
+  "></iframe>
+]
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+m=fit.models(Surv(time,censored)~as.factor(arm),distr=c("wei","exp","gam","lno","llo"),data=dat)
+plot(m,mods=c(1,3),add.km=T,lab.profile=c("Control","Intervention"))+xlim(0,70)
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+plot(m,mods=c(1,3),add.km=T,lab.profile=c("Control","Intervention"),t=seq(0,70))
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+plot(m,add.km=T,lab.profile=c("Control","Intervention"),t=seq(0,70))
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=11,fig.height=8,fig.align='center',opts=list(width="50%",title="INSERT TEXT HERE")}
+model.fit.plot(m)
+```
+
+- **NB**: Any \*IC can only tell us about model fit **for the observed data**!     
+- Extrapolation (like missing data) is based on (virtually) untestable assumptions
+
+---
+
+count: false
+exclude: true
+# Extrapolation
+
+## A recipe for disaster?...
+
+`r include_fig("xls_analysis.png",width="68%")`
+
+---
+
+exclude: true
+# Survival analysis in HTA
+
+## ... *To be or not to be (Bayesian)?*...
+
+- For more complex models, MLE-based estimates may fail to converge
+
+   – This may be an issue for multi-parameter models, where limited data (not compounded by relevant prior information) are not enough to fit all the model parameters
+   
+   – **NB**: you would normally need to fit more complex models for cases where the survival curves are "strange" and so the usual parametric models fail to provide sufficient fit
+
+.lightgray[
+- When there is strong correlation among the survival parameters, the results of the uncertainty analysis may be (strongly) biased under a more simplistic frequentist model
+
+   – This matters most in health economics, because this bias carries over the economic modelling, optimal decision making and assessment of the impact of parametric uncertainty!
+   
+   – **A full Bayesian approach propagates directly correlation and uncertainty in the model parameters through to the survival curves and the economic model**
+]
+
+---
+
+count: false
+exclude: true
+# Survival analysis in HTA
+<!--
+See trick to highlight only bits of this here:
+https://stackoverflow.com/questions/52016911/highlight-selection-of-code-in-xaringan/52018533
+-->
+
+## ... *To be or not to be (Bayesian)?*...
+
+```{eval=FALSE}
+Model fit for the Generalised F model, obtained using Flexsurvreg 
+(Maximum Likelihood Estimate). `Running time: 1.157 seconds`
+
+                      mean        se        L95%        U95%
+mu              2.29139696 0.0798508 2.13489e+00 2.44790e+00
+sigma           0.58729598 0.0725044 4.61076e-01 7.48069e-01
+Q               0.84874994 0.2506424 3.57500e-01 1.34000e+00
+P               0.00268265 0.0902210 `6.33197e-32 1.13655e+26`
+as.factor(arm)1 0.34645851 0.0877892 1.74395e-01 5.18522e-01
+```
+
+`r vspace("2em")`
+
+```{eval=FALSE}
+Model fit for the Generalised F model, obtained using Stan 
+(Bayesian inference via Hamiltonian Monte Carlo). `Running time: 26.692 seconds`
+
+                    mean        se      L95%      U95%
+mu              2.256760 0.3455163 1.1897086 3.0865904
+sigma           0.507861 0.0762112 0.3608566 0.6582047
+Q               0.700062 0.3358360 0.0786118 1.3880582
+P               1.131968 0.5837460 `0.3908284 2.634276`
+as.factor(arm)1 0.345516 0.0865904 0.1745665 0.5176818
+```
+
+---
+
+count: false
+exclude: true
+# Survival analysis in HTA
+
+## ... *To be or not to be (Bayesian)?*...
+
+.lightgray[
+- For more complex models, MLE-based estimates may fail to converge
+
+   – This may be an issue for multi-parameter models, where limited data (not compounded by relevant prior information) are not enough to fit all the model parameters
+   
+   – **NB**: you would normally need to fit more complex models for cases where the survival curves are "strange" and so the usual parametric models fail to provide sufficient fit
+]
+
+
+- When there is strong correlation among the survival parameters, the results of the uncertainty analysis may be (strongly) biased under a more simplistic frequentist model
+
+   – This matters most in health economics, because this bias carries over the economic modelling, optimal decision making and assessment of the impact of parametric uncertainty!
+   
+   – .olive[**A full Bayesian approach propagates directly correlation and uncertainty in the model parameters through to the survival curves and the economic model**]
+
+---
+
+
+# Example: ICD & Cardiac death
+
+.alignright[`r icon::academicons$pubmed` [Benaglia et al (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4847642/)]
+
+## Set up/interventions
+
+- ICD (Implantable Cardioverter Defibrillators) compared to anti-arrhythmic drugs (AAD) for prevention of sudden cardiac death in people with cardiac arrhythmia
+
+--
+
+## Data
+
+- Individual data from cohort of 535 UK cardiac arrhythmia patients implanted with ICDs between 1991 and 2002
+
+-  Meta-analysis of three (non-UK) RCTs providing published HRs
+   – Relatively short-term follow-up: approximately 75% people, followed for less than 5 years, maximum 10 years
+   
+- UK population mortality statistics by age, sex, cause of death
+
+--
+
+## Objective
+
+- Estimate the survival curve over the lifetime of ICD and AAD patients in UK 
+
+- Extrapolate the output to inform the wider economic model
+
+---
+
+count: false
+# Example: ICD & Cardiac death
+
+## Basic idea
+
+Use UK population data (matched by age/sex) to "**anchor**" the ICD population at risk
+
+`r include_fig("ICD1.png",width="45%")`
+
+---
+
+count: false
+# Example: ICD & Cardiac death
+
+## Basic idea
+
+Use UK population data (matched by age/sex) to "**anchor**" the ICD population at risk
+
+- Perhaps the easiest way to do this is to relate the hazard between the two populations &ndash; eg **proportional hazard** (PH) model
+`r vspace("-20px")`
+   $$\class{myblue}{h_{\rm{ICD}}(t) = e^{\beta}h_{\rm{UK}}(t) \qquad \Leftrightarrow \qquad \HR = \frac{h_{\rm{ICD}}(t)}{h_{\rm{UK}}(t)} = e^{\beta} = `r sftext("Constant")`}$$
+   
+`r vspace("-20px")`
+   
+- Relatively easy to model &ndash; but probably very unrealistic!
+
+   - ICD patients are at (much?) greater risk of arrhythmia death 
+   - If the proportion of deaths caused by arrythmia changes over time, we would induce bias, because we would be extrapolate a constant HR for all causes mortality
+   
+--
+
+- Formally account for multiple mortality causes (.blue[**Poly-Weibull**] model `r icon::academicons$pubmed` [Demiris et al, 2015](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4456429/)):
+\begin{align}
+\class{myblue}{h_{\rm{ICD}}(t)} &\class{myblue}{= h}_{\rm{\class{red}{ICD}}}^{\rm{\class{myblue}{arr}}}\class{myblue}{(t) + h}_{\rm{\class{red}{ICD}}}^{\rm{\class{myblue}{oth}}}\class{myblue}{(t)} \\
+&\class{myblue}{=} \class{orange}{e^\beta} \class{myblue}{h^{\rm{arr}}}_{\rm{\class{blue}{UK}}}\class{myblue}{(t)} + \class{myblue}{h^{\rm{oth}}}_{\rm{\class{blue}{UK}}}\class{myblue}{(t)} \\
+&\class{myblue}{=} \class{orange}{e^\beta}\class{myblue}{\alpha_1 \mu_1 t^{\alpha_1-1} + \alpha_2 \mu_2 t^{\alpha_2-1}}
+\end{align}
+
+`r vspace("-20px")`
+- This assumes that
+   -  Arrhythmia hazard is .orange[**proportional**] to matched UK population
+   - Other causes hazard is **identical** to matched UK population
+
+---
+
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+```{css echo=FALSE}
+.left-column30 {
+  width: 30%;
+  height: 92%;
+  float: left;
+}
+.left-column30 h2, .left-column h3 {
+  color: #035AA699;
+}
+.left-column30 h2:last-of-type, .left-column h3:last-child {
+  color: #035AA6;
+}
+.right-column70 {
+  width: 65%;
+  float: right;
+  padding-top: 0em;
+}
+
+```
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". 
+]
+
+---
+
+count: false
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". **But: don't they?...**
+]
+
+---
+
+count: false
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". **But: don't they?...**
+
+`r vspace("2em")`
+- In the ICD case, age at entry is around 60 &ndash; we **know** that people won't survive more than 60 more years
+   - Setting a prior for the scale $\mu_i \sim \dunif(0,100)$ implies that the prior mean survival of the resulting Weibull distribution is 
+   $$\class{myblue}{\mu_i\Gamma\left(1+\frac{1}{\alpha}\right) < 60}$$
+   
+- Can also include some knowledge on the shape $\alpha$ and the coefficient $\beta$ to limit their variations in reasonable ranges...
+
+]
+
+---
+
+# Results
+
+`r include_fig("ICD2.png",width="85%")`
+
+- Ignoring cause-specific mortality (.red[Weibull]) results in larger bias, especially for females (because the arrhythmia proportion of deaths does vary over time in that subgroup)
+
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [End](#end)]]
+---
+
+
+name: voi
+class: empty-slide
+
+# Value of information
+
+`r vspace("4rem")`
+
+.small[.alignleft[`r icon::fontawesome("arrow-circle-left")` [ILD and missing data](#ild-missing)]]
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [Survival analysis](#survival)]]
+
+---
+
+# Knowledge *is* power?...
+
+## (A tale of two stupid examples)
+
+.left-column30[
+`r include_fig("knowledge_power.jpg",width="75%")`
+]
+
+.right-columnt70[
+
+- **Example 1**: Intervention $t=1$ is more cost-effective, given current evidence
+   - $\class{myblue}{\Pr(t=1 `r sftext(" is cost-effective")`) = `r sftext("0.51")`}$
+   - If we get it wrong: 
+      - Increase in population average costs $=$ £3
+      - Decrease in population average effectiveness $=$ 0.000001 QALYs
+   - .red[Large uncertainty]/.traffic-light-green[negligible consequences] $\Rightarrow$ .traffic-light-green[**can afford uncertainty**!]
+
+]
+
+---
+
+count: false
+# Knowledge *is* power?...
+
+## (A tale of two stupid examples)
+
+.left-column30[
+`r include_fig("knowledge_power.jpg",width="75%")`
+]
+
+.right-columnt70[
+
+- **Example 1**: Intervention $t=1$ is more cost-effective, given current evidence
+   - $\class{myblue}{\Pr(t=1 `r sftext(" is cost-effective")`) = `r sftext("0.51")`}$
+   - If we get it wrong: 
+      - Increase in population average costs $=$ £3
+      - Decrease in population average effectiveness $=$ 0.000001 QALYs
+   - .red[Large uncertainty]/.traffic-light-green[negligible consequences] $\Rightarrow$ .traffic-light-green[**can afford uncertainty**!]
+
+`r vspace("60px")`
+- **Example 2**: Intervention $t=1$ is more cost-effective, given current evidence
+   - $\class{myblue}{\Pr(t=1 `r sftext(" is cost-effective")`) = `r sftext("0.999")`}$
+   - If we get it wrong: 
+      - Increase in population average costs $=$ £1000000000
+      - Decrease in population average effectiveness $=$ 999999 QALYs
+   - .traffic-light-green[Tiny uncertainty]/.red[dire consequences] $\Rightarrow$ .traffic-light-amber[**probably should think about it...**!]
+
+]
+
+---
+
+# Evidence based decision-making and VoI
+
+`r include_fig("evi_process.png",width="75%")`
+
+--
+
+.blue[**Process inherently Bayesian!**]
+
+
+`r vspace("-5px")`
+.small[Slide stolen from Nicky Welton &ndash; [Summer School *Bayesian methods in health economics*](http://www.statistica.it/gianluca/teaching/summer-school/)]
+
+---
+
+# VoI: Basic ideas
+
+- A new study will provide more data
+   - Reducing (or even eliminating?...) uncertainty in a subset of the model parameters
+   
+- Update the cost-effectiveness model
+   - If optimal decision changes, gain in monetary net benefit (NB = utility) from using new optimal treatment
+   - If optimal decision doesn't change, no gain in NB
+   
+- .red[**Expected**] VoI is the average gain in NB
+
+---
+
+count: false
+# VoI: Basic ideas & relevant measures
+
+- A new study will provide more data
+   - Reducing (or even eliminating?...) uncertainty in a subset of the model parameters
+   
+- Update the cost-effectiveness model
+   - If optimal decision changes, gain in monetary net benefit (NB = utility) from using new optimal treatment
+   - If optimal decision doesn't change, no gain in NB
+   
+- .red[**Expected**] VoI is the average gain in NB
+
+`r vspace("-10px")`
+
+1. **Expected value of Perfect Information** (EVPI)    
+   - Value of completely resolving uncertainty in all input parameters to decision model 
+   - Infinite-sized, long-term follow up trial measuring everything!...
+   - Gives an upper bound on the value of the new study &ndash; low EVPI suggests we can make our decision based on existing information
+   
+---
+
+count: false
+# VoI: Basic ideas & relevant measures
+
+- A new study will provide more data
+   - Reducing (or even eliminating?...) uncertainty in a subset of the model parameters
+   
+- Update the cost-effectiveness model
+   - If optimal decision changes, gain in monetary net benefit (NB = utility) from using new optimal treatment
+   - If optimal decision doesn't change, no gain in NB
+   
+- .red[**Expected**] VoI is the average gain in NB
+
+`r vspace("-10px")`
+
+1. **Expected value of Perfect Information** (EVPI)    
+   - Value of completely resolving uncertainty in all input parameters to decision model 
+   - Infinite-sized, long-term follow up trial measuring everything!...
+   - Gives an upper bound on the value of the new study &ndash; low EVPI suggests we can make our decision based on existing information
+2. **Expected value of Partial Perfect Information** (EVPPI)     
+   - Value of eliminating uncertainty in subset of input parameters to decision model
+   - e.g.: Infinite-sized trial measuring relative effects on 1-year survival
+   - Useful to identify which parameters are responsible for decision uncertainty
+---
+
+count: false
+# VoI: Basic ideas & relevant measures
+
+- A new study will provide more data
+   - Reducing (or even eliminating?...) uncertainty in a subset of the model parameters
+   
+- Update the cost-effectiveness model
+   - If optimal decision changes, gain in monetary net benefit (NB = utility) from using new optimal treatment
+   - If optimal decision doesn't change, no gain in NB
+   
+- .red[**Expected**] VoI is the average gain in NB
+
+`r vspace("-10px")`
+
+1. **Expected value of Perfect Information** (EVPI)    
+   - Value of completely resolving uncertainty in all input parameters to decision model 
+   - Infinite-sized, long-term follow up trial measuring everything!...
+   - Gives an upper bound on the value of the new study &ndash; low EVPI suggests we can make our decision based on existing information
+2. **Expected value of Partial Perfect Information** (EVPPI)    
+   - Value of eliminating uncertainty in subset of input parameters to decision model
+   - e.g.: Infinite-sized trial measuring relative effects on 1-year survival
+   - Useful to identify which parameters are responsible for decision uncertainty
+3. **Expected value of Sample Information** (EVSI)    
+   - Value of reducing uncertainty by conducting a specific study of a given design
+   - Can compare the benefits and costs of a study with given design
+   - Is the proposed study likely to be a good use of resource? What is the optimal design?
+
+---
+
+exclude: true
+# Summarising PSA
+
+## Expected Value of Perfect Information
+
+.alignleft[
+```{r echo=FALSE}
+library(kableExtra)
+options(knitr.kable.NA = "\\(\\ldots\\)")
+set.seed(140873)
+nb0=9685*round(rnorm(10000,7.5,3))
+nb1=9685*round(rnorm(10000,8,3))
+mnb=pmax(nb1,nb0)
+ol=mnb-nb1
+show.col=4
+tab=tibble(
+   iter=c(format(seq(1,show.col),digits=0),NA,format(1000,digits=0)),
+   pi0=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   rho=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   dots=rep("\\(\\ldots\\)",show.col+2),
+   gamma=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   nb0=c(nb0[1:show.col],NA,nb0[10000]),
+   nb1=c(nb1[1:show.col],NA,nb1[10000])
+)
+tab=tab %>% mutate(
+   mnb=c(mnb[1:show.col],NA,mnb[10000]),
+   ol=c(ol[1:show.col],NA,ol[10000])
+)
+
+tab[1:5] %>% kable(col.names=c(
+   "Iteration","\\(\\pi_0\\)","\\(\\rho\\)","\\(\\ldots\\)","\\(\\gamma\\)"
+   ##"\\(\\nb_0(\\boldsymbol\\theta)\\)","\\(\\nb_1(\\boldsymbol\\theta)\\)","Maximum net benefit","Opportunity loss"
+   ), align="c"
+   ) %>% kable_classic() %>%
+   column_spec(1:5,width="2cm") %>% 
+   #column_spec(c(8,9), width = "120px") %>% 
+   kable_styling(full_width=T) %>% 
+   # add_header_above(c(" "=1,"Parameter simulations"=4,"Expected utility"=2," "=2)) %>% 
+   add_header_above(c(" "=1,"Parameter simulations"=4)) %>% 
+   row_spec(nrow(tab),extra_css="border-bottom: 2px solid;") 
+
+```
+]
+
+`r vspace("9.5cm")`
+- Characterise uncertainty in the model parameters
+   - In a full Bayesian setting, these are drawings from the posterior distribution of $\bm\theta$
+   - In a frequentist setting, these are typically bootstrap draws from a set of univariate ditributions that describe some level of uncertainty around the MLEs
+
+---
+
+exclude: true
+count: false
+# Summarising PSA
+
+## Expected Value of Perfect Information
+
+.alignleft[
+```{r echo=FALSE}
+tab2=tab %>% add_row(
+   iter="",
+   pi0="",
+   rho="",
+   dots="",
+   gamma="Average",
+   nb0=mean(nb0),
+   nb1=mean(nb1),
+   mnb=mean(mnb,na.rm=T),
+   ol=mean(ol,na.rm=T)
+)
+
+italics1=tab$nb1>tab$nb0; italics1[is.na(italics1)]=FALSE
+italics0=tab$nb0>tab$nb1; italics0[is.na(italics0)]=FALSE
+tab2[1:7] %>% kable(col.names=c(
+   "Iteration","\\(\\pi_0\\)","\\(\\rho\\)","\\(\\ldots\\)","\\(\\gamma\\)",
+   "\\(\\nb_0(\\boldsymbol\\theta)\\)","\\(\\nb_1(\\boldsymbol\\theta)\\)"
+   #,"Maximum net benefit","Opportunity loss"
+   ), align="c"
+   ) %>% kable_classic() %>%
+   column_spec(1:5,width="2cm") %>% 
+   #column_spec(c(8,9), width = "120px") %>% 
+   kable_styling(full_width=T) %>% 
+   # add_header_above(c(" "=1,"Parameter simulations"=4,"Expected utility"=2," "=2)) %>% 
+   add_header_above(c(" "=1,"Parameter simulations"=4,"Expected utility"=2)) %>% 
+   row_spec(nrow(tab2),extra_css="border-bottom: 2px black solid;") %>% 
+   row_spec(nrow(tab2)-1,extra_css="border-bottom: 2px black solid;") %>% 
+   column_spec(7,color=c(rep("black",(nrow(tab))),"magenta"),italic=c(italics1,TRUE),width="2cm") %>% 
+   column_spec(6,italic=c(italics0,FALSE),width="2cm")
+
+```
+]
+
+`r vspace("9.5cm")`
+- Uncertainty in the parameters induces a distribution of decisions
+   - Typically based on the **net benefits**: $\class{myblue}{\nb_t(\bm\theta)=k\mu_{et}-\mu_{ct}}$
+   - In each parameter configuration can identify the *optimal strategy*
+   
+- Averaging over the uncertainty in $\bm\theta$ provides $t^*$, the overall optimal decision *given current uncertainty* (= choose the intervention associated with .magenta[*highest* **expected utility**])
+
+---
+
+exclude: true
+count: false
+# Summarising PSA
+
+## Expected Value of Perfect Information
+
+.alignleft[
+```{r echo=FALSE}
+tab2 %>% kable(col.names=c(
+   "Iteration","\\(\\pi_0\\)","\\(\\rho\\)","\\(\\ldots\\)","\\(\\gamma\\)",
+   "\\(\\nb_0(\\boldsymbol\\theta)\\)","\\(\\nb_1(\\boldsymbol\\theta)\\)",
+   "Maximum net benefit","Opportunity loss"), align="c"
+   ) %>% kable_classic() %>%
+   column_spec(1:5,width="2cm") %>% 
+#   column_spec(c(8,9), width = "120px") %>% 
+   kable_styling(full_width=T) %>% 
+   add_header_above(c(" "=1,"Parameter simulations"=4,"Expected utility"=2," "=2)) %>% 
+   row_spec(nrow(tab2),extra_css="border-bottom: 2px black solid;") %>% 
+   row_spec(nrow(tab2)-1,extra_css="border-bottom: 2px black solid;") %>% 
+   column_spec(7,color=c(rep("black",(nrow(tab))),"magenta"),italic=c(italics1,TRUE),width="2cm") %>% 
+   column_spec(6,italic=c(italics0,FALSE),width="2cm") %>% 
+   column_spec(8,bold=c(rep(FALSE,nrow(tab)),TRUE),color=c(rep("black",nrow(tab)),"blue")) %>% 
+   column_spec(9,color=c(rep("black",nrow(tab)),"olive"),bold=c(rep(FALSE,nrow(tab)),TRUE))
+
+```
+]
+
+`r vspace("9.5cm")`
+- **Expected value of "Perfect" Information** (EVPI) summarises uncertainty in the decision
+   - Defined as the .olive[**average Opportunity Loss**], or .blue[**average maximum expected utility under "perfect" information**] $-$ .magenta[**maximum expected utility overall**]:
+   `r vspace("-20px")`
+   $$\class{olive}{\evppi} = \class{blue}{\E_\bm{\theta}\left[\max_t \nb_t(\bm\theta) \right]} - \class{magenta}{\max_t \E_\bm\theta \left[\nb_t(\bm\theta)\right]} = \E_\bm\theta\left[\max_t \nb_t(\bm\theta) - \nb_{t^*}(\bm\theta) \right]$$
+
+---
+
+exclude: true
+count: false
+# Summarising PSA 
+
+```{r echo=FALSE,opts=list(width="53%")}
+library(BCEA)
+data(Vaccine)
+evi.plot(bcea(e,c,ref=2))
+```
+
+---
+
+# Summarising PSA + Research priority
+
+```{css echo=FALSE}
+<!-- https://www.garrickadenbuie.com/blog/better-progressive-xaringan/?panelset=r-markdown -->
+.shading > li {
+  color: gray;
+}
+.shading > li:last-of-type {
+  color: #24568c;
+  font-weight: normal;
+}
+```
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+--
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{myblue}{\bm\phi}\) but not \(\class{myblue}{\bm\psi}\)</li>
+</ul>
+
+
+`r vspace("3cm")`
+$$\class{myblue}{\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]}$$
+
+---
+
+count: false
+# Summarising PSA + Research priority
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{gray}{\bm\phi}\) but not \(\class{gray}{\bm\psi}\)</li>
+<li><b>If</b> we knew \(\class{myblue}{\bm\phi}\) perfectly, best decision = the maximum of this EU</li>
+</ul>
+
+`r vspace("2.25cm")`
+$$\class{myblue}{\max_t}\class{gray}{\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]}$$
+
+---
+
+count: false
+# Summarising PSA + Research priority
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{gray}{\bm\phi}\) but not \(\class{gray}{\bm\psi}\)</li>
+<li><b>If</b> we knew \(\class{gray}{\bm\phi}\) perfectly, best decision = the maximum of this EU</li>
+<li>Of course, we cannot know \(\class{myblue}{\bm\phi}\) <b>perfectly</b>, so take the expected value</li>
+</ul>
+
+`r vspace("1.1cm")`
+$$\class{myblue}{\E_{\bm\phi}}\class{myblue}{\left [\class{gray}{\max_t\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]}\right]}$$
+
+---
+
+count: false
+# Summarising PSA + Research priority
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{gray}{\bm\phi}\) but not \(\class{gray}{\bm\psi}\)</li>
+<li><b>If</b> we knew \(\class{gray}{\bm\phi}\) perfectly, best decision = the maximum of this EU</li>
+<li>Of course, we cannot know \(\class{gray}{\bm\phi}\) <b>perfectly</b>, so take the expected value</li>
+<li>And compare this with the <b>maximum expected utility overall</b></li>
+</ul>
+
+`r vspace(".5cm")`
+$$\class{gray}{\E_{\bm\phi}\left[\max_t\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]\right]}\class{myblue}{-\max_t \E_{\bm\theta}[\nb_t(\bm\theta)]}$$
+
+---
+
+count: false
+# Summarising PSA + Research priority
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{gray}{\bm\phi}\) but not \(\class{gray}{\bm\psi}\)</li>
+<li><b>If</b> we knew \(\class{gray}{\bm\phi}\) perfectly, best decision = the maximum of this EU</li>
+<li>Of course, we cannot know \(\class{gray}{\bm\phi}\) <b>perfectly</b>, so take the expected value</li>
+<li>And compare this with the <b>maximum expected utility overall</b></li>
+<li>This is the EVPPI</li>
+</ul>
+
+`r vspace("-.55cm")`
+$$\class{myblue}{\evppi = \E_{\bm\phi}\left[\max_t\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]\right]-\max_t \E_{\bm\theta}[\nb_t(\bm\theta)]}$$
+
+---
+
+count: false
+# Summarising PSA + Research priority
+
+## Expected Value of Partial Perfect Information
+
+- $\class{blue}{\bm\theta} =$ all the model parameters; can be split into two subsets
+   - The ".myblue[**parameters of interest**]", $\class{myblue}{\bm\phi}$, e.g. prevalence of a disease, HRQL measures, length of stay in hospital, ...
+   - The ".olive[**remaining parameters**], $\class{olive}{\bm\psi}$, e.g. cost of treatment with other established medications, ...
+
+- We are interested in quantifying the value of gaining more information on $\class{myblue}{\bm\phi}$, while leaving current level of uncertainty on $\class{olive}{\bm\psi}$ unchanged
+
+<ul class="shading">
+<li>First, consider the expected utility (EU) <b>if</b> we were able to learn \(\class{gray}{\bm\phi}\) but not \(\class{gray}{\bm\psi}\)</li>
+<li><b>If</b> we knew \(\class{gray}{\bm\phi}\) perfectly, best decision = the maximum of this EU</li>
+<li>Of course, we cannot know \(\class{gray}{\bm\phi}\) <b>perfectly</b>, so take the expected value</li>
+<li>And compare this with the <b>maximum expected utility overall</b></li>
+<li>This is the EVPPI</li>
+</ul>
+
+`r vspace("-.55cm")`
+$$\class{myblue}{\evppi = \E_{\bm\phi}\left[\class{red}{\max_t\E_{\bm\psi\mid\bm\phi}[\nb_t(\bm\theta)]}\right]-\max_t \E_{\bm\theta}[\nb_t(\bm\theta)]}$$
+
+- .red[**That**] is the difficult part!
+   - Can do nested Monte Carlo, but takes for ever to get accurate results
+   - .orange[**Recent methods**] based on **Gaussian Process regression** very efficient and quick! 
+   
+`r vspace("-17px")`
+.alignright[.small[`r icon::fontawesome("book-open")` [Strong et al (2014)](https://journals.sagepub.com/doi/full/10.1177/0272989x13505910) and `r icon::fontawesome("book-open")`  [Heath et al (2016)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6983)]]
+---
+
+# EVPPI &ndash; Brute force/nested MC
+
+Assuming there are only two interventions, can consider $\class{myblue}{\inb(\bm\theta)=\nb_1(\bm\theta)-\nb_0(\bm\theta)}$
+
+`r include_fig("brute-force-1_25.png",width="44%")`
+
+`r vspace("-5px")`
+.small[Slide stolen from Mark Strong &ndash; [Summer School *Bayesian methods in health economics*](http://www.statistica.it/gianluca/teaching/summer-school/)]
+---
+
+count: false
+# EVPPI &ndash; Brute force/nested MC
+
+Assuming there are only two interventions, can consider $\class{myblue}{\inb(\bm\theta)=\nb_1(\bm\theta)-\nb_0(\bm\theta)}$
+
+`r include_fig("brute-force-2_26.png",width="44%")`
+
+---
+
+count: false
+# EVPPI &ndash; model as a regression problem...
+
+Can model as a **regression** problem
+\begin{align}
+\nb_t(\bm\theta) =& \E_{\bm\psi\mid\bm\theta}[\nb_t(\bm\theta)] + \varepsilon, \qquad `r sftext(" with ")` \varepsilon \sim \dnorm(0,\sigma^2_\varepsilon) \\
+=& \class{olive}{g(\bm\phi)} + \class{myblue}{\varepsilon}
+\end{align}
+`r vspace("-20px")`
+
+"Data" 
+   - **Simulations** for $\nb_t(\bm\theta)$ as ".myblue[response]"
+   - **Simulations** for $\bm\phi$ as ".olive[covariates]"
+   - **NB**: Only need $S$ data points (=PSA simulations), instead of $S_\bm\phi \times S_\bm\psi$!
+   
+.center[
+```{r echo=FALSE}
+library(kableExtra)
+options(knitr.kable.NA = "\\(\\ldots\\)")
+set.seed(140873)
+nb0=9685*round(rnorm(10000,7.5,3))
+nb1=9685*round(rnorm(10000,8,3))
+mnb=pmax(nb1,nb0)
+ol=mnb-nb1
+show.col=4
+tab=tibble(
+   iter=c(format(seq(1,show.col),digits=0),NA,"\\(S\\)"), #format(1000,digits=0)
+   pi0=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   rho=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   dots=rep("\\(\\ldots\\)",show.col+2),
+   gamma=c(format(rbeta(show.col,1,2),digits=3,nsmall=0),NA,format(rbeta(1,1,2),digits=3,nsmall=0)),
+   nb0=c(nb0[1:show.col],NA,nb0[10000]),
+   nb1=c(nb1[1:show.col],NA,nb1[10000])
+)
+
+
+tab %>% kable(col.names=c(
+   "Iteration","\\(\\pi_0\\)","\\(\\rho\\)","\\(\\ldots\\)","\\(\\gamma\\)",
+   "\\(\\nb_0(\\boldsymbol\\theta)\\)","\\(\\nb_1(\\boldsymbol\\theta)\\)"
+   ), align="c"
+   ) %>% kable_classic() %>%
+   column_spec(1:7,width="2.5cm") %>% 
+   #column_spec(c(8,9), width = "120px") %>% 
+   kable_styling(full_width=F,font_size = 18) %>% 
+   add_header_above(c(" "=1,"Parameter simulations ('covariates')"=4,"'Responses'"=2)) %>% 
+   row_spec(nrow(tab),extra_css="border-bottom: 2px solid;") 
+
+```
+]
+
+---
+
+count: false
+# EVPPI &ndash; model as a regression problem...
+
+`r include_fig("brute-force-3_28.png",width="48%")`
+
+---
+
+count: false
+# EVPPI &ndash; model as a regression problem...
+
+`r include_fig("brute-force-4_29.png",width="48%")`
+
+---
+
+count: false
+# EVPPI &ndash; model as a regression problem...
+
+`r include_fig("brute-force-5_30.png",width="51%")`
+
+---
+
+count: false
+# EVPPI &ndash; model as a regression problem...
+
+- Once the functions $\class{olive}{g_t(\bm\phi)}$ are estimated, can approximate
+\begin{align}
+\evppi&=\E_\bm\phi \left[ \max_t \E_{\bm\psi\mid\bm\phi} [\nb_t(\bm\theta)] \right] - \max_t \E_\bm\theta [\nb_t(\bm\theta)] \\
+&\approx\frac{1}{S}\sum_{s=1}^S \max_t \hat{g}_t(\bm\phi_s) - \max_t \frac{1}{S}\sum_{s=1}^S \hat{g}_t(\bm\phi_s)
+\end{align}
+
+
+--
+
+
+- **NB**: $\class{olive}{g_t(\bm\phi)}$ can be complex, so need to use .orange[**flexible**] regression methods
+   - **GAMs**: $\displaystyle g_t(\bm\phi)=\sum_{q=1}^{Q_\bm\phi} h_t(\phi_{sq})$ with $h_t(\cdot)=$ smooth functions (cubic polynomials) 
+   
+   - very fast, but only if number of important parameters $Q_\bm\phi\leq 5$ (interactions increase model size exponentially)
+   
+   - If $Q_\bm\phi >5$ then use .blue[**Gaussian Process**] regression
+
+---
+
+# EVPPI via GP regression
+
+Model
+
+$$\class{myblue}{\begin{pmatrix}\nb_t(\bm\theta_1)\\\nb_t(\bm\theta_2)\\\vdots\\\nb_t(\bm\theta_S)\end{pmatrix}:=\boldsymbol{\nb}_t\sim\dnorm(\bm{H}\bm\beta,\mathcal{C}_{Exp}+\sigma^2\bm{I})}$$
+
+$$\displaystyle \class{myblue}{\bm{H} = \begin{pmatrix}1 & \phi_{11} & \cdots & \phi_{1Q_{\bm\phi}}\\1 & \phi_{21} & \cdots & \phi_{2Q_{\bm\phi}}\\\vdots & & \ddots & \\1 & \phi_{S1} & \cdots & \phi_{SQ_{\bm\phi}}\end{pmatrix}} \qquad `r sftext(" and ")` \qquad  \class{myblue}{\displaystyle \mathcal{C}_{Exp}(r,s)=\sigma^2\exp\left[\sum_{q=1}^{Q_\bm\phi}\left(\frac{\phi_{rq}-\phi_{sq}}{\delta_q}\right)^2\right]}$$
+
+- Parameters: $\class{olive}{\bm\beta}$, $\class{orange}{\bm\delta}$, $\class{orange}{\sigma^2}$, $\class{orange}{\sigma^2_\varepsilon}$
+
+- Very flexible structure &ndash; excellent approximation level
+
+- Can use conjugate priors + numerical optmisation, **but** can still be very slow &ndash; computational cost in the order of $S^3$ (inversion of a dense covariance matrix)
+
+---
+
+# EVPPI via GP regression
+
+... **but faster** .alignright[`r icon::fontawesome("book-open")`  [Heath et al (2016)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6983)]
+
+--
+
+1. Build from ideas in spatial statistics and use a Matérn covariance function
+   $$\class{myblue}{\mathcal{C}_M(r,s)=\frac{\sigma^2}{\Gamma(\nu)2^{\nu-1}}(\kappa\mid\mid \bm\phi_r-\bm\phi_s\mid\mid)^\nu \bm{K}_\nu (\kappa\mid\mid \bm\phi_r-\bm\phi_s\mid\mid)}$$
+   - Fewer parameters, but still implies a dense covariance matrix
+   - **BUT**: can use efficient algorithms to solve .olive[**Stochastic Partial Differential Equations**] (SPDEs) to approximate it &ndash; with computational cost $\propto S^{3/2}$! .alignright[`r icon::fontawesome("book-open")`  [Lindgren et al (2011)](https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.1467-9868.2011.00777.x)]
+   
+--
+
+2. Re-formulate the model as
+   $$\class{myblue}{\nb_t \sim \dnorm(\bm{H}\bm\beta, \mathcal{C}_M+\sigma^2_\varepsilon\bm{I}) = \dnorm(\bm{H}\bm\beta+f(\bm\omega),\sigma^2_\varepsilon\bm{I})}$$
+   - $\class{myblue}{f(\bm\omega)}$ are a set of "spatially structured" effects, with $\class{myblue}{\bm\omega \sim \dnorm(0,\bm{Q}^{-1}(\bm\xi))}$
+   - $\class{myblue}{\bm{Q}^{-1}(\bm\xi)}$ is a .orange[**sparse**] precision matrix determined by the SPDE solution
+   
+--
+
+3. Crucially, if we set a sparse Gaussian prior on $\bm\beta$, this is a Latent Gaussian model $\Rightarrow$ can be estimated using super-fast .olive[**Integrated Nested Laplace Approximation**] (INLA) .alignright[`r icon::fontawesome("book-open")`  [Rue et al (2009)](https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2008.00700.x)]
+
+**NB** Both methods are implemented in the `R` package [`BCEA`](http://www.statistica.it/gianluca/software/bcea/)
+
+---
+
+background-image: url("img/tenor.gif")
+background-size: cover
+
+# 
+
+---
+
+count: false
+# Lost in space
+
+- In a "proper" spatial problem, data are observed at a bivariate grid of points
+
+   - Points that are closer tend to be more correlated than points further apart
+   - The INLA-SPDE procedure builds a grid approximation of the underlying bidimensional space 
+   - Points not on the grid are estimated by interpolation &ndash; deriving a full surface
+
+
+--
+
+
+`r include_fig("swiss.png",width="40%")`
+
+---
+
+count: false
+# Lost in space
+
+- In a "proper" spatial problem, data are observed at a bivariate grid of points
+   - Points that are closer tend to be more correlated than points further apart
+   - The INLA-SPDE procedure builds a grid approximation of the underlying bidimensional space 
+   - Points not on the grid are estimated by interpolation &ndash; deriving a full surface
+   
+- In our case, "data" are observed on a high-dimensional space, with no proper "spatial" interpretation!
+
+- Need to use some form of **dimensionality reduction** to project the $Q_\bm\phi$-dimensional space of $\bm\phi$ onto a 2-dimensional space
+   - Simple solution: use PCA to preserve Euclidean distances and thus capture the "spatial" correlation across the elements of $\bm\phi$
+
+--
+`r vspace("20px")`
+   - Even better, regression-based dimension reduction method: .orange[**Principal Fitted Components**]
+      1. Estimate the function $R(\bm\phi): Q_\bm\phi \rightarrow d$ so that $\nb_t \perp\!\!\!\perp \bm\phi \mid R(\bm\phi)$
+      2. "**Project**" the $Q_\bm\phi-$dimensional information contained in $\bm\phi$ to the $d-$dimensional function $R(\cdot)$
+      3. Ideally, $d<<Q_\bm\phi$ &ndash; in fact, we would like $d\leq 2$
+    
+   - Computational cost is negligible 
+   - Can use model-fitting statistics (e.g. AIC) to determine the "best" fitting model for a given choice of $d$ (=2, 3, ...)
+   - **NB**: if AIC suggests $d>2$, then EVPPI estimates likely to be biased!
+      - Can add several structured effects to "re-balance" this...
+
+---
+
+# Examples
+
+**SAVI** .alignright[`r icon::fontawesome("book-open")`  [Heath et al (2016)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6983)]
+
+.pull-left[
+`r include_fig("running-time-savi.png",width="75%")`
+]
+.pull-right[
+`r include_fig("savi2.png",width="75%")`
+]
+
+- Fictional decision tree model with correlated parameters
+
+- 2 treatment options and overall 19 parameters
+
+- Parameters simulated from multivariate Normal, so can compute EVPPI analytically
+
+---
+
+count: false
+# Examples
+
+**Vaccine** .alignright[`r icon::fontawesome("book-open")`  [Heath et al (2016)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6983)]
+
+.pull-left[
+`r include_fig("running-time-vaccine.png",width="75%")`
+]
+.pull-right[
+`r include_fig("vaccine.png",width="75%")`
+]
+
+- Cost-effectiveness model for influenza vaccine based on evidence synthesis
+
+- 2 treatment options and overall 63 parameters
+
+- Estimates not available in closed form (needs MCMC simulations)
+
+---
+
+# Breaking bad
+
+**Breast cancer screening** .alignright[`r icon::fontawesome("book-open")`  [Welton et al (2008)](https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.1467-985X.2008.00558.x)]
+
+- Multi-decision model developed for the UK setting, with 4 interventions
+
+- Complex evidence synthesis for 6 parameters &ndash; highly structured!
+
+`r include_fig("breaking-bad1.png",width="50%")`
+
+---
+
+# The fix
+
+- Can relatively easily modify the basic structure of the model, e.g. include interaction terms to make $\bm{H}\bm\beta$ non-linear 
+
+$$\class{myblue}{\beta_0+\beta_1\phi_{1s}+\beta_2\phi_{2s}+\beta_3\phi_{3s}} + \class{orange}{\beta_4\phi_{1s}\phi_{2s} + \beta_5\phi_{1s}\phi_{3s} + \beta_6\phi_{2s}\phi_{3s}}$$
+
+`r include_fig("the-fix.png",width="50%")`
+
+.alignright[`r icon::fontawesome("book-open")`  [Baio et al (2017)](http://www.statistica.it/gianluca/book/bcea/)]
+---
+
+# Research priority 
+
+## Expected value of **sample** information
+
+`r vspace("-15px")`
+
+`r include_fig("voi_scheme1.png",width="65%")`
+
+---
+
+count: false
+
+# Research priority
+
+## Expected value of **sample** information
+
+`r vspace("-15px")`
+
+`r include_fig("voi_scheme2.png",width="65%")`
+
+--
+
+`r vspace("10px")`
+
+- The package `EVSI` can be used to (with some knowledge of Bayesian modelling!) to estimate the value of effectively any study design in reducing uncertainty in the corresponding decision-making process
+    - Sample size calculations + Research prioritisation 
+
+`r vspace("-45px")`
+.alignright[.small[`r icon::fontawesome("github")` [https://github.com/giabaio/EVSI](https://github.com/giabaio/EVSI)]]
+
+---
+
+count: false 
+
+# Research priority 
+
+## Expected value of **sample** information
+
+`r vspace("-35px")`
+
+.pull-left[
+`r include_fig("voi1.png",width="85%")`
+]
+.pull-right[
+`r include_fig("voi2.png",width="85%")`
+]
+
+`r vspace("-25px")`
+
+.small[
+`r icon::fontawesome("github")` [https://github.com/giabaio/EVSI](https://github.com/giabaio/EVSI)    
+`r icon::fontawesome("laptop")` [https://egon.stats.ucl.ac.uk/projects/EVSI](https://egon.stats.ucl.ac.uk/projects/EVSI)
+
+`r vspace("15px")`
+
+`r icon::fontawesome("book-open")`  Heath et al (2019). [*Medical Decision Making*](https://doi.org/10.1177/0272989X19837983)     
+]
+
+---
+
+count: false 
+
+# Research priority
+
+## Expected value of **sample** information
+
+`r include_fig("voi3.png",width="63%")`
+
+---
+
+name: end
+# Conclusions
+
+- "Health economics" is perhaps a misnomer/historical accident...
+
+   - Models are no so complex, to represent the underlying reality of clinical experimentation and the resulting decision-making processes, that **by necessity** we need suitably comprehensive statistical models
+   
+
+- Bayesian modelling is very helpful in HTA, especially
+
+   - Focus on decision-making
+   - Modular, complex models
+   - Integration of composite sources of evidence
+   - Increasing availability of software 
+   
+---
+
+# Where can I look for more, you ask?...
+
+[https://r-hta.org/](https://r-hta.org/)
+
+<iframe frameborder="no" src="https://r-hta.org/"
+style="
+    position: fixed;
+    top: 30px;
+    bottom: 0px;
+    right: 0px;
+    width: 200%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 999999;
+    height: 100%;
+    ms-transform: scale(0.45);
+   -moz-transform: scale(0.45);
+   -o-transform: scale(0.45);
+   -webkit-transform: translate(+50%, -50%);
+    transform: translate(+50%, -50%);
+    <!--
+   -webkit-transform: scale(0.45);
+   transform: scale(0.70);
+   -->
+"> </iframe>
+
+---
+
+count: false
+# Where can I look for more, you ask?...
+
+[https://www.convoi-group.org/](https://www.convoi-group.org/)
+
+
+<iframe frameborder="no" src="https://www.convoi-group.org/"
+style="
+    position: fixed;
+    top: 30px;
+    bottom: 0px;
+    right: 0px;
+    width: 140%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 999999;
+    height: 100%;
+    ms-transform: scale(0.45);
+   -moz-transform: scale(0.45);
+   -o-transform: scale(0.45);
+   -webkit-transform: scale(0.45);
+   transform: scale(0.70);
+"> </iframe>
+
+---
+
+class: thankyou-michelle 

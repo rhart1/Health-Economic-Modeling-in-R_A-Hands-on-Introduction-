@@ -1,0 +1,1306 @@
+---
+title: "&#8291;4. Introduction to health economic evaluation"
+author: Gianluca Baio
+date: "26 January 2021"
+institute: "[Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London"
+params: 
+   - conference: "STAT0019 - Bayesian Methods in Health Economics"
+   - location: "UCL - 2020/2021"
+output:
+  xaringan::moon_reader:
+    includes: 
+       in_header: "../assets/latex_macros.html" 
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "../assets/ucl-powerpoint.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("../assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+use_panelset()
+# This allows to copy code from the slides directly
+use_clipboard()
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+.title-small[
+`r icon::icon_style(icon::fontawesome("envelope",style = "solid"),scale=.8,fill="#00acee")`  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [http://www.statistica.it/gianluca/](http://www.statistica.it/gianluca/)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio](https://github.com/giabaio)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+`r icon::icon_style(icon::fontawesome("twitter"),scale=.8,fill="#00acee")`  [@gianlubaio](https://twitter.com/gianlubaio)     
+]
+
+### `r rmarkdown::metadata$params`
+
+`r date`
+
+.small[.alignleft[`r previous_slide("mcmc")`]]
+
+.footer[
+`r go_home(path="../assets/home-icon.png")`
+]
+
+---
+
+layout: true
+.footer[
+`r go_home(path="../assets/home-icon.png")` <span style="position: relative; bottom: 10px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio. STAT0019</span>
+]
+.footer-center[
+`r rmarkdown::metadata$title`
+]
+
+---
+
+# Summary 
+
+- Health economic evaluation    
+   - What is and why do we need health economics?
+
+- A framework for health economic evaluation    
+   - Statistical modelling
+   - Economic modelling
+   - Decision analysis
+   - Uncertainty analysis
+
+- Standard vs Bayesian HTA    
+   - Two-stage vs integrated approach
+
+- Decision-making    
+   - Cost-effectiveness plane; ICER; EIB
+   
+`r vspace("3rem")`
+.content-box-beamer[
+### **References** 
+
+`r bmhe(c(1,3))`
+
+`r bcea_book()`
+
+`r esdm()`
+]
+
+---
+
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+--
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\definecolor{myblue}{rgb}{0.14 0.34 0.55}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\phantom{
+\draw(0,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+}
+\phantom{
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+}
+\phantom{
+\draw(-2.5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+}
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\phantom{
+\draw(-0.2,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+}
+\phantom{
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+}
+\phantom{
+\draw(0.7,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=4.1cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+}
+\phantom{
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.40) -- (4.220);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (4.320) -- (2.140);
+}
+\phantom{
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+}
+\phantom{
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+}
+
+\phantom{
+\draw(0.4,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func1){
+\begin{itemize}
+\item[] $\color{myblue} \Delta_e=f_e(\boldsymbol\theta)$
+\item[] $\Delta_c=f_c(\boldsymbol\theta)$
+\item[] $\ldots$
+\end{itemize}
+};
+}
+
+\phantom{
+\draw(4.1,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func2){
+\begin{itemize}
+\item[] ${\sf ICER}=g(\Delta_e,\Delta_c)$
+\item[] ${\sf EIB}=h(\Delta_e,\Delta_c;k)$
+\item[] $\qquad \qquad \ldots$
+\end{itemize}
+};
+}
+
+\end{tikzpicture}
+```
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\definecolor{myblue}{rgb}{0.14 0.34 0.55}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\phantom{
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+}
+\phantom{
+\draw(-2.5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+}
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\draw(-0.2,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+
+\phantom{
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+}
+\phantom{
+\draw(0.7,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=4.1cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+}
+\phantom{
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.40) -- (4.220);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (4.320) -- (2.140);
+}
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+
+\phantom{
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+}
+
+\draw(0.4,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func1){
+\begin{itemize}
+\item[] $\color{myblue} \Delta_e=f_e(\boldsymbol\theta)$\\[-10pt]
+\item[] $\color{myblue} \Delta_c=f_c(\boldsymbol\theta)$\\[-15pt]
+\item[] $\color{myblue} \ldots$
+\end{itemize}
+};
+
+
+\phantom{
+\draw(4.1,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func2){
+\begin{itemize}
+\item[] ${\sf ICER}=g(\Delta_e,\Delta_c)$
+\item[] ${\sf EIB}=h(\Delta_e,\Delta_c;k)$
+\item[] $\qquad \qquad \ldots$
+\end{itemize}
+};
+}
+
+\end{tikzpicture}
+```
+
+---
+
+count: false
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\definecolor{myblue}{rgb}{0.14 0.34 0.55}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\phantom{
+\draw(-2.5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+}
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\draw(-0.2,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+
+\phantom{
+\draw(0.7,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=4.1cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+}
+\phantom{
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.40) -- (4.220);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (4.320) -- (2.140);
+}
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+
+
+\draw(0.4,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func1){
+\begin{itemize}
+\item[] $\color{myblue} \Delta_e=f_e(\boldsymbol\theta)$\\[-10pt]
+\item[] $\color{myblue} \Delta_c=f_c(\boldsymbol\theta)$\\[-15pt]
+\item[] $\color{myblue} \ldots$
+\end{itemize}
+};
+
+\draw(4.1,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func2){
+\begin{itemize}
+\item[] $\color{myblue} {\sf ICER}=g(\Delta_e,\Delta_c)$\\[-10pt]
+\item[] $\color{myblue} {\sf EIB}=h(\Delta_e,\Delta_c;k)$\\[-20pt]
+\item[] $\color{myblue} \qquad \qquad \ldots$
+\end{itemize}
+};
+
+\end{tikzpicture}
+```
+
+---
+
+count: false
+name: he-scheme
+# Health technology assessment (HTA)
+
+**Objective**: Combine .red[costs] and .blue[benefits] of a given intervention into a rational scheme for allocating resources 
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\definecolor{myblue}{rgb}{0.14 0.34 0.55}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\draw(-2.5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+
+\draw(-5.2,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\draw(-0.2,-2.65) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+
+\draw(3.8,-2.8) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.4cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+
+\draw(0.7,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=4.1cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.40) -- (4.220);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (4.320) -- (2.140);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+
+\draw(0.4,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func1){
+\begin{itemize}
+\item[] $\color{myblue} \Delta_e=f_e(\boldsymbol\theta)$\\[-10pt]
+\item[] $\color{myblue} \Delta_c=f_c(\boldsymbol\theta)$\\[-15pt]
+\item[] $\color{myblue} \ldots$
+\end{itemize}
+};
+
+\draw(4.1,.15) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](func2){
+\begin{itemize}
+\item[] $\color{myblue} {\sf ICER}=g(\Delta_e,\Delta_c)$\\[-10pt]
+\item[] $\color{myblue} {\sf EIB}=h(\Delta_e,\Delta_c;k)$\\[-20pt]
+\item[] $\color{myblue} \qquad \qquad \ldots$
+\end{itemize}
+};
+
+\end{tikzpicture}
+```
+
+---
+
+# "Standard" approach to HTA
+
+### Two-stage
+
+`r vspace("-15px")`
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\definecolor{olive}{rgb}{.2 .31 .09}
+\newcommand\red{\color{red}}
+\newcommand\black{\color{black}}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+\hspace{-.5cm}
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+
+\draw(-5.2,-2.75) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\draw(0.3,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+
+\draw(3.8,-2.85) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+
+\draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+
+%\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+\draw(1.0,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 1.\ Estimation (base-case)};
+%\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 2.\ Probabilistic sensitivity analysis};
+\draw(1.8,3) node[align=center,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](9){$\theta$};
+\draw(1.8,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](10){$y$};
+\draw(.5,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](11){$p(y\mid \theta)$};
+\draw(.5,3) node[align=center,draw,ellipse,double,fill=none,minimum width=.3cm,minimum height=.25cm,font=\sffamily\fontsize{6}{7}\selectfont](12){$\hat\theta=f(Y)$};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (9.south) -- (10.north);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (11.north) -- (12.south);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red!60] (12.220) to [out=220,in=130] (2.120);
+
+\phantom{
+\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 2.\ \textbf{Probabilistic sensitivity analysis}};
+\draw(2.9,2.0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont,color=red]{$\Rightarrow$};
+\draw(5.4,3) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](13){$\theta$};
+\draw(4.2,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](14){$p(\theta)\Rightarrow  g(\hat\theta)$};
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (13.south) to [out=270,in=45] (2.60);
+}
+\end{tikzpicture}
+```
+
+---
+
+count: false
+
+# "Standard" approach to HTA 
+
+### Two-stage
+
+`r vspace("-15px")`
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\definecolor{olive}{rgb}{.2 .31 .09}
+\newcommand\red{\color{red}}
+\newcommand\black{\color{black}}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+\hspace{-.5cm}
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+
+\draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+
+\draw(-5.2,-2.75) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+
+\draw(0.3,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+
+\draw(3.8,-2.85) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+
+\draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+
+%\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+\draw(1.0,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 1.\ Estimation (base-case)};
+%\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 2.\ Probabilistic sensitivity analysis};
+\draw(1.8,3) node[align=center,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](9){$\theta$};
+\draw(1.8,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](10){$y$};
+\draw(.5,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](11){$p(y\mid \theta)$};
+\draw(.5,3) node[align=center,draw,ellipse,double,fill=none,minimum width=.3cm,minimum height=.25cm,font=\sffamily\fontsize{6}{7}\selectfont](12){$\hat\theta=f(Y)$};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (9.south) -- (10.north);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (11.north) -- (12.south);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red!60] (12.220) to [out=220,in=130] (2.120);
+
+\draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive} 2.\ \textbf{Probabilistic sensitivity analysis}};
+\draw(2.9,2.0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont,color=red]{$\Rightarrow$};
+\draw(5.4,3) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](13){$\theta$};
+\draw(4.2,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](14){$p(\theta)\red\leftrightarrow\black g(\hat\theta)$};
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (13.south) to [out=270,in=45] (2.60);
+
+\end{tikzpicture}
+```
+
+---
+
+# 2./3. Economic modelling+Decision analysis 
+
+### Base-case scenario
+
+`r vspace("-10px")`
+
+```{css echo=FALSE}
+.big-left {
+  width: 70%;
+  float: left;
+  margin-left: 50px;
+}
+.small-right{
+  width: 20%;
+  height: 92%;
+  float: right;
+  margin-right: 50px;
+  margin-left: -30px;
+  text-align: left!important;
+}
+```
+
+.big-left[
+```{r echo=F,fig.width=6,fig.height=6,out.width='50%',dev="tikz",opts=list(width="60%",title="INSERT TEXT HERE")}
+library(BCEA)
+library(ggplot2)
+data(Vaccine)
+m=bcea(e=e,c=c,ref=2)
+df=data.frame(de=m$delta_e,dc=m$delta_c) %>% as_tibble() %>% rename(de=intervention.1,dc=intervention.1.1)
+p=ggplot(data=df,aes(de,dc)) + geom_point(col="gray80",size=.4) + theme_classic() +
+  theme(axis.line=element_blank(),
+      axis.text.x=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks=element_blank(),
+      legend.position="none",
+      panel.background=element_blank(),
+      panel.border=element_blank(),
+      panel.grid.major=element_blank(),
+      panel.grid.minor=element_blank(),
+      plot.background=element_blank()) +
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +
+  geom_segment(aes(x=0,y=-Inf,xend=0,yend=Inf),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) +
+  geom_segment(aes(x=-Inf,y=0,xend=Inf,yend=0),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) + 
+  geom_point(aes(x=mean(de),y=mean(dc)),col="red",size=2) +
+  labs(title="Cost effectiveness plane",y="Cost differential",x="Effectiveness differential") +
+  theme(plot.title = element_text(hjust = 0.5,size=18),
+        axis.title.x = element_text(size=15),
+        axis.title.y = element_text(size=15)
+  ) +
+  annotate(
+    "text",mean(df$de),mean(df$dc),
+    label="$\\mbox{ICER}=\\frac{ {\\sf E}[\\Delta_c]}{ {\\sf E}[\\Delta_c]}=\\frac{\\hat\\mu_{c1}-\\hat\\mu_{c0}}{\\hat\\mu_{e1}-\\hat\\mu_{e0}}$",
+    hjust=-.05, size=6
+  ) +
+  annotate(
+    "text",mean(df$de),mean(df$dc),
+    label="$\\phantom{\\mbox{ICER}}=\\mbox{Cost per outcome}$",
+    hjust=-.05,vjust=2.5, size=6
+  ) +
+  annotate("text",0,Inf,label="$\\Delta_c$",hjust=2,vjust=1,size=5) +
+  annotate("text",Inf,0,label="$\\Delta_e$",hjust=1,vjust=2,size=5) 
+p
+```
+]
+.small-right[
+$$\class{myblue}{\Delta_e=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\hat\theta}_1]}}_{\class{red}{\hat\mu_{e1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\hat\theta}_0]}}_{\class{red}{\hat\mu_{e0}}}}$$
+
+$$\class{myblue}{\Delta_c=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\hat\theta}_1]}}_{\class{red}{\hat\mu_{c1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\hat\theta}_0]}}_{\class{red}{\hat\mu_{c0}}}}$$
+]
+
+---
+
+count: false
+
+# 2./3. Economic model + Decision analysis
+
+### Uncertainty analysis*
+
+`r vspace("-10px")`
+
+.big-left[
+```{r echo=F,fig.width=6,fig.height=6,out.width='50%',dev="tikz",opts=list(width="60%",title="INSERT TEXT HERE")}
+# library(BCEA)
+# library(ggplot2)
+# data(Vaccine)
+# m=bcea(e,c,ref=2)
+# df=data.frame(de=m$delta.e,dc=m$delta.c)
+p=ggplot(data=df,aes(de,dc)) + geom_point(col="gray20",size=.4) + theme_classic() +
+  theme(axis.line=element_blank(),
+      axis.text.x=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks=element_blank(),
+      legend.position="none",
+      panel.background=element_blank(),
+      panel.border=element_blank(),
+      panel.grid.major=element_blank(),
+      panel.grid.minor=element_blank(),
+      plot.background=element_blank()) +
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +
+  geom_segment(aes(x=0,y=-Inf,xend=0,yend=Inf),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) +
+  geom_segment(aes(x=-Inf,y=0,xend=Inf,yend=0),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) + 
+  geom_point(aes(x=mean(de),y=mean(dc)),col="red",size=2) +
+  labs(title="Cost effectiveness plane",y="Cost differential",x="Effectiveness differential") +
+  theme(plot.title = element_text(hjust = 0.5,size=18),
+        axis.title.x = element_text(size=15),
+        axis.title.y = element_text(size=15)
+  ) +
+  annotate("text",0,Inf,label="$\\Delta_c$",hjust=2,vjust=1,size=5) +
+  annotate("text",Inf,0,label="$\\Delta_e$",hjust=1,vjust=2,size=5) 
+p
+```
+]
+.small-right[
+$$\class{myblue}{\Delta_e=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{e1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{e0}}}}$$
+
+$$\class{myblue}{\Delta_c=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{c1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{c0}}}}$$
+
+`r vspace("6rem")`
+
+.small[
+*Induced by $\class{myblue}{g(\boldsymbol{\hat\theta}_0),g(\boldsymbol{\hat\theta}_1)}$
+]
+]
+
+---
+
+name: whatswrong
+
+# What's wrong with this?...
+
+
+- Potential correlation between costs & clinical benefits .alignright[.orange[[**Individual level + Aggregated level Data**]]]
+   - Strong positive correlation &ndash; effective treatments are innovative and result from intensive and lengthy research $\Rightarrow$ are associated with higher unit costs
+   - Negative correlation - more effective treatments may reduce total care pathway costs e.g. by reducing hospitalisations, side effects, etc.
+   - Because of the way in which standard models are set up, bootstrapping generally only approximates the underlying level of correlation &ndash; .olive[**MCMC does a better job!**]
+
+--
+
+
+- Joint/marginal normality not realistic .alignright[.orange[[**Mainly ILD**]]]
+   - Costs usually skewed and benefits may be bounded in $[0; 1]$ 
+   - Can use transformation (e.g. logs) &ndash; but care is needed when back transforming to the natural scale
+   - Should use more suitable models (e.g. Beta, Gamma or log-Normal) &ndash; .olive[**generally easier under a Bayesian framework**]
+   - Particularly relevant in presence of partially observed data &ndash; more on this later!
+
+--
+
+
+- Particularly as the focus is on decision-making (rather than just inference), we need to use **all** available evidence to fully characterise current uncertainty on the model parameters and outcomes .alignright[.orange[[**Mainly ALD**]]]
+   - A Bayesian approach is helpful in combining different sources of information 
+   - .olive[**Propagating uncertainty is a fundamentally Bayesian operation!**]
+
+---
+
+# Bayesian approach to HTA
+
+### Integrated
+
+`r vspace("-30px")`
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\definecolor{olive}{rgb}{.2 .31 .09}
+\newcommand\red{\color{red}}
+\newcommand\black{\color{black}}
+\newcommand\olive{\color{olive}}
+
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+\hspace{-.5cm}
+\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+
+\draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+\draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+\draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+\draw(-5.2,-2.75) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+\begin{itemize}
+\item Estimates relevant \textbf{population} parameters $\boldsymbol\theta$
+\item Varies with the type of available data (\& statistical approach!)
+\end{itemize}
+};
+\draw(0.3,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+\begin{itemize}
+\item Combines the parameters to obtain a population average measure for costs and clinical benefits
+\item Varies with the type of available data \& statistical model used
+\end{itemize}
+};
+\draw(3.8,-2.85) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](7){
+\begin{itemize}
+\item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+\item Dictates the best course of actions, given current evidence
+\item Standardised process
+\end{itemize}
+};
+
+\draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](8){
+\begin{itemize}
+\item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+\item Mandatory in many jurisdictions (including NICE, in the UK)
+\item Fundamentally Bayesian!
+\end{itemize}
+};
+
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+\draw(2.4,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\color{olive}\textbf{Estimation \& PSA (one stage)}};
+\draw(1.8,3) node[align=center,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](9){$\theta$};
+\draw(1.8,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](10){$y$};
+\draw(.5,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](11){$p(y\mid \theta)$};
+\draw(.5,3) node[align=center,fill=none,minimum width=.3cm,minimum height=.25cm,font=\sffamily\fontsize{6}{7}\selectfont](12){$p(\theta)$};
+\draw(4.0,3) node[align=center,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](13){$p(\theta\mid y)$};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (9.south) -- (10.north);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,color=red] (10.180) to [bend left=90] (9.180);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,color=red] (9.east) -- (13.west);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (13.320) to [out=290,in=65] (2.60);
+
+\end{tikzpicture}
+```
+
+---
+
+# 2./4. Economic model + Uncertainty analysis* 
+
+.big-left[
+```{r echo=F,fig.width=6,fig.height=6,out.width='50%',dev="tikz",opts=list(width="65%",title="INSERT TEXT HERE")}
+# library(BCEA)
+# library(ggplot2)
+# data(Vaccine)
+# m=bcea(e,c,ref=2)
+# df=data.frame(de=m$delta.e,dc=m$delta.c)
+p=ggplot(data=df,aes(de,dc)) + geom_point(col="gray20",size=.4) + theme_classic() +
+  theme(axis.line=element_blank(),
+      axis.text.x=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks=element_blank(),
+      legend.position="none",
+      panel.background=element_blank(),
+      panel.border=element_blank(),
+      panel.grid.major=element_blank(),
+      panel.grid.minor=element_blank(),
+      plot.background=element_blank()) +
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +
+  geom_segment(aes(x=0,y=-Inf,xend=0,yend=Inf),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) +
+  geom_segment(aes(x=-Inf,y=0,xend=Inf,yend=0),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) + 
+#  geom_point(aes(x=mean(de),y=mean(dc)),col="red",size=2) +
+  labs(title="Cost effectiveness plane",y="Cost differential",x="Effectiveness differential") +
+  theme(plot.title = element_text(hjust = 0.5,size=18),
+        axis.title.x = element_text(size=15),
+        axis.title.y = element_text(size=15)
+  ) +
+  annotate("text",0,Inf,label="$\\Delta_c$",hjust=2,vjust=1,size=5) +
+  annotate("text",Inf,0,label="$\\Delta_e$",hjust=1,vjust=2,size=5) 
+p
+```
+]
+.small-right[
+$$\class{myblue}{\Delta_e=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{e1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{e0}}}}$$
+
+$$\class{myblue}{\Delta_c=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{c1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{c0}}}}$$
+
+`r vspace("6rem")`
+
+.small[
+*Induced by $\class{myblue}{p(\boldsymbol{\theta} \mid `r sftext("data")`)}$
+]
+]
+
+---
+count: false
+
+# 3. Decision analysis
+
+.big-left[
+```{r echo=F,fig.width=6,fig.height=6,out.width='50%',dev="tikz",opts=list(width="65%",title="INSERT TEXT HERE")}
+# library(BCEA)
+# library(ggplot2)
+# data(Vaccine)
+# m=bcea(e,c,ref=2)
+# df=data.frame(de=m$delta.e,dc=m$delta.c)
+p=ggplot(data=df,aes(de,dc)) + geom_point(col="gray80",size=.4) + theme_classic() +
+  theme(axis.line=element_blank(),
+      axis.text.x=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks=element_blank(),
+      legend.position="none",
+      panel.background=element_blank(),
+      panel.border=element_blank(),
+      panel.grid.major=element_blank(),
+      panel.grid.minor=element_blank(),
+      plot.background=element_blank()) +
+  geom_hline(yintercept=0) + geom_vline(xintercept=0) +
+  geom_segment(aes(x=0,y=-Inf,xend=0,yend=Inf),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) +
+  geom_segment(aes(x=-Inf,y=0,xend=Inf,yend=0),arrow=arrow(length=unit(0.30,"cm"),type = "closed")) + 
+  geom_point(aes(x=mean(de),y=mean(dc)),col="red",size=2) +
+  labs(title="Cost effectiveness plane",y="Cost differential",x="Effectiveness differential") +
+  theme(plot.title = element_text(hjust = 0.5,size=18),
+        axis.title.x = element_text(size=15),
+        axis.title.y = element_text(size=15)
+  ) +
+  annotate(
+    "text",mean(df$de),mean(df$dc),
+    label="$\\mbox{ICER}=\\frac{ {\\sf E}[\\Delta_c]}{ {\\sf E}[\\Delta_c]}=\\frac{ {\\sf E}[\\mu_{c1}]-{\\sf E}[\\mu_{c0}]}{ {\\sf E}[\\mu_{e1}]-{\\sf E}[\\mu_{e0}]}$",
+    hjust=-.05, size=6
+  ) +
+  annotate(
+    "text",mean(df$de),mean(df$dc),
+    label="$\\phantom{\\mbox{ICER}}=\\mbox{Cost per outcome}$",
+    hjust=-.05,vjust=2.5, size=6
+  ) +
+  annotate("text",0,Inf,label="$\\Delta_c$",hjust=2,vjust=1,size=5) +
+  annotate("text",Inf,0,label="$\\Delta_e$",hjust=1,vjust=2,size=5) 
+p
+```
+]
+.small-right[
+$$\class{myblue}{\Delta_e=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{e1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[e \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{e0}}}}$$
+
+$$\class{myblue}{\Delta_c=}\class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_1]}}_{\class{red}{\mu_{c1}}}} \class{myblue}{-} \class{red}{\underbrace{\class{myblue}{\mbox{E}[c \mid \boldsymbol{\theta}_0]}}_{\class{red}{\mu_{c0}}}}$$
+]
+
+---
+
+# Decision-theoretic approach to HTA
+
+- Analytic framework for decision-making in the face of uncertainty
+
+- Considers a set of .red[**prescriptive**] axioms to ensure rationality in decision-making
+
+- Identifies the best course of action given:   
+   - .red[**Model specification**]
+   - .red[**Current evidence**]
+
+--
+
+## **Process of rational decision-making**
+
+1.  Describe uncertainty on all unknown quantities by means of a (possibly subjective) probability distribution $\class{myblue}{p(\boldsymbol\omega) = p(e, c \mid \boldsymbol\theta)p(\boldsymbol\theta)}$
+
+2. For each intervention $t$, outcomes $o = (e, c)$ are valued by means of a pre-specified measure of utility $\class{myblue}{u(e, c; t)}$
+
+3. Select as the most “cost-effective” the intervention that is associated with the maximum expected utility $\class{myblue}{\mathcal{U}^t = \mbox{E}_\boldsymbol\omega [u(e, c; t)]}$
+
+
+- Typical utility function in HTA: Monetary Net Benefit $\class{myblue}{u(e, c; t) = nb_t = ke_t − c_t}$
+   - $k$ is the "willingness to pay", i.e. the .red[*cost per  extra unit of effectiveness gained*]
+   - Fixed, .red[linear] form, which simplifies computations
+   - Assumes decision-maker is *risk neutral*. Not necessarily true!
+
+---
+
+# ICER vs EIB
+
+- Under the MNB, the expected utility is 
+
+\begin{align}
+\class{myblue}{\mathcal{U}^t = \mathcal{NB}_t} & \class{myblue}{= \mbox{E}_{\class{blue}{\boldsymbol\omega}}[u(e,c;t)]} \\
+& \class{myblue}{= k\mbox{E}_{\class{blue}{\boldsymbol\omega}}[e_t] - \mbox{E}_{\class{blue}{\boldsymbol\omega}}[c_t]} \\
+& \class{myblue}{= k\mbox{E}_{\class{red}{\boldsymbol\theta}}[e\mid \boldsymbol\theta_t] - \mbox{E}_{\class{red}{\boldsymbol\theta}}[c\mid \boldsymbol\theta_t] = k\mbox{E}[\mu_{et}] - \mbox{E}[\mu_{ct}]}
+\end{align}
+<p style="margin-left: 2em;"><b>NB</b>: The expectation is taken with respect to \(p(\boldsymbol\omega)\) so \(\mathcal{NB}_t\) is a pure number!</p>
+
+--
+
+
+- Assuming we are considering only two interventions $t=(0,1)$, decision-making can be effected by looking at the .red[Expected Incremental Benefit]
+\begin{align}
+\class{myblue}{`r sftext("EIB")`} & \class{myblue}{=  \mathcal{NB}_1-\mathcal{NB}_0} \\
+& \class{myblue}{=  \left(k\mbox{E}[\mu_{e1}]-\mbox{E}[\mu_{c1}]\right) - \left(k\mbox{E}[\mu_{e0}]-\mbox{E}[\mu_{c0}]\right)} \\
+& \class{myblue}{= k\mbox{E}[\Delta_e] - \mbox{E}[\Delta_c]}
+\end{align}
+
+
+--
+
+
+- The reference treatment $t=1$ is more cost-effective than the comparator $t=0$ if 
+\begin{equation}
+\class{myblue}{`r sftext("EIB")`>0 \Rightarrow k>(<)\frac{\mbox{E}[\Delta_c]}{\mbox{E}[\Delta_e]} = `r sftext("ICER")` \quad `r sftext(" if ")` \mbox{E}[\Delta_e]>(<)0}
+\end{equation}
+
+---
+
+# Uncertainty analysis &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $\tiny p(\boldsymbol\theta\mid e,c) `r sftext(" vs ")` g_i(\theta_i)$
+
+`r vspace("-40px")`
+.three-column[
+### Parameters
+```{r echo=FALSE,fig.height=5,fig.width=2,dev="tikz",opts=list(width="55%")}
+par(mfrow=c(4,1),mar=c(2.4,0,1.1,1))
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),20,80),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.35,4,labels="$\\pi_0$",cex=1.5)
+
+plot(seq(0,2,.01),dnorm(seq(0,2,.01),.85,.24),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(1.25,1,labels="$\\rho$",cex=1.5)
+
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),5,20),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.45,1.0,labels="$\\gamma$",cex=1.5)
+
+plot(seq(0,10000),dgamma(seq(0,10000),40,1/110),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(6500,0.0003,"$c^{hosp}$",cex=1.5)
+
+```
+]
+.three-column[
+### Model structure
+`r vspace("-15px")`
+`r include_fig("psa_model.png",width="85%")`
+]
+.three-column[
+### Decision analysis
+```{r echo=FALSE}
+library(kableExtra)
+tab0=tibble(
+  Benefits=c("741","699","...","726","716.2"),
+  Costs=c("670382.1","871273.3","...","425822.2","790381.2")
+)
+tab1=tibble(
+  Benefits=c("732","664","...","811","774.5"),
+  Costs=c("1131978","1325654","...","766411.4","1066849.8")
+)
+```
+```{r echo=FALSE}
+tab0 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("Old chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab0),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(1:nrow(tab0),color="white") %>% 
+  row_spec(nrow(tab0),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+```
+
+`r vspace("10px")`
+
+```{r echo=FALSE}
+tab1 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("New chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab1),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(1:nrow(tab1),color="white") %>% 
+  row_spec(nrow(tab1),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+```
+
+]
+
+---
+
+count: false
+# Uncertainty analysis &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $\tiny p(\boldsymbol\theta\mid e,c) `r sftext(" vs ")` g_i(\theta_i)$
+
+`r vspace("-40px")`
+.three-column[
+### Parameters
+```{r echo=FALSE,fig.height=5,fig.width=2,dev="tikz",opts=list(width="55%")}
+par(mfrow=c(4,1),mar=c(2.4,0,1.1,1))
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),20,80),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.35,4,labels="$\\pi_0$",cex=1.5)
+points(rbeta(1,20,80),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,2,.01),dnorm(seq(0,2,.01),.85,.24),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(1.25,1,labels="$\\rho$",cex=1.5)
+points(rnorm(1,.85,.24),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),5,20),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.45,1.0,labels="$\\gamma$",cex=1.5)
+points(rbeta(1,5,20),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,10000),dgamma(seq(0,10000),40,1/110),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(6500,0.0003,"$c^{hosp}$",cex=1.5)
+points(rgamma(1,40,1/100),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+```
+]
+.three-column[
+### Model structure
+`r vspace("-15px")`
+`r include_fig("psa_model.png",width="85%")`
+]
+.three-column[
+### Decision analysis
+```{r echo=FALSE}
+tab0 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("Old chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab0),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(2:nrow(tab0),color="white") %>% 
+  row_spec(nrow(tab0),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+```
+
+`r vspace("10px")`
+
+```{r echo=FALSE}
+tab1 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("New chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab1),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(2:nrow(tab1),color="white") %>% 
+  row_spec(nrow(tab1),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+
+```
+
+]
+
+---
+
+count: false
+# Uncertainty analysis &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $\tiny p(\boldsymbol\theta\mid e,c) `r sftext(" vs ")` g_i(\theta_i)$
+
+`r vspace("-40px")`
+.three-column[
+### Parameters
+```{r echo=FALSE,fig.height=5,fig.width=2,dev="tikz",opts=list(width="55%")}
+par(mfrow=c(4,1),mar=c(2.4,0,1.1,1))
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),20,80),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.35,4,labels="$\\pi_0$",cex=1.5)
+points(rbeta(1,20,80),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,2,.01),dnorm(seq(0,2,.01),.85,.24),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(1.25,1,labels="$\\rho$",cex=1.5)
+points(rnorm(1,.85,.24),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),5,20),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.45,1.0,labels="$\\gamma$",cex=1.5)
+points(rbeta(1,5,20),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,10000),dgamma(seq(0,10000),40,1/110),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(6500,0.0003,"$c^{hosp}$",cex=1.5)
+points(rgamma(1,40,1/100),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+```
+]
+.three-column[
+### Model structure
+`r vspace("-15px")`
+`r include_fig("psa_model.png",width="85%")`
+]
+.three-column[
+### Decision analysis
+```{r echo=FALSE}
+tab0 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("Old chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab0),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(3:nrow(tab0),color="white") %>% 
+  row_spec(nrow(tab0),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+```
+
+`r vspace("10px")`
+
+```{r echo=FALSE}
+tab1 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("New chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab1),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  row_spec(3:nrow(tab1),color="white") %>% 
+  row_spec(nrow(tab1),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+
+```
+
+]
+
+---
+
+count: false
+name: psa-scheme
+# Uncertainty analysis &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $\tiny p(\boldsymbol\theta\mid e,c) `r sftext(" vs ")` g_i(\theta_i)$
+
+`r vspace("-40px")`
+.three-column[
+### Parameters
+```{r echo=FALSE,fig.height=5,fig.width=2,dev="tikz",opts=list(width="55%")}
+par(mfrow=c(4,1),mar=c(2.4,0,1.1,1))
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),20,80),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.35,4,labels="$\\pi_0$",cex=1.5)
+points(rbeta(1,20,80),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,2,.01),dnorm(seq(0,2,.01),.85,.24),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(1.25,1,labels="$\\rho$",cex=1.5)
+points(rnorm(1,.85,.24),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,1,.01),dbeta(seq(0,1,.01),5,20),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(.45,1.0,labels="$\\gamma$",cex=1.5)
+points(rbeta(1,5,20),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+
+plot(seq(0,10000),dgamma(seq(0,10000),40,1/110),axes=F,t="l",lwd=2,xlab="",ylab="")
+axis(1)
+text(6500,0.0003,"$c^{hosp}$",cex=1.5)
+points(rgamma(1,40,1/100),par()$usr[3],pch=19,col="red",cex=1.5,lwd=3,xpd=T)
+```
+]
+.three-column[
+### Model structure
+`r vspace("-15px")`
+`r include_fig("psa_model.png",width="85%")`
+]
+.three-column[
+### Decision analysis
+```{r echo=FALSE}
+tab0 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("Old chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab0),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  #row_spec(1:nrow(tab),color="white") %>% 
+  row_spec(nrow(tab0),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+```
+
+`r vspace("10px")`
+
+```{r echo=FALSE}
+tab1 %>% kable() %>%
+  kable_classic() %>% 
+  kable_styling(full_width = F,font_size = 12) %>% 
+  add_header_above(c("New chemotherapy"=2),background="white",bold=T) %>% 
+  row_spec(0:nrow(tab1),background="white",align="c") %>% 
+  # This hides the rows for the effect
+  #row_spec(1:nrow(tab),color="white") %>% 
+  row_spec(nrow(tab1),bold=TRUE) %>%
+  row_spec(4,extra_css="border-bottom: 1px solid;") %>% 
+  column_spec(1,width="35%") %>% column_spec(2,width="35%")
+
+```
+
+`r vspace("20px")`
+\begin{align}
+\class{myblue}{`r sftext("ICER")`} & \class{myblue}{=} \frac{\class{myblue}{`r sftext("276468.6")`}}{\class{myblue}{`r sftext("58.3")`}}\\
+& \class{myblue}{= `r sftext("6497.1")`}
+\end{align}
+]
+
+---
+
+# `BCEA` 
+
+## A package for Bayesian health economics
+
+### What is `BCEA` not?
+
+- `BCEA` is **not** a package to automatically run a Bayesian analysis
+   - It cannot build the health economic model for you
+   - It does not prepare the data to be used in the model
+   - It does not automatically run the MCMC simulations
+   - It does not choose the prior distributions for you
+
+--
+
+### So what *is* it then?
+
+- `BCEA`  provides a set of specific functions to systematically post-process the output of a Bayesian health economic model
+
+- Uses `R` [http://cran.r-project.org/](http://cran.r-project.org/)
+   -  Very good at interacting with standard MCMC software
+   - `BUGS` [www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml](www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml)
+   - `JAGS` [www.mcmc-jags.sourceforge.net/](www.mcmc-jags.sourceforge.net/)
+   - .red[**Free**] and there is a very large community of contributors
+   - Specifically designed for statistical analysis and has very good graphical capabilities
+
+---
+
+count: false
+
+# `BCEA` 
+
+## A package for Bayesian health economics
+
+`r include_fig("bcea_scheme.png",width="70%",title="INCLUDE TEXT HERE")`
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [Next lecture](../05_ILD/index.html)]]

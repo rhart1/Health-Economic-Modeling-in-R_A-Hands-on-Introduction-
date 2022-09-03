@@ -1,0 +1,26 @@
+{
+    "id": "F0889F86",
+    "path": "~/Dropbox/HE/R-for-CEA/2019/Short_course/BCEA_talk.Rnw",
+    "project_path": null,
+    "type": "sweave",
+    "hash": "4089458973",
+    "contents": "",
+    "dirty": false,
+    "created": 1622724383918.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "683,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1562245500,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1562245500,
+    "read_only": false,
+    "read_only_alternatives": []
+}

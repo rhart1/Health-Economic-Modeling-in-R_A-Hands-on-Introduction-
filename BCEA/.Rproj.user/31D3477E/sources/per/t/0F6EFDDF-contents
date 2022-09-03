@@ -1,0 +1,1560 @@
+title: "&#8291;8. Missing data in cost-effectiveness modelling"
+author: Gianluca Baio
+date: "2 March 2021"
+institute: "[Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London"
+params: 
+   conference: "STAT0019 &ndash; Bayesian Methods in Health Economics"
+   location: "UCL &ndash; 2020/2021"
+output:
+  xaringan::moon_reader:
+    includes: 
+       in_header: "../assets/latex_macros.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "../assets/ucl-powerpoint.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("../assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+use_panelset()
+# This allows to copy code from the slides directly
+use_clipboard()
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+.title-small[
+`r icon::icon_style(icon::fontawesome("envelope",style = "solid"),scale=.8,fill="#00acee")`  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [http://www.statistica.it/gianluca/](http://www.statistica.it/gianluca/)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio](https://github.com/giabaio)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+`r icon::icon_style(icon::fontawesome("twitter"),scale=.8,fill="#00acee")`  [@gianlubaio](https://twitter.com/gianlubaio)     
+]
+
+### `r rmarkdown::metadata$params`
+
+`r date`
+
+.small[.alignleft[`r previous_slide("ald")`]]
+
+.footer[
+`r go_home(path="../assets/home-icon.png")`
+]
+
+---
+
+layout: true
+.footer[
+`r go_home(path="../assets/home-icon.png")` <span style="position: relative; bottom: 10px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio. STAT0019</span>
+]
+.footer-center[
+`r rmarkdown::metadata$title`
+]
+
+---
+
+# Summary
+
+-  Background &ndash; what's difficult about missing data?
+
+- Missing data mechanisms
+
+- Missing data in health economic evaluation
+ 
+- Example &ndash; the MenSS Trial
+
+`r vspace("4em")`
+
+.content-box-beamer[
+### **References** 
+
+`r vspace("20px")`
+
+`r bugs_book(9.1)`
+
+`r daniels()` 
+
+`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)    
+
+`r icon::fontawesome("file-contract")` [Gabrio et al (2020)](https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssa.12522)
+
+]
+
+---
+
+# Background
+
+## The problems with missing data...
+
+- We plan to observe $n_{\rm{planned}}$ data points, but end up with a (much) lower number of observations $n_{\rm{observed}}$   
+
+   - What is the proportion of missing data? 
+   - Does it matter?...
+   
+- We typically don't know **why** the unobserved points are missing and **what** their value might have been   
+   – Missingness can be differential in treatment/exposure groups
+
+
+--
+
+
+- ... Basically, not very very much we can do about it!
+   - Any modelling based on at least some .red[**untestable**] assumptions
+   - Cannot check model fit to unobserved data
+   - Have to accept inherent uncertainty in our analysis!
+
+---
+
+# **Types** of missing data
+
+```{r engine='tikz', echo=F, out.width="85%",crop = TRUE,opts=list(width="75%",title="INSERT TEXT HERE"),eval=TRUE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{center}
+\begin{tikzpicture}[color=black]
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont] at (0,0) (a) {Base population};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,below = 1cm of a] (b) {Study sample};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,below left = 1cm and .3cm of b] (c) {Non responders};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,below right = 1cm and .3cm of b] (d) {Responders};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,below left = 1cm and .3cm of d] (e) {Full};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,below right = 1cm and .3cm of d] (f) {Partial};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,red,right = .7cm of f] (g) {Missing};
+\node[align=center,draw=none,fill=none,font=\sffamily\fontsize{9}{10}\selectfont,red,left = .7cm of c] (h) {Missing};
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (a.south) to (b.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (b.south)  -|  (c.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (b.south)  -|  (d.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (d.south)  -|  (e.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,thin] (d.south)  -|  (f.north);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red] (f.east) to (g.west);
+\draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red] (c.west) to (h.east);
+\end{tikzpicture}
+\end{center}
+```
+
+---
+
+
+# Missing data **mechanism**
+
+### Missing Completely at Random (MCAR)
+```{css echo=FALSE}
+.left-column60 {
+  width: 60%;
+  float: left;
+  padding-top: 0em;
+}
+.right-column35 h2, .left-column h3 {
+  color: #035AA699;
+}
+.right-column35 h2:last-of-type, .left-column h3:last-child {
+  color: #035AA6;
+}
+.right-column35 {
+  height: 92%;
+  float: right;
+  width: 38%
+}
+
+```
+
+```{r MCAR, engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}
+\draw(0,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$y_i$};	
+\draw(-1.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\mu_{i}$};
+\draw(1.5,1.5) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](3){$\boldsymbol{x}_{i}$};
+\draw(-1.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\beta$};
+\draw(-3,0) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](5){$\sigma$};
+\draw(3.5,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](6){$m_{i}$};
+\draw(3.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\pi_{i}$};
+\draw(3.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\delta$};
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.300) -- (1.130);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (3.210) -- (1.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (4.south) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (5.east) -- (1.west);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (8.south) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.south) -- (6.north);
+
+\draw(-3.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-3.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-3.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-3.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-2.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-2.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-1.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-1.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-1.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\draw[rounded corners=15pt,thick,color=red] (-3.5,-0.6) rectangle ++ (5.5,4.2) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis};
+\draw[rounded corners=15pt,thick,color=olive,dashed] (2.3,-0.6) rectangle ++ (2.5,4.3) node[xshift=-1.2cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness};
+\end{tikzpicture}
+```
+
+
+.left-column60[
+`r include_fig("MCAR-1.png",width="95%")`
+]
+.right-column35[
+- $y_i=$ Outcome subject to missingness
+
+- $m_i=1$ if $y_i$ missing or 0 if $y_i$ observed ("missingness indicator")
+
+- $\bm\theta=\left(\bm\theta^{\rm{MoA}},\bm\theta^{\rm{MoM}}\right)=$ model parameters
+   - $\bm\theta^{\rm{MoA}}=(\beta,\sigma)$ 
+   - $\bm\theta^{\rm{MoM}}=\delta$ 
+
+`r vspace("4em")`
+**NB**: things are even more complicated when missing is (also) for the predictors/covariates!
+]
+
+---
+
+count: false
+# Missing data **mechanism**
+
+### Missing at Random (MAR)
+
+```{r MAR, engine='tikz', echo=F,crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}
+\draw(0,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$y_i$};	
+\draw(-1.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\mu_{i}$};
+\draw(1.5,1.5) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](3){$\boldsymbol{x}_{i}$};
+\draw(-1.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\beta$};
+\draw(-3,0) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](5){$\sigma$};
+\draw(3.5,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](6){$m_{i}$};
+\draw(3.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\pi_{i}$};
+\draw(3.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\delta$};
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.300) -- (1.130);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (3.210) -- (1.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (4.south) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (5.east) -- (1.west);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (8.south) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.south) -- (6.north);
+
+\draw(-3.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-3.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-3.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-3.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-3.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+
+\draw(-2.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-2.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-1.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-1.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-1.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (3.east) -- (7.west);
+\draw[rounded corners=15pt,thick,color=red] (-3.5,-0.6) rectangle ++ (5.5,4.2) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis};
+\draw[rounded corners=15pt,thick,color=olive,dashed] (1.1,-0.8) rectangle ++ (2.9,4.6) node[xshift=-1.2cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness};
+\end{tikzpicture}
+```
+
+.left-column60[
+`r include_fig("MAR-1.png",width="85%")`
+]
+.right-column35[
+- $y_i=$ Outcome subject to missingness
+
+- $m_i=1$ if $y_i$ missing or 0 if $y_i$ observed ("missingness indicator")
+
+- $\bm\theta=\left(\bm\theta^{\rm{MoA}},\bm\theta^{\rm{MoM}}\right)=$ model parameters
+   - $\bm\theta^{\rm{MoA}}=(\beta,\sigma)$ 
+   - $\bm\theta^{\rm{MoM}}=\delta$ 
+
+`r vspace("4em")`
+**NB**: things are even more complicated when missing is (also) for the predictors/covariates!
+]
+
+---
+
+count: false
+# Missing data **mechanism**
+
+### Missing Not at Random (MNAR)
+
+```{r MNAR, engine='tikz', echo=F,crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+\begin{tikzpicture}
+\draw(0,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$y_i$};	
+\draw(-1.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\mu_{i}$};
+\draw(1.5,1.5) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](3){$\boldsymbol{x}_{i}$};
+\draw(-1.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\beta$};
+\draw(-3,0) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](5){$\sigma$};
+\draw(3.5,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](6){$m_{i}$};
+\draw(3.5,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\pi_{i}$};
+\draw(3.5,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\delta$};
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.300) -- (1.130);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (3.210) -- (1.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (4.south) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (5.east) -- (1.west);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (8.south) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.south) -- (6.north);
+
+\draw(-3.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-3.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-3.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-3.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-3.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-2.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-2.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-1.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-1.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-1.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (3.east) -- (7.west);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (1.30) -- (7.210);
+\draw[rounded corners=15pt,thick,color=red] (-3.5,-0.6) rectangle ++ (5.5,4.2) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis};
+\draw[rounded corners=15pt,thick,color=olive,dashed] (-.7,-0.8) rectangle ++ (4.8,4.6) node[xshift=-1.2cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness};
+\end{tikzpicture}
+```
+
+
+.left-column60[
+`r include_fig("MNAR-1.png",width="85%")`
+]
+.right-column35[
+- $y_i=$ Outcome subject to missingness
+
+- $m_i=1$ if $y_i$ missing or 0 if $y_i$ observed ("missingness indicator")
+
+- $\bm\theta=\left(\bm\theta^{\rm{MoA}},\bm\theta^{\rm{MoM}}\right)=$ model parameters
+   - $\bm\theta^{\rm{MoA}}=(\beta,\sigma)$ 
+   - $\bm\theta^{\rm{MoM}}=\delta$ 
+
+`r vspace("4em")`
+**NB**: things are even more complicated when missing is (also) for the predictors/covariates!
+]
+
+---
+
+# Missing data **analysis methods**
+
+- Complete Case Analysis
+   - Elimination of partially observed cases
+   - Simple but reduce efficiency and possibly give bias parameter estimates
+   
+.lightgray[
+
+- Inverse probability weighting
+   - Weigh the original data (subject to missingness) to account for the fact that the actual sample size is smaller than originally planned
+   - Weigh up(down) units that have a low(high) chance of actually being observed
+   
+- Single (deterministic) imputation
+   - Imputation of missing data with a single value (mean, median, LVCF)
+   - Does not account for the uncertainty in the imputation process
+   
+-  Multiple (stochastic) imputation (MI)
+   - Missing data imputed $K$ times to obtain $K$ different imputed datasets
+   - Each dataset is analysed and $K$ sets of estimates are derived
+   - Parameter estimates are combined into a single quantity
+   - The uncertainty due to imputation is incorporated but the validity relies on the correct specification of the imputation model
+   
+- "Full Bayesian"
+   -  Basically extends MI to model formally the missing mechanism
+]
+
+---
+
+# Complete Case Analysis (CCA)
+
+- Essentially swipes the problem under the rug and restricts the analysis to only "valid" cases (ie those completely observed on **all** the variables under consideration) 
+
+- Typically, common statistical packages take this approach by default
+
+.panelset[
+
+.panel[
+.panel-name[Code]
+```{r sim.data,eval=FALSE}
+# A very simple simulation study...
+
+# 1. Generates 100 data points for a covariate 'x', assuming x~Normal(mean=2,sd=5)
+x=rnorm(100,2,5)
+
+# 2. Generates 100 data points for the outcome 'y', assuming a linear regression with 
+# a. intercept (alpha) = 0.5
+# b. "effect" of x (beta) = 1.5
+# c. error variance = 1 (ie add 'rnorm(100)', which simulates 100 values from Normal(0,1))
+y=.5+1.5*x+rnorm(100)
+
+# 3. Removes 20 values at random and replaces them with 'NA' (missing)
+y[sample(1:100,20)]=NA
+
+# 4. Runs a linear regression model (y on x) and print results (see 'Output' panel...)
+summary(lm(y~x))
+```
+]
+
+.panel[
+.panel-name[Output]
+```{r, ref.label="sim.data",echo=FALSE,eval=TRUE,highlight.output = c(17)}
+```
+]
+
+]
+
+---
+
+count: false
+# Complete Case Analysis (CCA)
+
+## Advantages
+
+- Clearly very easy to implement
+
+- If data are MCAR or MAR (and the model is correctly specified!), the results are unbiased
+
+`r vspace("4em")`
+
+## Disadvantages
+
+- The sample size is reduced, due to the fact that units subject to missingness are dropped out
+   -  If missing data affect more than one variable, this has an even bigger impact
+
+- Consequently, the estimates will be associated with (artificially) larger standard errors
+   - **NB**: this is a feature of analyses that are characterised by missing data 
+   - Intuitively, it makes sense: we do not have all the possible relevant information, and thus our estimation will be less precise than we would obtain, had we been able to observe all the relevant data!
+   
+- Does not account for the missing generating mechanism
+
+- Can affect sample size calculations
+
+---
+
+# Missing data **analysis methods**
+
+.lightgray[
+- Complete Case Analysis
+   - Elimination of partially observed cases
+   - Simple but reduce efficiency and possibly give bias parameter estimates
+]
+
+- Inverse probability weighting
+   - Weigh the original data (subject to missingness) to account for the fact that the actual sample size is smaller than originally planned
+   - Weigh up(down) units that have a low(high) chance of actually being observed
+
+.lightgray[
+- Single (deterministic) imputation
+   - Imputation of missing data with a single value (mean, median, LVCF)
+   - Does not account for the uncertainty in the imputation process
+   
+-  Multiple (stochastic) imputation (MI)
+   - Missing data imputed $K$ times to obtain $K$ different imputed datasets
+   - Each dataset is analysed and $K$ sets of estimates are derived
+   - Parameter estimates are combined into a single quantity
+   - The uncertainty due to imputation is incorporated but the validity relies on the correct specification of the imputation model
+   
+- "Full Bayesian"
+   -  Basically extends MI to model formally the missing mechanism
+]
+
+---
+
+# Inverse probability weighting
+
+-  The basic idea is to estimate, for each unit $i = 1,\ldots , n_{\rm{obs}}$, the probability of being observed, $\hat{p}_i$
+
+
+-  Then, each unit is weighted by the inverse of this value, $w_i = \hat{p}_i^{-1}$
+   - Thus units that are observed and actually have a large chance of being observed are "normal" &ndash; since we do expect to see them
+   - Hence they will be multiplied by a small factor
+   - Conversely, units that are observed but are associated with a small chance of being available are assumed to be representative of "underrepresented" cases
+   - Hence they will be multiplied by a larger factor to “balance” the sample
+
+
+- This is effective particularly (but not necessarily only!) in stratified cases
+
+
+- **NB**: $\hat{p}_i$ is a kind of .blue[**propensity score**] &ndash; and this procedure is similar to increasingly popular methods in health economics (e.g. .red[**Multiple Adjusted Indirect Comparisons**])
+
+---
+
+count: false
+# Inverse probability weighting
+
+## (Ridiculously simplified!) Example
+
+Suppose we *know* the data to be
+```{r echo=F,message=F,error=F}
+library(knitr)
+library(kableExtra)
+tab=data.frame("Response",0,1,2,1,2,3,2,3,4)
+(tab) %>% kable(col.names = NULL) %>% 
+  kable_classic() %>% 
+  kable_styling(full_width=F) %>% 
+  add_header_above(c("Group" = 1, "Group A" = 3, "Group B" = 3, "Group C" = 3),border_right = TRUE) #%>% 
+#  column_spec(c(1,4,7), border_right = T)
+```
+
+- The "true" estimation given the complete data set is
+$$\class{blue}{\hat\mu=\frac{18}{9}=2}$$
+
+--
+
+`r vspace("2em")`
+But actually, some of the values are missing and thus the *actual* data are
+```{r echo=F,message=F,error=F}
+library(knitr)
+library(kableExtra)
+tab=data.frame("Response","?",1,"?",1,2,3,2,"?",4)
+(tab) %>% kable(col.names = NULL) %>% 
+  kable_classic() %>% 
+  kable_styling(full_width=F) %>% 
+  add_header_above(c("Group" = 1, "Group A" = 3, "Group B" = 3, "Group C" = 3),border_right = TRUE) 
+
+```
+
+- The CCA of the observed data would give an estimate of 
+$$\class{red}{\hat\mu=\frac{13}{6}\neq 2}$$
+
+---
+
+count: false
+# Inverse probability weighting
+
+- We had originally planned 3 observations in group A 
+
+- However, because of missingness, only 1 observation is available
+
+- IPW assumes that the available data will carry information **also** for those that are missing and thus re-weight the observation by $w_i = \hat{p}^{−1}$
+
+--
+
+`r vspace("1em")`
+-  In this case, **assuming the missingness mechanism is MCAR**
+   - $\hat{p}_i^A= 1/3 \Rightarrow w_i^A = 1/\hat{p}_i^A = 3$
+   - $\hat{p}_i^B= 3/3 \Rightarrow w_i^B = 1/\hat{p}_i^B = 1$
+   - $\hat{p}_i^C= 2/3 \Rightarrow w_i^C = 1/\hat{p}_i^C = 3/2$
+
+--
+
+`r vspace("2em")`
+-  The IPW estimator can be computed as
+\begin{align}
+\hat{\mu}_{\tiny\mbox{IPW}} & = \frac{\sum_i y_i w_i}{\sum_i n_i w_i} \\
+& = \frac{1\times 3 + (1+2+3)\times 1 + (2+4)\times 1.5}{(1\times 3) + (3\times 1) + (2\times 1.5)} \\
+& = \frac{18}{9} = 2
+\end{align}
+
+---
+
+count: false
+# Inverse probability weighting
+
+## Advantages
+
+- Not too complex &ndash; only requires that we are able to estimate the weigths (i.e. the probability of being observed)
+   - IPW estimates are generally consistent
+   - With large enought sample size, they produce an unbiased estimation
+   - This does not necessarily apply for moderate to small sample sizes
+   
+## Disadvantages
+
+- We need to estimate the probability of being observed &ndash; this might not be so easy!
+
+- Even when we can estimate the "inclusion" probabilities, these estimations might be highly unstable
+   - When $p_i$ is close to 0, then the resulting weight tends to $\infty$
+   - If the inclusion probabilities are not estimated with precision, neither will the weights thus rendering the procedure unreliable
+
+---
+
+# Missing data **analysis methods**
+
+.lightgray[
+- Complete Case Analysis
+   - Elimination of partially observed cases
+   - Simple but reduce efficiency and possibly give bias parameter estimates
+
+- Inverse probability weighting
+   - Weigh the original data (subject to missingness) to account for the fact that the actual sample size is smaller than originally planned
+   - Weigh up(down) units that have a low(high) chance of actually being observed
+]
+
+- Single (deterministic) imputation
+   - Imputation of missing data with a single value (mean, median, LVCF)
+   - Does not account for the uncertainty in the imputation process
+
+.lightgray[   
+-  Multiple (stochastic) imputation (MI)
+   - Missing data imputed $K$ times to obtain $K$ different imputed datasets
+   - Each dataset is analysed and $K$ sets of estimates are derived
+   - Parameter estimates are combined into a single quantity
+   - The uncertainty due to imputation is incorporated but the validity relies on the correct specification of the imputation model
+   
+- "Full Bayesian"
+   -  Basically extends MI to model formally the missing mechanism
+]
+
+---
+
+# Single (deterministic) imputation
+
+-  Another approach to handling missing data is to impute the missing values, using available information
+
+- The most straightforward way of doing this is to substitute missing values with the mean of the observed values
+
+`r include_fig("table_si.png",width="57%")`
+
+---
+
+count: false
+# Single (deterministic) imputation
+
+## Advantages
+
+-  Again, very easy to use
+
+
+## Disadvantages
+
+- If observed data are on an ordinal scale, strictly speaking not applicable
+
+- Assumes no underlying individual variability around missing data
+   - All missing data points are treated as if they came from the exact same generating process
+   - This goes even beyond (= it’s worse than) the assumption of MCAR!
+
+---
+
+# Missing data **analysis methods**
+
+.lightgray[
+- Complete Case Analysis
+   - Elimination of partially observed cases
+   - Simple but reduce efficiency and possibly give bias parameter estimates
+
+- Inverse probability weighting
+   - Weigh the original data (subject to missingness) to account for the fact that the actual sample size is smaller than originally planned
+   - Weigh up(down) units that have a low(high) chance of actually being observed
+
+- Single (deterministic) imputation
+   - Imputation of missing data with a single value (mean, median, LVCF)
+   - Does not account for the uncertainty in the imputation process
+]
+
+-  Multiple (stochastic) imputation (MI)
+   - Missing data imputed $K$ times to obtain $K$ different imputed datasets
+   - Each dataset is analysed and $K$ sets of estimates are derived
+   - Parameter estimates are combined into a single quantity
+   - The uncertainty due to imputation is incorporated but the validity relies on the correct specification of the imputation model
+   
+.lightgray[   
+- "Full Bayesian"
+   -  Basically extends MI to model formally the missing mechanism
+]
+
+---
+
+# Multiple imputation
+
+## Example
+
+- Suppose we partially observe a continuous variable $y$ on $n_{\rm{obs}} < n$ individuals
+
+- Also, we completely observe an additional variable $x$ on the $n$ individuals in the sample
+
+- The simplest way in which we can describe the relationship between $y$ and $x$ is through linear regression
+
+$$\class{myblue}{y_i = \beta_0 + \beta_1 x_i + \varepsilon_i \qquad \varepsilon_i \sim \dnorm(0,\sigma^2)}$$
+
+--
+
+-  We can procede in the following way
+
+   1. Fit the regression model to the complete cases and estimate the parameters $\bm{\theta} = (\beta_0, \beta_1, \sigma^2 )$
+   2. Build a linear predictor for the missing data points $\mu^{\rm{mis}} = \hat\beta_0 + \hat\beta_1 x_i$
+   3. Simulate a random value from the induced distribution of the missing data
+   $$\class{myblue}{y_i^{\rm{mis}}\sim \dnorm(\mu^{\rm{mis}},\hat\sigma^2)}$$
+
+---
+
+count: false
+# Multiple imputation
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=5,fig.height=5,out.width="70%",fig.align='center',dev="tikz",eval=FALSE}
+# Generates data
+N <- 1000				# population size
+# 1. covariates
+x0.pop <- rep(1,N)			# intercept
+x1.pop <- rnorm(N)			# some continuous covariate
+x2.pop <- rbinom(N,1,.6)		# some binary covariate (eg sex)
+x3.pop <- rpois(N,3)			# some discrete count (eg number of visits)
+x4.pop <- round(rnorm(N,40,8))		# some continuous covariate, but rounded off (eg age)
+center <- function(x) {x-mean(x)}	# creates centered versions of the covariates 
+X.pop <- cbind(x0.pop,center(x1.pop),center(x2.pop),center(x3.pop),center(x4.pop))
+X.pop <- cbind(x0.pop,x1.pop,x2.pop,x3.pop,x4.pop)
+
+# 2. create response
+beta <- numeric()			# effect of the covariates on outcome
+beta[1] <- .86				# intercept 
+beta[2] <- -1.3				# effect of continuous covariate
+beta[3] <- .94				# effect of sex (eg M vs F)
+beta[4] <- 2.4				# effect of covariate 3
+beta[5] <- 1.8				# effect of age
+sigma <- 6				# individual variability
+linpred <- X.pop%*%beta			# linear predictor
+y.pop <- rnorm(N,linpred,sigma)		# simulated response
+mu <- mean(y.pop)			# "true" population mean for the main outcome
+sigma <- sqrt((N-1)*sd(y.pop)/N)	# "true" population standard deviation for the main outcome
+
+n <- 100				# sample size
+y <- sample(y.pop,n,FALSE)		# sample the outcome from the "true population"	
+x0 <- sample(x0.pop,n,FALSE)		# sample the covariates from the "true population"	
+x1 <- sample(x1.pop,n,FALSE)
+x2 <- sample(x2.pop,n,FALSE)
+x3 <- sample(x3.pop,n,FALSE)
+x4 <- sample(x4.pop,n,FALSE)
+X <- cbind(x0,x1,x2,x3,x4)
+data <- data.frame(y,X)			# save the sample data in a data.frame
+
+## Assume MCAR and drop out
+w <- 1.5				# assumed maximum width of the 95% CI
+S <- 4					# "guess" at the "true" population standard deviation
+y.bar <- 0				# "guess" at the "true" population mean
+
+nstar <- 1/((w/4/S)^2 + (1/N))		# computes the analystical optimal sample size
+p <- .2 				# 20% drop out
+n.d <- nstar/(1-p)			# inflation for drop out
+# Sample from the overall population using n.d
+y <- sample(y.pop,n.d,FALSE)		# sample the outcome from the "true population"	
+x0 <- sample(X.pop[,1],n.d,FALSE)	# sample the covariates from the "true population"	
+x1 <- sample(X.pop[,2],n.d,FALSE)
+x2 <- sample(X.pop[,3],n.d,FALSE)
+x3 <- sample(X.pop[,4],n.d,FALSE)
+x4 <- sample(X.pop[,5],n.d,FALSE)
+X <- cbind(x0,x1,x2,x3,x4)
+m <- rbinom(n.d,1,p)			# Now generates missing data assuming MCAR
+y.true <- y				# copy the "true" values (will not have that in real data!)
+y[m==1] <- NA				# for m=1, then y is forced to be missing
+data.mcar <- data.frame(y,X,m,y.true)	# save the sample data in a data.frame
+tot.missing <- sum(data.mcar$m)		# number of missing values
+
+library(arm)
+mod <- lm(y~x4,data=data.mcar)
+
+mu <- cbind(x0,x4)%*%mod$coefficients
+sigma.hat <- sigma.hat(mod)
+missing <- which(data.mcar$m==1)
+y.sim=numeric()
+for (i in 1:length(missing)) {
+	y.sim[i] <-  rnorm(1,mu[missing[i]],sigma.hat)
+}
+
+plot(data.mcar$x4[data.mcar$m==0],data.mcar$y[data.mcar$m==0],xlab="",ylab="",bty="l",pch=20,cex=1.1,ylim=c(.8*range(data$y)[1],1.1*range(data$y)[2]))
+mtext("$x$",1,line=2.5,cex=1.2)
+mtext("$y$",2,line=2.5,cex=1.2)
+abline(a=mod$coefficients[1],b=mod$coefficients[2],lwd=2)
+text(data.mcar$x4[data.mcar$m==1],par()$usr[3],"?",pos=3)
+points(data.mcar$x4[missing],y.sim,pch=24,col="red")
+legend("topright",c("Observed data","Missing data","Imputed values"),col=c("black","black","red"),pch=c(20,NA,24),bty="n",text.col="white")
+legend("topright",c("Observed data","Missing data","Imputed values"),col=c("black","black","red"),pch=c(NA,"?",NA),bty="n")
+```
+
+`r include_fig("unnamed-chunk-7-1.png",width="48%")`
+
+---
+
+count: false
+# Multiple imputation
+
+- If we had infinite data on which to base our estimation of the parameters $\class{myblue}{\bm{\theta} = (\beta_0, \beta_1, \sigma^2 )}$ for the imputation model, then a single draw would be sufficient to fully represent our uncertainty in the missingness patterns (provided that the imputation model is correctly specified!)
+
+
+--
+
+
+- However, in general that is .red[**not**] the case
+   - The dataset is typically small to moderate
+   - We are only using the complete cases anyway to estimate $\class{myblue}{\bm\theta}$
+   - The imputation model is possibly mis-specified
+
+- Consequently, the resulting linear predictor and the estimation of the individual variance are likely to be with limited precision
+
+
+--
+
+
+- To deal with this...
+   - Simulate multiple instances of the possible value that the missing observations might have had (if we had been able to observe them), by considering a number $K$ of draws from their distribution
+
+---
+
+count: false
+# Multiple imputation
+
+
+1. **Imputation**
+
+   - Impute (fill in) the missing entries of the incomplete data sets $K$ (typically 5-10) times, by simulating from a given model (e.g. linear regression, in the previous case)    
+   - This step results in $K$ complete data sets
+   
+--
+
+2. **Analysis**
+   - Analyse each of the $K$ completed datasets using standard methods
+   - This amounts to computing the estimate $\class{myblue}{\bar{y}_k}$ with variance $\class{myblue}{\sigma^2_k}$
+   
+--
+
+3. **Pooling** ("Rubin's rule")
+   -  Combine the $K$ analysis results into a single final result
+   $$\class{myblue}{\bar{y}_{\rm{MI}} = \frac{1}{K}\sum_{k=1}^K \bar{y}_k}$$
+   `r vspace("-10px")`
+   with variance
+   `r vspace("-10px")`
+   $$\class{myblue}{\sigma^2_{\rm{MI}} = \left(1 + \frac{1}{K}\right)\underbrace{\left[\frac{1}{K-1}\sum_{k=1}^K \left(\bar{y}_k - \bar{y}_{\rm{MI}}\right)^2\right]}_{`r sftext("between imputation")`} + \underbrace{\left[ \frac{1}{K}\sum_{k=1}^K \sigma^2_k \right]}_{`r sftext("within imputation")`}}$$
+   
+---
+
+count: false
+# Multiple imputation
+
+```{css echo=FALSE}
+.right-column30 {
+  width: 30%;
+  height: 92%;
+  float: right;
+}
+.right-column30 h2, .right-column h3 {
+  color: #035AA699;
+}
+.right-column30 h2:last-of-type, .left-column h3:last-child {
+  color: #035AA6;
+}
+.left-column70 {
+  width: 65%;
+  float: left;
+  padding-top: 0em;
+}
+```
+
+.left-column70[
+## Advantages
+
+- (Generally) valid under MCAR and MAR assumptions
+
+- Makes use of the whole dataset
+
+- Can be extended to MNAR, although models become more complex and untestable assumptions are necessary
+
+## Disadvantages
+
+- Leads to biased results if the imputation model is completely mis-speficied ("**congeniality**")
+
+- Can be computationally intensive
+
+]
+
+.right-column30[
+`r include_fig("mscongeniality.jpeg",width="100%")`
+]
+
+---
+
+# Missing data **analysis methods**
+
+.lightgray[
+- Complete Case Analysis
+   - Elimination of partially observed cases
+   - Simple but reduce efficiency and possibly give bias parameter estimates
+
+- Inverse probability weighting
+   - Weigh the original data (subject to missingness) to account for the fact that the actual sample size is smaller than originally planned
+   - Weigh up(down) units that have a low(high) chance of actually being observed
+
+- Single (deterministic) imputation
+   - Imputation of missing data with a single value (mean, median, LVCF)
+   - Does not account for the uncertainty in the imputation process
+
+-  Multiple (stochastic) imputation (MI)
+   - Missing data imputed $K$ times to obtain $K$ different imputed datasets
+   - Each dataset is analysed and $K$ sets of estimates are derived
+   - Parameter estimates are combined into a single quantity
+   - The uncertainty due to imputation is incorporated but the validity relies on the correct specification of the imputation model
+]
+   
+- "Full Bayesian"
+   -  Basically extends MI to model formally the missing mechanism
+
+---
+
+# (Bayesian) Modelling for missing data
+
+- Effectively, need to model a bivariate outcome $(y, m)$, depending on the model parameters (see `r ref_lecture("ild","factorisation")`)
+\begin{align}
+\class{myblue}{p(y,m \mid \bm\theta)} & \class{myblue}{= p\left(y \mid m,\bm\theta^{\rm{MoA}}\right) p\left(m\mid \bm\theta^{\rm{MoM}}\right)} && \class{blue}{`r sftext("Pattern mixture model")`} \\
+& \class{myblue}{=   p\left(m \mid y,\bm\theta^{\rm{MoM}}\right) p\left(y\mid \bm\theta^{\rm{MoA}}\right)} && \class{red}{`r sftext("Selection model")`} 
+\end{align}
+   -  Common assumption (explicit in a Bayesian setup): the two blocks of model parameters are independent (at least a priori)
+
+
+--
+
+
+-  .blue[**Pattern mixture models**]
+   - Needs to model the full possible missingness "patterns" $m$ using a marginal distribution
+   - Models for data more natural
+
+
+- .red[**Selection models**]
+   -  Models directly the marginal distribution of the observable data
+   - Needs to figure out how the missingness model may be affected by it
+
+---
+
+# Missing data **in HTA**
+
+- Missing data are complicated in any context
+
+   - But are fairly established in medical/bio-statistical research
+  
+  
+-  In HTA it's even more complicated...
+
+   - Bivariate outcome, usually correlated
+   - Normality not reasonable (skewness)
+   - Other features of the data ("spikes")
+   - Main objective: decision-making, not inference! (See `r ref_lecture("intro_he","he-scheme")`)
+   
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MCAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+`r vspace("-20px")`
+
+`r include_fig("unnamed-chunk-9-1.png",width="72%")`
+
+
+`r vspace("8px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0}}$
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0}}$
+
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.320) -- (12.150);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (5.230) -- (15.50);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+`r include_fig("unnamed-chunk-10-1.png",width="72%")`
+
+
+`r vspace("11px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0} + \sum_{k=1}^K \gamma_{ek}x_{eik}}$
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0} + \sum_{h=1}^H \gamma_{ch}x_{cih}}$
+
+---
+
+count: false
+# Missing data **in HTA**
+
+### Selection models: MNAR $(e,c)$
+
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\input{../assets/latex_colours.tex}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning,calc}
+
+\begin{tikzpicture}
+\draw(-3,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont,node distance=1](1){$c_i$};	
+\draw(-3,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](2){$\phi_{ic}$};
+\draw(-4.4,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](3){$\boldsymbol\psi_{c}$};
+\draw(-3,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](4){$\mu_c$};
+\draw(-4.8,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](5){$\boldsymbol{x}_{ci}$};
+\draw(-1,0) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{10}{10}\selectfont, node distance=1](6){$e_i$};
+\draw(-1,1.5) node[align=center,double,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](7){$\phi_{ie}$};
+\draw(.7,1.5) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](8){$\boldsymbol\psi_{e}$};
+\draw(-1,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](9){$\mu_e$};
+\draw(1.0,3) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=15pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](10){$\boldsymbol{x}_{ei}$};
+\draw(2.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](11){$m_{ei}$};
+\draw(2.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](12){$\pi_{ei}$};
+\draw(2.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](13){$\boldsymbol\gamma_{e}$};
+\draw(-6.2,0) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](14){$m_{ci}$};
+\draw(-6.2,1.5) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](15){$\pi_{ci}$};
+\draw(-6.2,3) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=20pt,font=\fontsize{9}{10}\selectfont, node distance=1](16){$\boldsymbol\gamma_{c}$};
+
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-0pt,auto,node distance=.0pt,thin,dashed] (5.320) -- (2.130);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (5.230) -- (15.50);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=0pt,thin] (7.270) -- (6.north);
+\draw [->,>=latex,shorten >=0pt,auto,shorten <=-0pt,node distance=.0pt,thin] (8.220) -- (6.60);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.270) -- (7.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.230) -- (7.50);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (10.320) -- (12.150);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (9.210) -- (2.30);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (6.130) -- (2.340);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (12.south) -- (11.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (13.south) -- (12.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (15.south) -- (14.north);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin] (16.south) -- (15.north);
+
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (6.20) -- (12.210);
+\draw [->,>=latex,shorten >=-0pt,shorten <=-0pt,auto,node distance=.0pt,thin,dashed] (1.150) -- (15.320);
+
+\draw[rounded corners=15pt,thick,color=red] (-5.2,-0.6) rectangle ++ (6.6,4.3) node[xshift=-4.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of analysis for $(c,e)$};
+\draw[rounded corners=15pt,thick,color=olive] (1.6,-0.6) rectangle ++ (1.3,4.3) node[xshift=-0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $e$};
+\draw[rounded corners=15pt,thick,color=orange] (-6.8,-0.6) rectangle ++ (1.3,4.3) node[xshift=-1.0cm, yshift=0.15cm]{\fontsize{6}{7}\selectfont \sffamily Model of missingness for $c$};
+
+\draw(-7.5,-1) node[align=center,circle,fill=green!80!blue!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](17){ };
+\draw(-7.5,-1.2) node[align=center,circle,fill=blue!20,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](18){ };
+\draw(-7.5,-1.4) node[align=center,circle,double,fill=blue!20,draw=black,inner sep=.05pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](21){ };
+\draw(-7.5,-1.6) node[align=center,rectangle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{9}{10}\selectfont, node distance=1.7](19){ };
+\draw(-7.5,-1.8) node[align=center,circle,fill=yellow!30,draw=black,inner sep=1pt,minimum size=4pt,font=\fontsize{10}{10}\selectfont,node distance=1](20){ };
+\draw(-6.25,-1) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](21){Partially observed data};
+\draw(-6.15,-1.2) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Unobservable parameters};
+\draw(-5.28,-1.4) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Deterministic function of random quantities};
+\draw(-5.8,-1.6) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, unmodelled data};
+\draw(-5.92,-1.8) node[align=right,circle,draw=none,font=\sffamily\fontsize{6}{7}\selectfont,node distance=1](22){Fully observed, modelled data};
+\end{tikzpicture}
+```
+
+`r vspace("-20px")`
+
+`r include_fig("unnamed-chunk-11-1.png",width="72%")`
+
+
+`r vspace("11px")`
+- $\class{olive}{m_{ei}\sim\dbern(\pi_{ei}); \qquad \logit(\pi_{ei})=\gamma_{e0} + \sum_{k=1}^K \gamma_{ek}x_{eik} + \gamma_{eK+1}e_i;} \class{blue}{\quad \gamma_{eK+1}\sim`r sftext("Informative Prior")`}$ 
+
+- $\class{orange}{m_{ci}\sim\dbern(\pi_{ci}); \qquad \logit(\pi_{ci})=\gamma_{c0} + \sum_{h=1}^H \gamma_{ch}x_{cih} + \gamma_{cH+1}c_i;} \class{blue}{\quad \gamma_{cK+1}\sim`r sftext("Informative Prior")`}$
+
+---
+
+# Motivating example: MenSS trial
+
+- The MenSS pilot RCT evaluates the cost-effectiveness of a new digital intervention to reduce the incidence of STI in young men with respect to the SOC
+   - QALYs calculated from utilities (EQ-5D 3L)
+   - Total costs calculated from different components (no baseline)
+  
+ 
+--
+
+### Partially observed data
+
+`r include_fig("tab_menss.png",width="75%")`
+   
+---
+
+count: 
+# Motivating example: MenSS trial
+
+- The MenSS pilot RCT evaluates the cost-effectiveness of a new digital intervention to reduce the incidence of STI in young men with respect to the SOC
+   - QALYs calculated from utilities (EQ-5D 3L)
+   - Total costs calculated from different components (no baseline)
+
+
+### Skewness and "structural values"
+
+`r vspace("-30px")`
+
+`r include_fig("menss_data.png",width="48%")`
+
+---
+
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]     
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e_{it}$};
+\draw(1.5,2.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(1.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_{et}$};
+\draw(1.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.20);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+
+\draw(4.5,3.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Marginal model for $e$}};
+\draw(4.5,2.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e_{it}\sim \mbox{Normal}(\phi_{eit},\psi_{et})$};
+\draw(4.5,2.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\phi_{eit}=\mu_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(4.05,2.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\white\phi_{eit}\black=\mu_{et}+\alpha_{t}u^*_{0it}$};
+\draw(-4.5,3.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e$}};
+\draw(-4.5,2.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$c_{it}\mid e_{it}\sim \mbox{Normal}(\phi_{cit},\psi_{ct})$};
+\draw(-4.5,2.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\phi_{cit}=\mu_{ct}+\beta_t(e_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("unnamed-chunk-12-1.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]     
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e^*_{it}$};
+\draw(1.5,.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(1.5,-.25) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu_{et}$};
+\draw(1.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,1.75) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=.0pt,thin] (3.320) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.west) -- (6.east);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (9.210) -- (2.20);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (6.130) -- (2.340);
+
+\draw(4.5,1.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Marginal model for $e^*$}};
+\draw(4.3,1.0) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e^*_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\mbox{logit}(\phi_{eit})=\mu_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(4.15,0.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\white\phi_{eit}\black=\mu_{et}+\alpha_{t}u^*_{0it}$};
+\draw(-4.5,1.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e^*$}};
+\draw(-4.5,1.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,1.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("unnamed-chunk-13-1.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](12){$e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin,color=gray!20] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=gray!20] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=gray!20] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin,color=gray!20] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=gray!20] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Mixture model for $e$};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](20){$e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](23){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Conditional model for $c\mid e^*$};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("unnamed-chunk-14-1.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=red!50!blue!100](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](12){\red $e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm,color=myblue](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin,color=gray!20] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=gray!20] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=gray!20] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Mixture model for $e$}};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](20){\red $e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=red!50!blue!100](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](23){$\white\mbox{logit}(\phi_{eit})\black =\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=myblue](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](tit1){Conditional model for $c\mid e^*$};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm,color=gray!20](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("unnamed-chunk-15-1.png",width="75%")`
+
+---
+
+count: false
+# Modelling
+
+.alignright[`r icon::academicons$pubmed` [Gabrio et al (2018)](https://pubmed.ncbi.nlm.nih.gov/30565727/)]
+1. **Bivariate Normal**     
+   - Simpler and closer to "standard" frequentist models     
+   - Accounts for .red65blue[correlation between QALYs and costs]    
+`r vspace("-10px")`
+2. **Beta-Gamma**     
+   - Account for .red65blue[correlation between outcomes] **and** model the relevant ranges: QALYs $\in (0,1)$ and costs $\in (0,\infty)$    
+   - **But**: needs to rescale the observed data $\class{myblue}{e^*_{it}=(e_{it}-\epsilon)}$ to avoid spikes at 1    
+`r vspace("-10px")`
+3. **Hurdle model**    
+   - Model $e_{it}$ as a .blue[**mixture**] to account for .red65blue[correlation between outcomes] + relevant ranges + .olive[structural values]
+   - May expand further to account for partially observed baseline utilities $u_{0it}$ (needs untestable assumptions!)
+```{r engine='tikz', echo=F, crop = TRUE,opts=list(width="65%",title="INSERT TEXT HERE"),eval=FALSE}
+\sffamily
+\input{../assets/latex_colours.tex}
+\begin{tikzpicture}
+\draw(-1.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](1){$c_{it}$};
+\draw(-1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](2){$\phi_{ict}$};
+\draw(-2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](3){$\psi_{ct}$};
+\draw(-1.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](4){$\mu_{ct}$};
+\draw(-.5,.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](5){$\beta_t$};
+\draw(.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](6){$e^{<1}_{it}$};
+\draw(1.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](7){$\phi_{iet}$};
+\draw(2.5,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](8){$\psi_{et}$};
+\draw(.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](9){$\mu^{<1}_{et}$};
+\draw(1.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](10){$u^*_{0it}$};
+\draw(2.5,0.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](11){$\alpha_t$};
+\draw(1.5,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](12){$e^{1}_{it}$};
+\draw(.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](13){$e^*_{it}$};
+\draw(-.5,-2.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](14){$\pi_{it}$};
+\draw(-.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](15){$d_{it}$};
+\draw(-1.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](16){$\boldsymbol{X}_{it}$};
+\draw(.5,-3.3) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](17){$\boldsymbol\eta_t$};
+\draw(-.2,-.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{8}{10}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$\mu_{et}$};
+
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (2.270) -- (1.north);
+\draw [->,>=latex,shorten >=0pt,shorten <=-4pt,auto,node distance=.0pt,thin] (3.300) -- (1.120);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (4.270) -- (2.north);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (5.220) -- (2.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=0pt,thin] (7.210) -- (6.60);
+\draw [->,>=latex,shorten >=-2pt,auto,shorten <=-4pt,node distance=.0pt,thin] (8.210) -- (6.30);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.320) -- (7.130);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (10.south) -- (7.north);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (11.220) -- (7.50);
+\draw [->,>=latex,shorten >=-2pt,shorten <=-2pt,auto,node distance=.0pt,thin,color=red!65!blue] (18.180) -- (2.0);
+\draw [->,>=latex,shorten >=-5pt,shorten <=-5pt,auto,node distance=.0pt,thin] (13.90) -- (6.270);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (12.220) -- (13.30);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=red!65!blue] (13.140) -- (2.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.0) -- (13.180);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin] (14.270) -- (15.90);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (16.30) -- (14.220);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (17.150) -- (14.320);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-4pt,auto,node distance=.0pt,thin] (9.230) -- (18.60);
+\draw [->,>=latex,shorten >=-4pt,shorten <=-6pt,auto,node distance=.0pt,thin,color=green!65!blue] (14.80) -- (18.260);
+
+\draw(-4.1,-2.9) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\olive {Model for the structural ones}};
+\draw(-4.1,-3.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](18){$d_{it} := \mathbf{I}(e_{it}=1) \sim \mbox{Bernoulli}(\pi_{it})$};
+\draw(-4.1,-3.5) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](19){$\mbox{logit}(\pi_{it})=\boldsymbol{X}_{it}\boldsymbol\eta_t$};
+\draw(4.3,-.8) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\blue {Mixture model for $e$}};
+\draw(4.3,-1.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](20){$e^{1}_{it}:=1$};
+\draw(4.3,-1.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](21){$e^{<1}_{it}\sim \mbox{Beta}\left(\phi_{eit}\psi_{et},(1-\phi_{eit})\psi_{et}\right)$};
+\draw(4.3,-1.7) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](22){$\mbox{logit}(\phi_{eit})=\mu^{<1}_{et}+\alpha_{t}(u_{0it}-\bar{u}_{0t})$};
+\draw(3.85,-2.05) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](23){$\white\mbox{logit}(\phi_{eit})\black=\mu^{<1}_{et}+\alpha_{t}u^*_{0it}$};
+\draw(4.3,-2.6) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](24){$e^*_{it} = \pi_{it} e^1_{it}+(1-\pi_{it})e^{<1}_{it}$};
+\draw(4.3,-3.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](25){$\mu_{et}=(1-\bar\pi_{t})\mu^{<1}_{et}+\bar\pi_{t}$};
+\draw(-4.5,.2) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](tit1){\red {Conditional model for $c\mid e^*$}};
+\draw(-4.5,-.1) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](26){$c_{it}\mid e^*_{it}\sim \mbox{Gamma}(\psi_{ct}\phi_{cit},\psi_{ct})$};
+\draw(-4.5,-.4) node[align=center,circle,draw=none,fill=none,font=\sffamily\fontsize{6}{7}\selectfont,minimum width=.2cm,minimum height=.1cm](27){$\mbox{log}(\phi_{cit})=\mu_{ct}+\beta_t(e^*_{it}-\mu_{et})$};
+\end{tikzpicture}
+```
+`r include_fig("unnamed-chunk-16-1.png",width="75%")`
+
+---
+
+# Bayesian multiple imputation (MAR)
+`r vspace("-5px")`
+
+`r include_fig("results.png",width="69%")`
+
+---
+
+# Cost-effectiveness analysis
+
+.pull-left[
+`r include_fig("CEP_comparison_bg.png",width="100%")`
+]
+.pull-right[
+`r include_fig("CEAC_comparison_bg.png",width="100%")`
+
+.alignright[.small[`r icon::fontawesome("arrow-circle-right")` [Next lecture](../09_NMA/index.html)]]
+]

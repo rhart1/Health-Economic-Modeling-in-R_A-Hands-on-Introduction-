@@ -1,0 +1,1126 @@
+\documentclass[9pt]{beamer}
+%\usepackage{ucltemplate}
+\usepackage{etex}
+\usepackage{graphicx,hyperref,epsfig,bm,xspace}%pst-node,pst-text,pst-3d,pifont,pstricks,
+\usepackage{xcolor}
+\usepackage[UKenglish]{babel}
+\usepackage{tikz,verbatim,inconsolata,listings}
+\usepackage[position=top]{subfig}
+\usetikzlibrary{shapes,arrows,decorations.pathreplacing,positioning}
+%%%%\usepackage{animate}
+
+\lstset{basicstyle=\ttfamily\fontsize{6}{7}\selectfont,breaklines=true,tabsize=2,
+keywords={},linewidth=1\textwidth,backgroundcolor=\color{black!5},
+moredelim=[is][\color{red}]{~}{~},
+moredelim=[is][\textbf]{**}{**},
+moredelim=[is][\color{blue}]{*!}{*!},
+moredelim=[is][\color{green}]{''}{''}
+} 
+
+\newcommand{\UCL}{
+  \logo{\includegraphics[height=.37cm]{/home/gianluca/Dropbox/EcSan/ShortCourses/BSU-UCL/LaTeX/UCL.jpg}} 
+  \setbeamertemplate{sidebar right}{% 
+    \  \vfill%
+    \llap{\insertlogo\hskip0.0cm}\vskip0.015cm%
+  }
+}
+\newcommand{\nologo}{
+  \logo{}
+}
+
+\input{/home/gianluca/Dropbox/EcSan/MSVES/utils2}
+%\input{utils3}
+
+\graphicspath{{/home/gianluca/Dropbox/EcSan/ShortCourses/BSU-UCL/LaTeX/}{/home/gianluca/Dropbox/UCL/3021/Lectures/}{/home/gianluca/Dropbox/HE/NICE_workshop/}{/home/gianluca/Dropbox/HE/RSS/}{/home/gianluca/Dropbox/bcea/Talks/}}
+
+%%%%% UNCOMMENT THIS TO PRODUCE HANDOUTS %%%%
+%%%%%\usepackage{/home/gianluca/Dropbox/EcSan/Lectures/handoutWithNotes,pgf,pgfpages}
+%%%%%\pgfpagesuselayout{4 on 1 with notes}[a4paper,border shrink=5mm]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mode<presentation>
+  %\usetheme{default} %Boadilla Singapore Warsaw
+\usetheme{Boadilla}
+\usecolortheme{whale} 
+\usefonttheme[onlymath]{serif}
+%\setbeamercovered{transparent} %
+  \setbeamertemplate{itemize item}{$\bullet$} %
+\setbeamertemplate{itemize subitem}{--} %
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{myblue}{rgb}{0.14 0.34 0.55}
+\definecolor{olive}{rgb}{.2 .31 .09}
+\definecolor{orange}{rgb}{1 0.5 0}
+\definecolor{mygrey}{rgb}{.94 .94 .94}
+\definecolor{amber}{rgb}{1.0, 0.75, 0.0}
+\definecolor{cyan}{rgb}{0.4, .72, .8}
+\newcommand\myblue{\color{myblue}}
+\newcommand\olive{\color{olive}}
+\newcommand\orange{\color{orange}}
+\newcommand\mygrey{\color{mygrey}}
+\newcommand\amber{\color{amber}}
+\newcommand\red{\color{red}}
+\newcommand\blue{\color{blue}}
+\newcommand\black{\color{black}}
+\newcommand\white{\color{white}}
+\newcommand\magenta{\color{magenta}}
+\newcommand\cyan{\color{cyan}}
+\definecolor{irishgreen}{RGB}{22 155 98}
+\definecolor{irishorange}{RGB}{255 136 62}
+%%% knitr colours commands (but cannot define them as they exist in knitr)
+% \newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%            R number
+% \newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%              R value of input
+% \newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%   R comment
+% \newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%                        R operator (eg $)
+% \newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%            R text
+% \newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%    ???
+% \newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%             R sign (eg =)
+% \newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%            R input to function
+% \newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%   R command
+
+
+
+\newcommand{\E}{\mbox{E}}
+\renewcommand{\b}{\mbox{B}}
+\newcommand{\bcea}{\texttt{BCEA}\xspace}
+\newcommand{\R}{\texttt{R}\xspace}
+\newcommand{\hs}{\hspace{5pt}}
+
+\makeatletter
+\def\blfootnote{\xdef\@thefnmark{}\@footnotetext}
+\makeatother
+
+\title[\fontsize{5}{5} \selectfont \texttt{BCEA} for CEA]
+{Using \texttt{BCEA} to summarise the output of a 	health economic model}
+\date[\fontsize{5}{5} \selectfont Short course UCL, 8 Jul 2019]{\fontsize{8}{9}\selectfont Short course Introduction to \texttt{R} for Cost Effectiveness Analysis modelling \\[8pt] University College London \\ Monday 8 July 2019}
+%%%\date[\fontsize{5}{5} \selectfont CERGAS, 31 Jan 2019]{ \fontsize{8}{9}\selectfont Seminari CERGAS \\ Universit\`a Bocconi, Milano \\[8pt] Thursday 31 January 2019}
+\author[\fontsize{5}{5} \selectfont Gianluca Baio]{\textbf{Gianluca Baio} \\[10pt] \fontsize{8}{9}\selectfont{University College London \newline Department of Statistical Science}}
+\institute[\fontsize{5}{5} \selectfont \!\!UCL]{\olive \texttt{g.baio@ucl.ac.uk}\\\vspace{.2cm} \textcolor{olive}{(With contributions from Anna Heath, Andrea Berardi, Christina Ding, Andrea Gabrio, Antonio Remiro)}\\ \vspace{.2cm} \url{http://www.ucl.ac.uk/statistics/research/statistics-health-economics/} \\\url{http://www.statistica.it/gianluca}\\\url{https://github.com/giabaio}  
+}
+
+\begin{document}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(prompt = TRUE,comment=NA, messages=FALSE, warning=FALSE
+)
+options(width=100)
+@
+
+\frame{\titlepage}
+
+\UCL
+
+\part{Using \bcea to summarise outputs of an economic model} \begin{frame}<handout:0>[noframenumbering]{\partpage}\end{frame}
+
+\frame{
+  \frametitle{Health economic evaluations \hspace{0pt plus 1 filll} \small What is it?}
+  \begin{figure}
+  \begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+  \hspace{-.5cm}
+  \onslide<1->{\draw(-5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](1){Statistical\\ model};
+  }
+  \onslide<2->{
+    
+    \draw(0.5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=gray,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](2){Economic\\ model};
+  }
+  \onslide<3->{
+    \draw(4,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](3){Decision\\ analysis};
+  }
+  \onslide<4->{
+    \draw(-5,2) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=2.2cm,minimum height=1cm](4){Uncertainty\\ analysis};
+  }
+  \onslide<1->{
+    \draw(-5.2,-2.75) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3cm](5){
+      \begin{itemize}
+      \item Estimates relevant \textbf{population} parameters
+      \item Varies with the type of available data (\& statistical approach!)
+      \end{itemize}
+    };
+  }
+  \onslide<2->{
+    \draw(0.3,-2.7) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](6){
+      \begin{itemize}
+      \item Combines the parameters to obtain a population average measure for costs and clinical benefits
+      \item Varies with the type of available data \& statistical model used
+      \end{itemize}
+    };
+  }
+  \onslide<3->{
+    \draw(3.8,-2.85) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.5cm](7){
+      \begin{itemize}
+      \item Summarises the economic model by computing suitable measures of ``cost-effectiveness''
+      \item Dictates the best course of actions, given current evidence
+      \item Standardised process
+      \end{itemize}
+    };
+  }
+  \onslide<4->{
+    \draw(-2.15,2.05) node[align=center,rectangle,rounded corners,draw=none,font=\sffamily\tiny,text width=3.7cm](8){
+      \begin{itemize}
+      \item Assesses the impact of uncertainty (eg in parameters or model structure) on the economic results
+      \item \only<4-5>{Fundamentally Bayesian!}\only<6>{\textbf{Fundamentally Bayesian!}}
+      \end{itemize}
+    };
+  }
+  \onslide<4>{
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.north) -- (4.south);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (4.320) -- (2.140);
+  }
+  \onslide<5->{
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,red] (1.north) -- (4.south);
+  }
+  \onslide<2->{
+    \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (1.east) -- (2.west);
+  }
+  \onslide<3->{
+    \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (2.east) -- (3.west);
+  }
+  
+  \onslide<5>{
+    \draw(1.0,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive 1.\ Estimation (base-case)};
+    \draw(4.3,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive 2.\ PSA};
+    \draw(1.8,3) node[align=center,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](9){$\theta$};
+    \draw(1.8,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](10){$y$};
+    \draw(.5,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](11){$p(y\mid \theta)$};
+    \draw(.5,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](12){$\hat\theta=f(Y)$};
+    
+    \draw(2.9,2.0) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{$\Rightarrow$};
+    
+    \draw(5.4,3) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](13){$\theta$};
+    \draw(4.2,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](14){$p(\theta)\red\leftrightsquigarrow\black g(\hat\theta)$};
+    
+    
+    \draw(-4.0,-4) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{5}{6}\selectfont](){\textit{``Two-stage approach'' (Spiegelhalter, Abrams \& Myles, 2004)}};
+    
+    
+    \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (9.south) -- (10.north);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (11.north) -- (12.south);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (13.south) to [out=270,in=45] (2.north);
+  }
+  
+  \onslide<6>{
+    \draw(2.7,3.5) node[align=center,draw=none,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont]{\olive Estimation \& PSA (one stage)};
+    \draw(2.3,3) node[align=center,circle,draw,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](15){$\theta$};
+    \draw(2.3,1) node[align=center,circle,draw,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](16){$y$};
+    \draw(2.3,1) node[align=center,draw,fill=none,color=red,font=\sffamily\fontsize{9}{10}\selectfont,minimum width=.6	2cm,minimum height=.62cm,dashed]{};
+    \draw(1,1) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](17){$p(y\mid \theta)$};
+    \draw(1,3) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{6}{7}\selectfont](18){$p(\theta)$};
+    \draw(4.3,3) node[align=center,fill=none,font=\sffamily\fontsize{6}{7}\selectfont](19){$\red p(\theta\mid y)$};
+    
+    \draw(-4.0,-4) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{5}{6}\selectfont](){\textit{``Integrated approach'' Spiegelhalter, Abrams \& Myles (2004)}};
+    \draw(-3.45,-4.2) node[align=center,fill=none,minimum width=.5cm,minimum height=.5cm,font=\sffamily\fontsize{5}{6}\selectfont](){\textit{Baio, Berardi \& Heath (2017)}};
+    
+    \draw [->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin] (15.south) -- (16.north);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin,color=red] (15.east) -- (19.west);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,color=red] (16.180) to [bend left=90] (15.180);
+    \draw [dashed,->,>=latex,shorten >=0pt,auto,node distance=3cm,thin,blue!40] (19.south) to [out=280,in=45] (2.25);
+  }
+  
+  \end{tikzpicture}
+  \end{figure}
+}
+
+\begin{frame}[fragile]
+\frametitle{General (Bayesian) process of HTA}
+\vspace{-15pt}
+
+\begin{figure}
+\begin{tikzpicture}%[->,>=latex,shorten >=0pt,auto,node distance=3cm,ultra thin]
+\onslide<1-4|handout:1>{
+  \node{\includegraphics*[scale=.94]{5.statistical-cost-effectiveness-analysis/figs/HE_process}};
+}
+\onslide<1|handout:0>{
+  \draw(2.5,0) node[rectangle,align=center,draw=none,fill=white,text width=6cm,text height=7cm]{};
+  \draw(-0.3,-2) node[rectangle,align=center,draw=none,fill=white,text width=11cm,text height=3cm]{};
+}
+\onslide<2|handout:0>{
+  \draw(-0.3,-2) node[rectangle,align=center,draw=none,fill=white,text width=11.5cm,text height=3cm]{};
+  \draw(2.5,-.88) node[rectangle,align=center,draw=none,fill=white,text width=6cm,text height=3cm]{};
+}
+\onslide<3|handout:0>{
+  \draw(-3.2,-2) node[rectangle,align=center,draw=none,fill=white,text width=6cm,text height=3cm]{};
+}
+
+\end{tikzpicture}
+\end{figure}
+\end{frame}
+
+
+\frame{%
+  \frametitle{\bcea: a package for Bayesian health economics}%
+  \textbf{\myblue What is \bcea \textbf{not}?}
+  \begin{itemize}
+  \item \bcea is \textbf{not} a package to automatically run a Bayesian analysis
+  \begin{itemize}
+  \item It cannot build the health economic model for you
+  \item It does not prepare the data to be used in the model
+  \item It does not automatically run the MCMC simulations from the posterior distributions of the Bayesian model  
+  \item It does not choose the prior distributions for you
+  \end{itemize}
+  \end{itemize}
+  
+  \vspace{5pt}\pause
+  \textbf{\myblue So what \textrm{\textit{is}} it, then?}%
+  \begin{itemize}
+  \item \bcea is a package that provides a set of specific functions to systematically post-process the output of a Bayesian health economic model
+  \item Uses \R (\texttt{\myblue http://cran.r-project.org/}) to achieve this
+  \begin{itemize}
+  \item \R is particularly good at interacting with standard MCMC software
+  \begin{itemize}
+  \item \texttt{\olive WinBUGS} (\texttt{\myblue http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml}) 
+  \item \texttt{\olive JAGS} (\texttt{\myblue http://mcmc-jags.sourceforge.net/})
+  \item \texttt{\olive Stan} (\texttt{\myblue https://mc-stan.org/users/interfaces/rstan})
+  \end{itemize}
+  \item Lots of ``packages'' that can be used for essentially any kind of statistical analysis
+  \begin{itemize}
+  \item Notably, survival analysis (eg \texttt{\olive flexsurv} and \texttt{\olive survHE})
+  \end{itemize}
+  \item \R is \textbf{\red free} and there is a very large community of contributors
+  \item \R is specifically designed for statistical analysis and has very good graphical capabilities
+  \end{itemize}
+  \end{itemize}
+}
+
+
+\frame{
+  \frametitle{Health economic evaluations  \hspace{0pt plus 1 filll} \small What do we want?}
+  
+  \texttt{BCEA} \& its use directly in \texttt{R} are designed with these objectives in mind
+  
+  \begin{enumerate}
+  \item Checking the model assumptions
+  \begin{itemize}
+  \item Do we mean what we mean (eg in terms of PSA simulations)?...
+  \item Simulation error (especially, \textbf{but not only}, for a Bayesian approach)
+  \end{itemize}
+  \item Produce the base-case economic evaluation
+  \begin{itemize}
+  \item What's the most cost-effective intervention, given current evidence?
+\item Cost-effectiveness plane, Expected Incremental Benefit (as a function of $k$),...
+\end{itemize}
+\item Perform uncertainty analysis
+\begin{itemize}
+\item Standard PSA (mandatory): Cost-effectiveness Plane, CEAC, ...
+\item Fairly easy (but not always used): CEAF
+\item More advanced/``too difficult'' (hardly ever performed): EVP(P)I
+\end{itemize}
+\item Standardised reporting
+\begin{itemize}
+\item Graphical tools (use \texttt{R} facilities)
+\end{itemize}
+\end{enumerate}
+}
+
+
+\frame{
+\frametitle{The \texttt{R} package \texttt{BCEA}}
+\begin{figure}
+\centering
+\begin{tikzpicture}
+
+\draw(0,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](1){\texttt{bcea}};
+
+\draw(-2,-2.9) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.6cm,minimum height=2.6cm,text depth=2.0cm](2){\texttt{plot}};
+
+\draw(-2.0,-3.1) node[align=left,rectangle,rounded corners,draw,fill=red,font=\sffamily\fontsize{6}{7}\selectfont,text width=1.7cm](18){
+\tiny$\bullet$ \texttt{ceplane.plot} \\
+\tiny$\bullet$ \texttt{contour} \\
+\tiny$\bullet$ \texttt{contour2} \\
+\tiny$\bullet$ \texttt{ceac.plot} \\
+\tiny$\bullet$ \texttt{evi.plot} \\
+\tiny$\bullet$ \texttt{eib.plot} \\
+\tiny$\bullet$ \texttt{ib.plot} \\
+};
+
+\draw(1.5,-3) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](3){\texttt{summary}};
+
+\draw(3,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](4){\texttt{evppi}};
+
+\draw(0,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](5){\texttt{CreateInputs}};
+
+\draw(-3,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](6){\texttt{struct.psa}};
+
+\draw(5,3.0) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](7){\texttt{plot}};
+
+\draw(5,2.0) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](8){\texttt{diag.evppi}};
+
+\draw(-3,0.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](9){\texttt{multi.ce}};
+
+\draw(-5,1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](10){\texttt{mce.plot}};
+
+\draw(-5,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](11){\texttt{ceaf.plot}};
+
+\draw(-5,-1.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](12){\texttt{ceef.plot}};
+
+\draw(3,.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](13){\texttt{CEriskav}};
+
+\draw(5,.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](14){\texttt{plot}};
+
+\draw(3,-1.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](15){\texttt{mixedAn}};
+
+\draw(5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](16){\texttt{plot}};
+
+\draw(5,-2) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](17){\texttt{summary}};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (2.70) -- (1.210);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.240) -- (18.0);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (3.90) -- (1.300);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.160) -- (9.360);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.140) -- (6.310);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.50) -- (4.220);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.20) -- (13.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.340) -- (15.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.west) -- (12.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (7.west) -- (4.15);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (4.340) -- (8.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (16.west) -- (15.15);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (17.west) -- (15.345);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (14.west) -- (13.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (5.east) -- (4.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (5.west) -- (6.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (9.160) -- (10.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (9.200) -- (11.east);
+
+\end{tikzpicture}
+\end{figure}
+}
+
+\begin{frame}[fragile]
+\frametitle{How does \texttt{BCEA} work?  \hspace{0pt plus 1 filll} \small\only<1-2>{1.\ ``Parameters simulations'' (``PSA runs'')}\only<3>{2.\ Computation of the economic outcome $(e,c)$}\only<4-5>{}\only<6->{3.\ Run the economic analysis}}
+\begin{overprint}
+\begin{overlayarea}{\textwidth}{1.15\textheight}
+\begin{onlyenv}<1>
+\vspace{-10pt}
+<< howwork1,eval=FALSE,size="footnotesize" >>=
+# Install BCEA (only required once and needs an internet connection!)
+# You can either get the "official" version from CRAN
+install.packages("BCEA")
+# Or the development version from the GitHub repository
+devtools::install_github("giabaio/BCEA")
+@
+\vspace{-10pt}
+<<howwork2,size="footnotesize">>=
+library(BCEA)   # Then loads the library (so you can access its functions)
+data(Vaccine)   # Loads an example dataset 
+# Creates an object with the model inputs suitable formatted
+inp = CreateInputs(vaccine, print.lincom=FALSE)
+@
+\vspace{-15pt}
+<<howwork3,eval=FALSE, size="footnotesize">>=
+# Visualise the first few rows of the "PSA matrix"
+head(inp$mat)
+@
+\vspace{-15pt}
+<<howwork4,size="footnotesize",echo=FALSE>>=
+head(inp$mat[1:6,1:14])
+@
+(many more rows \& variables!)
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+\begin{center}
+\vspace{-10pt}
+\includegraphics[scale=.175]{Excel_dataset}
+\end{center}
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+<<howwork5, size="footnotesize",eval=FALSE>>=
+# Aggregate the model inputs to compute (e,c)
+QALYs.inf = QALYs.pne <- QALYs.hosp <- QALYs.adv <- QALYs.death <- matrix(0,n.sims,2)
+for (t in 1:2) {
+  QALYs.inf[,t] = ((Infected[,t,1] + Infected[,t,2])*omega[,1]/365)/N
+  QALYs.pne[,t] = ((Pneumonia[,t,1] + Pneumonia[,t,2])*omega[,4]/365)/N
+  QALYs.hosp[,t] = ((Hospital[,t,1] + Hospital[,t,2])*omega[,5]/365)/N
+  QALYs.death[,t] = ((Death[,t,1] + Death[,t,2])*omega[,6])/N
+}
+QALYs.adv[,2] = (Adverse.events*omega[,7]/365)/N
+e = -(QALYs.inf + QALYs.pne + QALYs.adv + QALYs.hosp + QALYs.death)
+...
+@
+\vspace{-10pt}
+<<howwork6, size="footnotesize">>=
+# Visualise the matrix of Effects & Costs
+head(cbind(e,c))
+@
+\textbf{NB}: Similar calculations can be and are (too?!!) often done in an \texttt{Excel} spreadsheet
+\end{onlyenv}
+
+\begin{onlyenv}<4-5>
+\begin{itemize}
+\item At this point, we are ready to call the function \texttt{bcea} that runs the economic analysis, for example something like 
+<<howwork7, size="small">>=
+m = bcea(e=e,c=c,ref=2,interventions=treats,Kmax=50000)
+@
+\item \textbf{NB}: the inputs to the function are
+\begin{itemize}
+\item \texttt{\red e}: a \textbf{matrix} containing the simulations from the posterior distributions of the variable of clinical effectiveness ($\myblue n_{\rm{sim}} \times n_{\rm{int}}$ values)
+\item \texttt{\red c}: a \textbf{matrix} containing the simulations from the posterior distributions of the variable of cost ($\myblue n_{\rm{sim}} \times n_{\rm{int}}$ values)
+\item \texttt{\red ref}: an indication of which intervention is to be taken as reference (default: the intervention in the first column of \texttt{e} or \texttt{c})
+\item \texttt{\red interventions}: a vector of labels for the interventions being compared
+\item \texttt{\red Kmax}: the maximum value of $\myblue k$, the parameter of willingness to pay
+\end{itemize}
+\vspace{10pt}
+\item<5> The output is an object \texttt{m}, containing several elements
+<<howwork8, size="footnotesize">>=
+names(m)
+@
+\end{itemize}
+\end{onlyenv}
+
+\begin{onlyenv}<6->
+<<howwork9,size="small">>=
+m = bcea(e,c,ref=2,interventions=c("Status Quo","Vaccination"))
+@
+\vspace{-15pt}
+\only<6>{
+<<howwork10,size="small",results="hide">>=
+summary(m)
+@
+\vspace{-15pt}
+<<howwork101,size="small",echo=FALSE>>=
+cat("
+Cost-effectiveness analysis summary\n\n
+Reference intervention:  Vaccination\n
+Comparator intervention: Status Quo\n\n
+Optimal decision: choose Status Quo for k<20100 and Vaccination for k>=20100\n\n\n
+Analysis for willingness to pay parameter k = 25000\n\n
+            Expected utility\n
+Status Quo           -36.054\n
+Vaccination          -34.826\n\n
+                             EIB  CEAC  ICER\n
+Vaccination vs Status Quo 1.2284 0.529 20098\n\n
+Optimal intervention (max expected utility) for k=25000: Vaccination\n\n
+EVPI 2.4145
+")
+@
+}
+\only<7>{
+<<howwork11,size="small",fig.width=8,fig.height=8,out.width='55%',fig.align='center'>>=
+plot(m)
+@
+}
+\only<8>{
+<<howwork12,size="small",fig.width=8,fig.height=8,out.width='55%',fig.align='center'>>=
+ceplane.plot(m,wtp=20000,xlim=c(-.002,.002),ylim=c(-10,20))
+@
+}
+\only<9>{
+<<howwork13,size="footnotesize",fig.width=8,fig.height=8,out.width='55%',fig.align='center'>>=
+ceplane.plot(m,wtp=10000,graph="gg",point_colors="blue",point_sizes=.8,area_color="springgreen3")
+@
+}
+\only<10>{
+<<howwork14,size="small",fig.width=8,fig.height=8,out.width='55%',fig.align='center'>>=
+ceac.plot(m)
+@
+}
+\only<11>{
+<<howwork15,size="small",fig.width=8,fig.height=8,out.width='55%',fig.align='center'>>=
+evi.plot(m)
+@
+}
+\end{onlyenv}
+\end{overlayarea}
+\end{overprint}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Specialised plots}
+\begin{onlyenv}<1>
+\begin{itemize}
+\vspace{5pt}
+\item The code \hlkwd{\texttt{contour}}\hlstd{\texttt{(m)}} generates a contourplot of the cost-effectiveness plane and also estimates the proportion of points lying in each quadrant
+\end{itemize} 
+<<specplot1, size="small",fig.width=8,fig.height=8,out.width='55%',fig.align='center',echo=FALSE,message=FALSE,warning=FALSE>>=
+contour(m)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<2-3>
+The specialised function \hlkwd{\texttt{contour2}} also shows the \textbf{sustainability area}\vspace{10pt}
+
+\begin{tabular}{cc}
+\begin{minipage}[l]{5.5cm}
+<<specplot2, size="small",fig.width=8,fig.height=8,out.width='100%',fig.align='center',message=FALSE,warning=FALSE>>=
+contour2(m)
+@
+\end{minipage}
+& 
+\begin{minipage}[l]{5.5cm}
+\only<3>{
+<<specplot3, size="small",fig.width=8,fig.height=8,out.width='100%',fig.align='center',message=FALSE,warning=FALSE>>=
+contour2(m,wtp=100)
+@
+}
+\end{minipage}
+\end{tabular}
+\end{onlyenv}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Exporting graphical output}
+\begin{itemize}
+\item \R has very good graphical facilities and the graphs produced can be exported to many different formats
+\end{itemize}
+<<export,size="small",eval=FALSE>>=
+# "Open" the graphical device"
+pdf("NAME_OF_FILE.pdf",width=8,height=8)    # units in inches
+# Make the plot
+ceplane.plot(BCEA_OBJECT)
+# "Close" the graphical device
+dev.off()
+@
+
+<<export2,size="small",eval=FALSE>>=
+# "Open" the graphical device"
+jpeg("NAME_OF_FILE.jpg",width=480,height=480)  # units in px
+# Make the plot
+ceplane.plot(BCEA_OBJECT)
+# "Close" the graphical device
+dev.off()
+@
+
+\begin{itemize}
+\item \textbf{NB}: \texttt{Rstudio} \& \texttt{rmarkdown} can do even more --- that's for another day...
+\end{itemize}
+\end{frame}
+
+\part{Advanced use of \bcea} \begin{frame}<handout:0>[noframenumbering]{\partpage}\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Advanced economic analysis using \bcea}
+\begin{itemize}
+\item Multiple treatment comparison
+\item Structural Probabilistic Sensitivity Analysis
+\item Expected value of partial perfect information
+\vspace{10pt}
+\item (Risk aversion in the utility function)
+\item (Mixed strategies)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{MTC (pairwise comparisons) \hspace{0pt plus 1 filll}\small Probabilistic ``depression model''}
+\vspace{-7pt}
+<<depression1,echo=FALSE>>=
+n.samples<-1000 
+
+# Number and names of treatments
+n.treat<-3
+t.names<-c("No treatment","CBT","Antidepressant")
+
+# Over a 30 year time horizon
+# Costs for recovery, relapse, and no recovery
+c.rec<-rnorm(n=n.samples, mean=1000, sd=50)
+c.rel<-rnorm(n=n.samples, mean=2000, sd=100)
+c.norec<-rnorm(n=n.samples, mean=2500, sd=125)
+# Over a 30 year time horizon
+# QALYs for recovery, relapse, and no recovery
+q.rec<-rnorm(n=n.samples, mean=26, sd=2)
+q.rel<-rnorm(n=n.samples, mean=23, sd=3)
+q.norec<-rnorm(n=n.samples, mean=20, sd=4)
+
+# Probabilities of recovery and relapse following recover
+p.rec<-p.rel<-matrix(nrow=n.samples, ncol=n.treat)
+
+# Probabilities for no treatment
+p.rec[,1]<-rbeta(n=n.samples, shape1=6, shape2=200)
+p.rel[,1]<-rbeta(n=n.samples, shape1=2, shape2=100)
+
+# Probabilities for CBT
+# Probability of recovery higher than on no treatment
+p.rec[,2]<-rbeta(n=n.samples, shape1=6, shape2=130)
+# Probability of relapse lower than on no treatment
+p.rel[,2]<-rbeta(n=n.samples, shape1=2, shape2=200)
+
+# Probabilities for antidepressant
+# Probability of recovery lower than no treatment or CBT
+p.rec[,3]<-rbeta(n=n.samples, shape1=6, shape2=120)
+# Probability relase lower than no treatment, higher than CBT
+p.rel[,3]<-rbeta(n=n.samples, shape1=2, shape2=120)
+# Cost of treatment 
+c.treat<-t(matrix(rep(c(0,300,30),n.samples),ncol=n.samples,nrow=3))
+# Total cost and effects 
+costs<-c.treat+p.rec*(1-p.rel)*c.rec+p.rec*p.rel*c.rel+(1-p.rec)*c.norec
+effects<-p.rec*(1-p.rel)*q.rec+p.rec*p.rel*q.rel+(1-p.rec)*q.norec
+@
+\begin{onlyenv}<1>
+<<depression2, size="small",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE,eval=F>>=
+# "Standard" analysis: pairwise comparisons
+depression.bcea = bcea(effects,costs,interventions=t.names,ref=3)
+plot(depression.bcea)
+@
+\vspace{-8pt}
+<<depression3, size="small",fig.width=8,fig.height=8,out.width='63%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+depression.bcea = bcea(effects,costs,interventions=t.names,ref=3)
+plot(depression.bcea)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+<<depression4, size="small",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE,eval=F>>=
+# For multiple treatment comparison
+depression.multi.ce = multi.ce(depression.bcea)
+mce.plot(depression.multi.ce,pos=c(1,0.8),graph=c("base","ggplot2"))
+@
+
+<<depression5, size="small",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+depression.multi.ce = multi.ce(depression.bcea)
+mce.plot(depression.multi.ce,pos=c(1,0.8),graph=c("base","ggplot2"))
+@
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+<<depression51, size="small",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE>>=
+mce.plot(depression.multi.ce,pos=c(1,1),graph="ggplot2") + 
+  ggplot2::stat_summary(fun.y = max, geom="line", colour="grey25", alpha=.3, lwd=2.5)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<4>
+<<depression6, size="small",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE>>=
+ceaf.plot(depression.multi.ce)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<5>
+\begin{columns}
+\column{.487\textwidth}
+\vspace{-3.23cm}
+<<depression7, size="tiny",fig.width=8,fig.height=8,out.width='50%',fig.align='center',message=FALSE,warning=FALSE>>=
+ceef.plot(depression.bcea,print.plot=FALSE)
+@
+\column{.487\textwidth}
+<<depression8, size="tiny",fig.width=8,fig.height=8,out.width='90%',fig.align='center',message=FALSE,warning=FALSE>>=
+ceef.plot(depression.bcea,print.summary=FALSE)
+@
+\end{columns}
+\end{onlyenv}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using \bcea to post-process the output of the Markov model}
+<<mm0,echo=FALSE,message=FALSE,warning=FALSE>>=
+library(VGAM)
+
+
+# Define the number and names of treatments
+# These are Standard of Care with website
+# and Standard of Care without website
+n.treatments<-2
+treatment.names<-c("SoC with website","SoC")
+
+# Define the number and names of states of the model
+# This is two and they are "Smoking" and "Not smoking"
+n.states<-2
+state.names<-c("Smoking","Not smoking")
+
+# Define the number of cycles
+# This is 10 as the time horizon is 5 years and cycle length is 6 months
+n.cycles<-10
+
+# Define simulation parameters
+# This is the number of PSA samples to use
+n.samples<-1000
+
+#############################################################################
+## Input parameters #########################################################
+#############################################################################
+
+# The transition matrix is a 2x2 matrix
+# Rows sum to 1
+# Top left entry is transition probability from smoking to smoking
+# Top right is transition probability from smoking to not smoking
+# Bottom left is transition probability from not smoking to smoking
+# Bottom right is transition probability from not smoking to not smoking
+
+# There is one transition matrix for each reatment option and each PSA sample
+# Store them in an array with (before filling in below) NA entries
+transition.matrices<-array(dim=c(n.treatments,n.samples,n.states,n.states),
+	dimnames=list(treatment.names,NULL,state.names,state.names))
+
+# First the transition matrix for Standard of Care with website
+# Transitions from smoking 
+transition.matrices["SoC with website",,"Smoking",]<-rdiric(n.samples,c(85,15))
+# Transitions from not smoking
+transition.matrices["SoC with website",,"Not smoking",]<-rdiric(n.samples,c(8,92))
+
+# Second the transition matrix for Standard of Care
+# Transitions from smoking 
+transition.matrices["SoC",,"Smoking",]<-rdiric(n.samples,c(88,12))
+# Transitions from not smoking
+# These should be the same as the transition probabilities from not smoking for SoC with website
+# as the website has no impact on probability of relapse
+transition.matrices["SoC",,"Not smoking",]<-transition.matrices["SoC with website",,"Not smoking",]
+
+# Now define the QALYS associated with the states per cycle
+# There is one for each PSA sample and each state
+# Store in an NA array and then fill in below
+state.qalys<-array(dim=c(n.samples, n.states),dimnames=list(NULL,state.names))
+
+# QALY associated with 1-year in the smoking state is Normal(mean=0.95, SD=0.01)
+# Divide by 2 as cycle length is 6 months
+state.qalys[,"Smoking"]<-rnorm(n.samples,mean=0.95,sd=0.01)/2
+
+# QALY associated with 1-year in the not smoking state is 1 (no uncertainty)
+# So all PSA samples have the same value
+# Again divide by 2 as cycle length is 6 months
+state.qalys[,"Not smoking"]<-1/2
+
+# And finally define the state costs
+# These are all zero as the only cost is a one-off subscription fee of ?50
+# to the smoking cessation website
+state.costs<-array(0,dim=c(n.samples, n.states),dimnames=list(NULL,state.names))
+
+# Define the treatment costs
+# One for each PSA sample and each treatment
+# Treatment costs are actually fixed but this allows flexibility if we
+# want to include uncertainty/randomness in the cost
+treatment.costs<-array(dim=c(n.treatments,n.samples),dimnames=list(treatment.names,NULL))
+
+# Cost of the smoking cessation website is a one-off subscription fee of ?50
+treatment.costs["SoC with website",]<-50
+# Zero cost for standard of care
+treatment.costs["SoC",]<-0
+
+#############################################################################
+## Simulation ###############################################################
+#############################################################################
+
+# Build an array to store the cohort vector at each cycle
+# Each cohort vector has 2 (=n.states) elements: probability of being in smoking state,
+# and probability of being in the not smoking state
+# There is one cohort vector for each treatment, for each PSA sample, for each cycle.
+cohort.vectors<-array(dim=c(n.treatments,n.samples,n.cycles,n.states),
+		dimnames=list(treatment.names,NULL,NULL,state.names))
+
+# Assume that everyone starts in the smoking state no matter the treatment
+cohort.vectors[,,1,"Smoking"]<-1
+cohort.vectors[,,1,"Not smoking"]<-0
+
+# Build an array to store the costs and QALYs accrued per cycle
+# One for each treatment, for each PSA sample, for each cycle
+# These will be filled in below in the main model code
+# Then discounted and summed to contribute to total costs and total QALYs
+cycle.costs<-array(dim=c(n.treatments,n.samples,n.cycles),
+	dimnames=list(treatment.names,NULL,NULL))
+cycle.qalys<-array(dim=c(n.treatments,n.samples,n.cycles),
+	dimnames=list(treatment.names,NULL,NULL))
+
+# Build arrays to store the total costs and total QALYs
+# There is one for each treatment and each PSA sample
+# These are filled in below using cycle.costs, 
+# treatment.costs, and cycle.qalys
+total.costs<-array(dim=c(n.treatments,n.samples),
+	dimnames=list(treatment.names,NULL))
+total.qalys<-array(dim=c(n.treatments,n.samples),
+	dimnames=list(treatment.names,NULL))
+
+
+# The remainder of the cohort.vectors will be filled in by Markov updating below
+
+# Main model code
+# Loop over the treatment options
+for(i.treatment in 1:n.treatments)
+{
+	# Loop over the PSA samples
+	for(i.sample in 1:n.samples)
+	{
+		# Loop over the cycles
+		# Cycle 1 is already defined so only need to update cycles 2:n.cycles
+		for(i.cycle in 2:n.cycles)
+		{
+			# Markov update
+			# Multiply previous cycle's cohort vector by transition matrix
+			# i.e. pi_j = pi_(j-1)*P
+			cohort.vectors[i.treatment,i.sample,i.cycle,]<-
+				cohort.vectors[i.treatment,i.sample,i.cycle-1,]%*%
+				transition.matrices[i.treatment,i.sample,,]
+		}
+		
+		# Now use the cohort vectors to calculate the 
+		# total costs for each cycle
+		cycle.costs[i.treatment,i.sample,]<-
+		  cohort.vectors[i.treatment,i.sample,,]%*%state.costs[i.sample,]
+		# And total QALYs for each cycle
+		cycle.qalys[i.treatment,i.sample,]<-
+		  cohort.vectors[i.treatment,i.sample,,]%*%state.qalys[i.sample,]
+
+		# Combine the cycle.costs and treatment.costs to get total costs
+		# Apply the discount factor 
+		# (1 in first year, 1.035 in second, 1.035^2 in third, and so on)
+		# Each year acounts for two cycles so need to repeat the discount values
+		total.costs[i.treatment,i.sample]<-treatment.costs[i.treatment,i.sample]+
+			cycle.costs[i.treatment,i.sample,]%*%
+			(1/1.035)^rep(c(0:(n.cycles/2-1)),each=2)
+
+		# Combine the cycle.qalys to get total qalys
+		# Apply the discount factor 
+		# (1 in first year, 1.035 in second, 1.035^2 in third, and so on)
+		# Each year acounts for two cycles so need to repeat the discount values
+		total.qalys[i.treatment,i.sample]<-cycle.qalys[i.treatment,i.sample,]%*%
+			(1/1.035)^rep(c(0:(n.cycles/2-1)),each=2)
+	}
+}
+@
+\begin{itemize}
+\item You can run the script provided to obtain the simulations and then summarise the costs \& QALYs
+\item \textbf{BUT}: before you can use \bcea, you need a little more pre-processing...
+\end{itemize}
+\pause
+\begin{columns}
+\column{.487\textwidth}
+<<mm1,size="small">>=
+class(total.costs)
+dim(total.costs)
+@
+\column{.487\textwidth}
+<<mm2,size="small">>=
+class(total.qalys)
+dim(total.qalys)
+@
+\end{columns}
+\vspace{5pt}
+\pause
+\begin{itemize}
+\item Recall that \bcea requires the inputs as
+\begin{itemize}
+\item Matrices (which they are)
+\item of size $n_{\rm{sim}}\times n_{\rm{int}}$, which they aren't!
+\end{itemize}
+\item So you need a bit of care when passing these two inputs to the function \hlkwd{\texttt{bcea}}!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Basic economic analysis}
+<<mm3,size="footnotesize",fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE>>=
+mm = bcea(t(total.qalys),t(total.costs),interventions=treatment.names,ref=1)
+plot(mm)
+@
+\end{frame}
+
+\frame{
+\frametitle{Summarising PSA + Research priority: \hspace{0pt plus 1 filll}\small Expected Value of \textbf{Partial} Perfect Information}
+\vspace{-10pt}
+\begin{itemize}
+\item $\blue\bm\theta\black=$ all the model parameters; can be split into two subsets
+\begin{itemize}
+\item The ``\textbf{\myblue parameters of interest}'' $\myblue \bm\phi$, e.g.\ prevalence of a disease, HRQL measures, length of stay in hospital, ...
+\item The ``\textbf{\olive remaining parameters}'' $\olive \bm\psi$, e.g.\ cost of treatment with other established medications, 
+\end{itemize}
+\item We are interested in quantifying the value of gaining more information on $\myblue \bm\phi$, while leaving the current level of uncertainty on $\olive\bm\psi$ unchanged
+\pause\vspace{10pt}
+\item In formul\ae:
+\begin{itemize}
+\item[\only<1|handout:0>{\white --} \only<2|handout:1>{\myblue --} \only<3-|handout:0>{\color{grayslide} --}] \only<1|handout:0>{\white First, consider the expected utility (EU) \textbf{if} we were able to learn $\bm\phi$ but not $\bm\psi$} \only<2|handout:1>{\myblue First, consider the expected utility (EU) \textbf{if} we were able to learn $\bm\phi$ but not $\bm\psi$} \only<3-|handout:0>{\color{grayslide} First, consider the expected utility (\raisebox{-1pt}{\includegraphics[scale=.005]{/home/gianluca/Dropbox/UCL/Biostats/Talks/EUflag}}) \textbf{if} we were able to learn $\bm\phi$ but not $\bm\psi$}\black
+\item[\only<1-2|handout:0>{\white --} \only<3|handout:1>{\myblue --} \only<4-|handout:0>{\color{grayslide} --}] \only<1-2|handout:0>{\color{white}\textbf{If} we knew $\bm\phi$ perfectly, best decision $=$ the maximum of this EU} \only<3|handout:1>{\myblue \textbf{If} we knew $\bm\phi$ perfectly, best decision $=$ the maximum of this EU} \only<4-|handout:0>{\color{grayslide}\textbf{If} we knew $\bm\phi$ perfectly, best decision $=$ the maximum of this EU} \black  
+\item[\only<1-3|handout:0>{\white --} \only<4|handout:1>{\myblue --} \only<5-|handout:0>{\color{grayslide} --}] \only<1-3|handout:0>{\color{white} Of course we cannot learn $\phi$ \textbf{perfectly}, so take the expected value} \only<4|handout:1>{\myblue Of course we cannot learn $\bm\phi$ \textbf{perfectly}, so take the expected value} \only<5-|handout:0>{\color{grayslide} Of course we cannot learn $\bm\phi$ \textbf{perfectly}, so take the expected value}\black
+\item[\only<1-4|handout:0>{\white --} \only<5|handout:1>{\myblue --} \only<6-|handout:0>{\color{grayslide} --}] \only<1-4|handout:0>{\color{white} And compare this with the \textbf{maximum expected utility overall}} \only<5|handout:1>{\myblue And compare this with the \textbf{maximum expected utility overall}} \only<6-|handout:0>{\color{grayslide} And compare this with the \textbf{maximum expected utility overall}}\black
+\item[\only<1-5|handout:0>{\white --} \only<6|handout:1>{\myblue --} \only<7-|handout:0>{\color{grayslide} --}] \only<1-5|handout:0>{\color{white} This is the EVPPI!} \only<6|handout:1>{\myblue This is the EVPPI!}\black \only<7-|handout:0>{\color{grayslide} This is the EVPPI!}
+\[ \hspace{-40pt}
+\only<1|handout:0>{\white\mbox{EVPPI} = \mbox{E}_{\bm\phi}\left[\max_t \mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \right] - \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]} 
+\only<2|handout:0>{\white\mbox{EVPPI} = \mbox{E}_{\bm\phi}\left[\max_t \myblue{\mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right]}\white \right] - \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]} 
+\only<3|handout:0>{\white\mbox{EVPPI} = \mbox{E}_{\bm\phi}\left[\myblue\max_t \color{myblue!65}\mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \white \right] - \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]}
+\only<4|handout:0>{\white\mbox{EVPPI} = \myblue\mbox{E}_{\bm\phi}\left[\color{myblue!65}\max_t \mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \myblue \right]  \white- \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]}
+\only<5|handout:0>{\white\mbox{EVPPI} = \color{myblue!65} \mbox{E}_{\bm\phi}\left[\max_t \mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \right]\myblue -  \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]}
+\only<6|handout:0>{\myblue \mbox{EVPPI} = \mbox{E}_{\bm\phi}\left[\max_t \mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \right] - \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]}
+\only<7-|handout:1>{\color{myblue!65} \mbox{EVPPI} = \mbox{E}_{\bm\phi}\left[ \red \max_t \mbox{E}_{\bm\psi\mid\bm\phi} \left[\mbox{NB}_t(\bm\theta)\right] \color{myblue!65} \right] - \max_t \mbox{E}_{\bm\theta} \left[\mbox{NB}_t(\bm\theta)\right]}
+\] \end{itemize}
+\item<7-> \textbf{\red That's} the difficult part!
+\begin{itemize}
+\item<7-> Can do nested Monte Carlo, but takes forever to get accurate results
+\item<7-> \textbf{\orange Recent methods} based on \textbf{Gaussian Process regression} very efficient \& quick!
+\end{itemize}
+\end{itemize}
+\vfill \orange \fontsize{5}{6}\selectfont\onslide<7->{
+Strong et al \textit{Medical Decision Making}. 2014; \textbf{34(3)}: 311-26. \hfill \texttt{\myblue http://savi.shef.ac.uk/SAVI/} \\
+Heath et al \textit{Statistics in Medicine}. 2016; \textbf{35(23)}: 4264-4280. \hfill \texttt{\myblue https://egon.stats.ucl.ac.uk/projects/EVSI/}
+
+}
+}
+
+\begin{frame}[fragile]
+\frametitle{Performing the EVPPI analysis\hspace{0pt plus 1 filll}\small Info-rank plot}
+\begin{onlyenv}<1>
+<<mm4,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm)
+@
+\vspace{-10pt}
+<<mm41,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+<<mm5,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,wtp=10000)
+@
+\vspace{-10pt}
+<<mm51,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,wtp=10000)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+<<mm6,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,howManyPars=10)
+@
+\vspace{-10pt}
+<<mm61,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,howManyPars=10)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<4>
+<<mm7,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,rel=FALSE)
+@
+\vspace{-10pt}
+<<mm71,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,rel=FALSE)
+@
+\end{onlyenv}
+
+\begin{onlyenv}<5>
+\begin{columns}
+\column{.487\textwidth}
+\fontsize{6}{7}\selectfont{
+<<mm8,fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+ir = info.rank(inp$parameters,inp$mat,mm,rel=FALSE)
+@
+}
+\vspace{-10pt}
+<<mm81,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE>>=
+head(ir$rank,10)
+@
+\column{.487\textwidth}
+\fontsize{6}{7}\selectfont{
+<<mm9,fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,fig.show="hide">>=
+ir = info.rank(inp$parameters,inp$mat,mm,rel=TRUE)
+@
+}
+\vspace{-10pt}
+<<mm91,size="footnotesize",fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE>>=
+head(ir$rank,10)
+@
+\end{columns}
+\end{onlyenv}
+
+\begin{onlyenv}<6>
+<<mm10,size="footnotesize", fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,eval=FALSE>>=
+x=evppi(parameter=c("q.4.","psi.2.","psi.5."),inp$mat,mm)
+plot(m)
+@
+<<mm101,size="footnotesize", fig.width=8,fig.height=8,out.width='70%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE,cache=TRUE>>=
+x=evppi(parameter=c("q.4.","psi.2.","psi.5."),inp$mat,mm,suppress.messages=TRUE)
+@
+\vspace{-15pt}
+<<mm102,size="footnotesize", fig.width=8,fig.height=8,out.width='60%',fig.align='center',message=FALSE,warning=FALSE,echo=FALSE>>=
+plot(x,xlim=c(0,10000))
+@
+\end{onlyenv}
+\end{frame}
+
+
+\frame{
+\frametitle{\texttt{BCEAweb}}
+\begin{itemize}
+\item Inspired by similar projects (eg \texttt{SAVI} \color{blue!67}\texttt{http://savi.shef.ac.uk/SAVI/}\color{black})
+\item Create a web interface to use \texttt{BCEA} without even opening \texttt{R} (or even having it installed on your computer!)
+\vspace{10pt}\pause
+\item Typical work flow
+\begin{enumerate}
+\item Design the economic model (eg Markov model, decision tree, ...)
+\item Run the statistical analysis to estimate the quantities of interest (eg survival analysis, evidence synthesis, NMA, ...)
+\item Run the economic model \& obtain ``PSA samples''
+\end{enumerate}
+\vspace{5pt}
+\textbf{NB}: Can obtain in a ``Integrated'' (\includegraphics[scale=.05]{emoticon_yes}) or ``Two-stage'' (\includegraphics[scale=.045]{emoticon_cry}) approach!
+\vspace{5pt}
+\begin{enumerate}\setcounter{enumi}{3}
+\item<3-> \alert{Upload ``PSA samples'', including values for $(e,c)$ to \texttt{BCEAweb}}
+\item<3-> \alert{Use \texttt{BCEA} in the background to do \textbf{all} the economic analysis}
+\item<3-> \alert{Create reports that can be used as the basis for eg papers, reimbursement files, ...}
+\end{enumerate}
+\end{itemize}
+}
+
+\frame{\frametitle{\texttt{BCEAweb}  \hspace{0pt plus 1 filll}\small\url{https://egon.stats.ucl.ac.uk/projects/BCEAweb/}}
+\only<1>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea9.png}
+\end{center}
+}
+
+\only<2>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea2.png}
+\end{center}
+}
+
+\only<3>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea1.png}
+\end{center}
+}
+
+\only<4>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea4.png}
+\end{center}
+}
+
+\only<5>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea3.png}
+\end{center}
+}
+
+\only<6>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea6.png}
+\end{center}
+}
+
+\only<7>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea5.png}
+\end{center}
+}
+
+\only<8>{
+\vspace{-10pt}
+\begin{center}
+\includegraphics[height=8cm]{14.value-of-partial-info-2/figs/bcea7.png}
+\end{center}
+}
+}
+
+\frame{
+\frametitle{Shameless self marketing\hspace{0pt plus 1 filll}\small But seriously: lots of useful info...}
+\vspace{-5pt}
+\scalebox{.88}{\includegraphics[scale=.35]{BMHE.jpg}} \qquad 
+\scalebox{.88}{\includegraphics[scale=.181]{BCEAbook.jpg}}
+\vfill
+
+\texttt{\myblue http://www.statistica.it/gianluca/book/bmhe/}\\
+\texttt{\myblue http://www.statistica.it/gianluca/book/bcea/}
+}
+
+\frame{
+\begin{center}
+{\huge Thank you!}
+\end{center}
+}
+
+\end{document} 

@@ -1,0 +1,1102 @@
+---
+title: "&#8291;6. Survival analysis in HTA"
+author: Gianluca Baio
+date: "9 February 2021"
+institute: "[Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London"
+params: 
+   - conference: "STAT0019 - Bayesian Methods in Health Economics"
+   - location: "UCL - 2020/2021"
+output:
+  xaringan::moon_reader:
+    includes: 
+       in_header: "../assets/latex_macros.html" 
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      highlightSpans: true
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "../assets/ucl-powerpoint.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("../assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+use_panelset()
+# This allows to copy code from the slides directly
+use_clipboard()
+
+# Loads data and all
+data=read.csv(file="/home/gianluca/Dropbox/HE/IQVIA/Survival/data/Trial.csv",header=TRUE)
+data$TIME=data$aval
+data$EVENT=data$cnsr
+load("~/Dropbox/EcSan/ShortCourses/ICON/data_surv.Rdata")
+dat$TIME=dat$time
+dat$EVENT=dat$censored
+dat$treatment=factor(dat$arm,labels=c("Comparator","Intervention"))
+library(flexsurv)
+library(survHE)
+library(rms)
+library(rstan)
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+.title-small[
+`r icon::icon_style(icon::fontawesome("envelope",style = "solid"),scale=.8,fill="#00acee")`  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [http://www.statistica.it/gianluca/](http://www.statistica.it/gianluca/)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio](https://github.com/giabaio)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+`r icon::icon_style(icon::fontawesome("twitter"),scale=.8,fill="#00acee")`  [@gianlubaio](https://twitter.com/gianlubaio)     
+]
+
+### `r rmarkdown::metadata$params`
+
+`r date`
+
+.small[.alignleft[`r previous_slide("ild")`]]
+
+.footer[
+`r go_home(path="../assets/home-icon.png")`
+]
+
+---
+
+layout: true
+.footer[
+`r go_home(path="../assets/home-icon.png")` <span style="position: relative; bottom: 10px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio. STAT0019</span>
+]
+.footer-center[
+`r rmarkdown::metadata$title`
+]
+
+---
+
+# Summary
+
+- Survival data in health economic evaluations   
+   – Extrapolation from clinical trials   
+   – Parametric models
+   
+- Issues with Bayesian modelling   
+   – Parameterisations   
+   – Convergence   
+   – Alternative methods for Bayesian inference
+   
+- PSA in survival analysis   
+   – Propagating the relevant uncertainty
+
+`r vspace("3em")`
+
+.content-box-beamer[
+### **References** 
+
+`r vspace("20px")`
+
+`r bugs_book(c("11.11"))`
+
+`r icon::icon_style(icon::fontawesome("firefox"),fill="orange")` [NICE DSU Evidence Synthesis Technical Support Document Series &ndash; TSD14](http://nicedsu.org.uk/technical-support-documents/survival-analysis-tsd/)    
+
+`r icon::icon_style(icon::fontawesome("firefox"),fill="orange")` [NICE DSU Evidence Synthesis Technical Support Document Series &ndash; TSD16](http://nicedsu.org.uk/technical-support-documents/treatment-switching-tsd/)
+
+`r icon::icon_style(icon::fontawesome("firefox"),fill="orange")` [NICE DSU Evidence Synthesis Technical Support Document Series &ndash; TSD19](http://nicedsu.org.uk/technical-support-documents//partitioned-survival-analysis-tsd/)
+
+`r kruschke(14)`
+]
+
+---
+
+# Survival analysis
+
+## Relevant quantities
+
+- Outcome is **time to event** $T>0$, a continuous random variable with sample space (support) $[0,\infty)$
+
+- Relevant quantites are: the .orange[density] and .red[cumulative distribution] functions
+   $$\class{red}{F(t)=\Pr(T\leq t)=\int_0^t}\class{orange}{f(u)}\class{red}{du}$$
+   the .blue["survivor"] (often referred to as .blue["survival"]) function
+   $$\class{blue}{S(t)=1-F(t)=\Pr(T>t)}$$ 
+   the .olive["hazard"] and the .spanish-red["cumulative hazard"] functions
+   $$\class{olive}{\lim_{\Delta\rightarrow 0} \frac{\Pr(t\leq T \leq t+\Delta\mid T>t)}{\Delta}} \qquad{ `r sftext("and")` } \qquad \class{spanish-red}{H(t)=\int_0^t}\class{olive}{h(u)}\class{spanish-red}{du}$$
+   
+- Since $\class{red}{F(t)}$, $\class{blue}{S(t)}$, $\class{orange}{f(t)}$, $\class{olive}{h(t)}$ and $\class{spanish-red}{H(t)}$ are all connected, specifying one of them is sufficient to fully characterise the survival model
+
+---
+
+count: false
+# Survival analysis
+.pull-left[
+```{r echo=F,fig.width=6,fig.height=5,out.width='45%',fig.align='center',dev="tikz",message=FALSE,warning=FALSE,cache=TRUE,opts=list(width="68%",title="The top panel shows a density function describing how the probability mass is spread over the continuum of points in the range 0 to infinity; the bottom panel shows the survival function, ie the probability of not having experienced the event up to time t")}
+t=seq(0,60,.1)
+plot(t,dweibull(t,3,22),t="l",bty="n",xlab="Time",ylab="Density function")
+text(30,dweibull(30,3,22),"$f(t)$",col="orange",pos=4,cex=2.5)
+
+plot(t,1-pweibull(t,3,22),t="l",bty="n",xlab="Time",ylab="Survival function")
+text(20,1-pweibull(20,3,22),"$S(t)=\\Pr(T> t)$",col="blue",pos=4,cex=2.5)
+```
+]
+.pull-right[
+```{r echo=F,fig.width=6,fig.height=5,out.width='45%',fig.align='center',dev="tikz",message=FALSE,warning=FALSE,cache=TRUE,opts=list(width="68%",title="The top panel shows the cumulative function, ie the probability of experiencing the event before time t; the bottom panel shows the hazard function, ie the instantaneous probability of experiencing the event at a specific time t")}
+t=seq(0,60,.1)
+plot(t,pweibull(t,3,22),t="l",bty="n",xlab="Time",ylab="Distribution function")
+text(24,pweibull(24,3,22),"$F(t)=\\Pr(T\\leq t)$",col="red",pos=4,cex=2.5)
+
+plot(t,flexsurv::hweibull(t,3,22),t="l",bty="n",xlab="Time",ylab="Hazard function")
+text(40,flexsurv::hweibull(40,3,22),"$h(t)$",col="#334f17",pos=2,cex=2.5)
+```
+]
+
+---
+
+count: false
+# Survival analysis
+
+## Recap
+`r vspace("-20px")`
+
+1. The density function is the derivative wrt time of the cumulative function: 
+
+   $\displaystyle\class{myblue}{f(t)=\frac{d}{dt}F(t)=F^\prime(t)}$
+   
+2. The "instantaneous" hazard function is a conditional probability, so can be specified as the ratio of the joint probability to the marginal probability of the conditioning event: 
+
+   $\displaystyle\class{myblue}{h(t)=\frac{\lim_{\Delta\rightarrow 0} \Pr(t \leq T \leq t+\Delta\mid T>t)/\Delta}{\Pr(T>t)}=\frac{f(t)}{S(t)}}$
+   
+3. The derivative wrt time of the survival function is minus the density function: 
+
+   $\displaystyle\class{myblue}{S^\prime(t)=\frac{d}{dt}S(t)=\frac{d}{dt}[1-F(t)]=-f(t)}$
+   
+4. The hazard function can be represented as the ratio of the derivative to the actual survival function: 
+
+   $\displaystyle\class{myblue}{h(t)=-\frac{S^\prime(t)}{S(t)}}$
+   
+5. The cumulative hazard function is minus the log-survival: 
+
+   $\displaystyle\class{myblue}{H(t)=\int_0^t h(u)du=\int_0^t -\frac{S^\prime(u)}{S(u)}du=-\log(S(t))}$
+
+---
+
+count: false
+# Survival analysis
+ 
+## Censoring
+
+In order to account for censoring, we need to specify the data collection
+
+- $t_i>0$: .blue[**observed**] time to event for subject $i$
+
+- $d_i=0,1$: an indicator of censoring
+   - If $d_i=0$, then the $i-$th subject did not experienced the event. In this case, $t_i$ is the .red[**partially**] observed time
+   - If $d_i=1$, then the observed time is the "true" (.orange[**fully**] observed) one
+
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="This graph shows the concept of censoring. The first individual is fully observed and it takes 3 units of time before they experience the event. We know their history in full. The fourth individual is censored because we know when they enter the observation, but by the end of the follow up period they still have not experienced the event. We do not know when they will")}
+\begin{center}
+\sffamily
+\begin{tikzpicture}
+\draw[line width=0.05mm] (-2,0) -- (3,0);
+\draw[line width=0.05mm] (0,-.5) -- (2,-.5);
+\draw[line width=0.05mm] (-1,-1) -- (2.5,-1);
+\draw[line width=0.05mm] (-0.5,-1.55) -- (3.5,-1.55);
+\draw[line width=0.05mm] (-1.8,-2.05) -- (1.5,-2.05);
+\draw[line width=0.05mm] (3.5,.5) -- (3.5,-2.5);
+\draw(3,-.02) node(1){$\bullet$};
+\draw(2,-.52) node(2){$\bullet$};
+\draw(1.5,-2.07) node(2){$\bullet$};
+\draw(3.2,-3.0) node(3)[]{End of follow up};
+\draw(6,-.8) node(4)[]{
+\begin{tabular}{ccc}
+$t_i$ & $d_i$ & True time \\[1mm]
+3 & 1 & 3 \\[1mm]
+2 & 1 & 2\\[1mm]
+2.5 & 0 & ? ($\geq$ 2.5) \\[1mm]
+3.5 & 0 & ? ($\geq$ 3.5)\\[1mm]
+1.5 & 1 & 1.5
+\end{tabular}
+};
+\end{tikzpicture}
+\end{center}
+```
+
+---
+
+count: false
+# Survival analysis
+ 
+## Modelling
+
+Broadly speaking, there are two wide “families” of survival models:
+`r vspace("2em")`
+
+1. .olive[**Semi-parametric**] Survival Models (eg Cox Proportional Hazard, splines, ...)
+
+   Model directly the hazard function $\class{olive}{h(t)}$    
+   &ndash; Distribution of survival time unknonwn    
+   &ndash; Less consistent with theoretical $\class{blue}{S(t)}$ (typically step function)    
+   &#8291;+ Does not rely on distributional assumptions    
+   &#8291;+ Baseline hazard not necessary for estimation of hazard ratio    
+`r vspace("2em")`
+--
+
+2. .blue[**Parametric**] Survival Models (eg Weibull, Exponential, ...)
+
+   Model directly the time-to-event t, using a suitable parametric distribution    
+   &#8291;+ Completely specified $\class{olive}{h(t)}$ and $\class{blue}{S(t)}$    
+   &#8291;+ More consistent with theoretical $\class{blue}{S(t)}$     
+   &#8291;+ Time-quantile prediction possible     
+   &ndash; Assumption on underlying distribution
+
+---
+
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[Trial data &ndash; [Kaplan-Meier](https://en.wikipedia.org/wiki/Kaplan–Meier_estimator) curves]
+]
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+m=fit.models(Surv(time,censored)~as.factor(arm),distr="weibull",data=dat)
+pl=plot(m,add.km=TRUE,t=seq(0,40))
+# Removes the model curves
+pl$layers[[1]]$data=pl$layers[[1]]$data %>% mutate(S=-100)
+# Removes the legend
+pl=pl+theme(legend.position = "none") 
+# Adds names of arms
+pl=pl+annotate("text",x=10,y=.25,label="Control") + annotate("text",x=15,y=.27,label="Intervention",hjust=-1)
+pl
+```
+
+`r include_fig("unnamed-chunk-5-1.png",width="60%",title="The Kaplan-Meier curves are non-parametric statistics used to estimate the survival function from lifetime data. They resemble closely the observed data")`
+
+---
+
+count: false
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[**Median** time:] $\class{ubuntublue}{t: S(t)=0.5}$
+]
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+scurves=make.surv(m,t=seq(0,40,.1))
+pl=plot(m,add.km=TRUE,lab.profile=c("Control","Intervention"))
+pl+xlim(0,40) + annotate("segment", 
+                         x=-Inf,y=.5,
+                         xend=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),yend=0.5,
+                         linetype=2,color="red"
+) + geom_point(aes(x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5),size=5,color="red") +
+    geom_point(aes(x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5),size=5,color="red") +
+    annotate("text",x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),hjust=1.5,vjust=1.5) +
+    annotate("text",x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),hjust=-.4,vjust=-1) 
+```
+
+`r include_fig("unnamed-chunk-6-1.png",width="60%",title="The median survival time is the time (on the x-axis) in correspondence of which the estimated survival curve is equal to 0.5. That is the point in the follow up at which 50% of the population have experienced the event")`
+
+---
+
+count: false
+# Survival analysis in HTA
+
+.alignleft[
+.ubuntublue[**Mean** time:] $\class{ubuntublue}{\displaystyle\int_0^\infty S(t)dt}$
+]
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=9,fig.height=7,dev="tikz",fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE"),eval=FALSE}
+mean=numeric()
+mean[1]=m$models[[1]]$res["scale","est"]*gamma(1+1/m$models[[1]]$res["shape","est"])
+mean[2]=(m$models[[1]]$res["scale","est"]+exp(m$models[[1]]$res["as.factor(arm)1","est"]))*gamma(1+1/m$models[[1]]$res["shape","est"])
+pl=plot(m,add.km=TRUE,lab.profile=c("Control","Intervention"),t=seq(0,40),annotate=TRUE) +
+   annotate("text",x=scurves[[1]][[1]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=format(mean[1],digits=3,nsmall=2),hjust=1.5,vjust=1.5) +
+    annotate("text",x=scurves[[1]][[2]] %>% filter(S<=0.5) %>% slice(1) %>% pull(t),y=0.5,
+            label=format(mean[2],digits=3,nsmall=2),hjust=-.4,vjust=-1) 
+pl
+```
+
+`r include_fig("unnamed-chunk-7-1.png",width="60%",title="Conversely, the mean survival time gives the point on the x-axis that balances the distribution of the times. Because the underlying time distributions is generally skewed, mean and median times tend to be different")`
+
+---
+
+count: false
+# Survival analysis in HTA
+
+### General structure
+
+$$\class{myblue}{t \sim f(\mu(\bm{x}),\alpha(\bm{x})), \qquad t\geq 0}$$
+
+- $\bm{x}=$ vector of covariates (potentially influencing survival)
+
+- $\mu(\bm{x})=$ .blue[**location**] parameter
+   - Scale or mean &ndash; usually main objective of the (biostats!) analysis   
+   - Typically depends on the covariates $\bm{x}$
+   
+- $\alpha(\bm{x})=$ .olive[**ancillary**] parameters   
+   - Shape, variances, etc
+   - May depend on $\bm{x}$, but often assume they don't (see `r icon::fontawesome("firefox")` [NICE TSD 14](http://nicedsu.org.uk/technical-support-documents/survival-analysis-tsd/))
+   
+- **NB**: $S(t)$ and $h(t)$ are functions of $\mu(\bm{x}), \alpha(\bm{x})$
+
+--
+
+- Typically use generalised linear model
+
+   $$\class{myblue}{g(\mu_i)=\beta_0 + \sum_{j=1}^J \beta_j x_{ij} [+ \ldots]}$$
+   `r vspace("-20px")`
+   &ndash; since $t>0$, usually, $g(\cdot) = \log$
+
+.lightgray[   
+- In a Bayesian setting, complete by putting suitable priors on $\bm\beta$ and $\alpha$ (more on this later...)
+]
+
+---
+
+count: false
+# Survival analysis in HTA
+
+### For example... (see `r icon::fontawesome("firefox")` [`survHE` paper](https://www.jstatsoft.org/article/view/v095i14) + `r icon::fontawesome("firefox")` [NICE TSD 14](http://nicedsu.org.uk/technical-support-documents/survival-analysis-tsd/))
+
+`r include_fig("table_mod1.png",width="68%")`
+
+---
+
+# `survHE` 
+
+## A `R` package for survival analysis **in HTA**
+### **Objective**:  Simplify and standardise commands to fit survival analysis
+
+- Can do MLE + bootstrap to get (possibly rough-ish!) estimates from the joint distribution of the parameters
+
+- Can also do Bayesian models to get (usually better!) estimates from the joint .orange[**posterior**] distribution of the parameters
+   - **INLA**: Super fast (comparable to MLE), but currently supports only a restricted range of models
+   - **MCMC**: Slower, but more generalisable &ndash; .olive[`survHE`] produces and saves the model code + data & initial values, so the user can customise them
+   
+--
+
+- Automatically produces specialised graphs
+   - Survival curves + model fitting statistics (AIC, BIC, DIC)
+
+- Can produce a full [PSA](../04_Intro_HE/#psa-scheme) characterisation of the parameters **and** the survival curves
+   - These can be used directly in the economic model!
+   
+---
+
+count: false
+# `survHE`
+
+## A `R` package for survival analysis **in HTA**
+
+### **Objective**:  Simplify and standardise commands to fit survival analysis
+
+```{r,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE")}
+\begin{center}
+\begin{tikzpicture}
+\draw(0.5,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](1){\texttt{fit.models}};
+\draw(1.5,-2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](2){\texttt{summary}};
+\draw(0,-2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](3){\texttt{print}};
+\draw(-1.5,-1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](4){\texttt{model.fit.plot}};
+\draw(2.5,-1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](5){\texttt{plot}};
+\draw(0.5,1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=green!55,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](6){\texttt{make.surv}};
+\draw(2.5,1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=green!55,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](7){\texttt{psa.plot}};
+\draw(-1.5,1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=green!55,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](8){\texttt{write.surv}};
+\draw(-5,-1.25) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!10,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](9){\texttt{digitise}};
+\draw(-5,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!10,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](10){\texttt{make.ipd}};
+
+\draw[rounded corners=15pt,thick] (-6,-1.75) rectangle ++ (2.1,2.3) node[xshift=-1.1cm, yshift=0.1cm]{\fontsize{6}{7}\selectfont \sffamily Data preparation};
+\draw[rounded corners=15pt,thick] (-3,-3.0) rectangle ++ (6.7,3.5) node[xshift=-1.6cm, yshift=-3.7cm]{\fontsize{6}{7}\selectfont \sffamily Model fitting \& assessment};
+\draw[rounded corners=15pt,thick] (-3,.7) rectangle ++ (6.7,1.1) node[xshift=-1.5cm, yshift=0.1cm]{\fontsize{6}{7}\selectfont \sffamily PSA \& extrapolation};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.310) -- (2.90);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.250) -- (3.90);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.190) -- (4.30);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.350) -- (5.140);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.90) -- (6.270);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (6.0) -- (7.180);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (6.180) -- (8.0);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (9.90) -- (10.270);
+\draw [->,>=latex,dashed,shorten >=0pt,auto,node distance=1cm,ultra thin] (10.0) -- (1.180);
+\end{tikzpicture}
+\end{center}
+```
+
+`r icon::fontawesome("github")` [https://github.com/giabaio/survHE](https://github.com/giabaio/survHE)
+.alignright[`r icon::fontawesome("firefox")` [`survHE` webpage](http://www.statistica.it/gianluca/software/survhe/)]
+
+---
+
+# Fitting parametric models in `R` with `survHE`
+
+.panelset[
+.panel[
+.panel-name[Running the model]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE}
+# Loads the package (can also use the GitHub development version 
+# see http://www.statistica.it/gianluca/software/survhe/)
+library(survHE)
+
+# Defines the 'model formula' 
+formula=Surv(TIME,EVENT)~1
+
+# Fits the model on the data for the Intervention group only using a bunch of distributions
+m.int=fit.models(formula,data=subset(data,treatment=="Intervention"),
+                 distr=c("exp","weibull","lnorm","llogis","gompertz","gengamma"))
+
+# Fits the model on the data for the Control group only using a bunch of distributions
+m.ctr=fit.models(formula,data=subset(data,treatment=="Comparator"),
+                 distr=c("exp","weibull","lnorm","llogis","gompertz","gengamma"))
+```
+]
+
+.panel[
+.panel-name[Exploring the object]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE}
+# Explores the object 'm.int' to see what's inside...
+lapply(m.int,names)
+
+# Shows model fitting statistics (eg AIC)
+m.int$model.fitting$aic
+```
+]
+
+
+.panel[
+.panel-name[Estimates (1)]
+.pull-left[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
+# Prints the model estimates for model 1 (Exponential)
+print(m.int,mod=1)
+```
+]
+.pull-right[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE}
+# Prints the model estimates for model 2 (Weibull)
+print(m.int,mod=2)
+```
+]
+]
+
+.panel[
+.panel-name[Estimates (2)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE}
+# Prints the model estimates for model 3 (log-Normal), using 3 digits precision
+print(m.int,mod=3,digits=3)
+```
+]
+
+.panel[
+.panel-name[Estimates (3)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE}
+# Can also show the output printout from the original inferential engine ('flexsurv' in this case...)
+print(m.int,mod=3,original=TRUE)
+```
+]
+
+]
+
+---
+
+count: false
+# Fitting parametric models in `R` with `survHE`
+
+.panelset[
+
+.panel[
+.panel-name[Plotting (1)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE,fig.width=8,fig.height=8,fig.align='center',opts=list(width="36%",title="INSERT TEXT HERE"),eval=TRUE}
+plot(m.int) # Basic plot function (based on 'ggplot2')
+```
+]
+
+.panel[
+.panel-name[Plotting (2)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE,fig.width=8,fig.height=8,fig.align='center',opts=list(width="36%",title="INSERT TEXT HERE"),eval=TRUE}
+plot(m.int,mods=6) # Selects only the 6th model (Generalised Gamma)
+```
+]
+
+.panel[
+.panel-name[Plotting (3)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE,fig.width=8,fig.height=8,fig.align='center',opts=list(width="36%",title="INSERT TEXT HERE"),eval=TRUE}
+plot(m.int,mods=6,add.km=TRUE) # Selects only the 6th model (Generalised Gamma) and adds Kaplan-Maier curve
+```
+]
+
+.panel[
+.panel-name[Model fit]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,echo=TRUE,fig.width=12,fig.height=9,fig.align='center',opts=list(width="46%",title="INSERT TEXT HERE"),eval=TRUE}
+model.fit.plot(m.int)
+```
+]
+
+.panel[
+.panel-name[...and more!]
+Many more options are shown and explained in the `survHE` `r icon::fontawesome("firefox")` [paper](https://www.jstatsoft.org/article/view/v095i14) and `r icon::fontawesome("firefox")` [webpage](http://www.statistica.it/gianluca/software/survhe/)
+]
+
+]
+
+---
+
+# Extrapolation
+
+## A recipe for disaster?...
+
+.pull-left[
+`r include_fig("ristorante.png",width="74%")`
+]
+.pull-right[
+<iframe frameborder="no" src="https://www.independent.co.uk/life-style/food-and-drink/worst-mistakes-people-make-eating-italian-food-cooking-silvia-baldini-food-network-a7763651.html"
+style="
+    position: fixed;
+    top: -15px;
+    bottom: 0px;
+    right: -80px;
+    width: 75%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 999999;
+    height: 115%;
+    ms-transform: scale(0.45);
+   -moz-transform: scale(0.45);
+   -o-transform: scale(0.45);
+   -webkit-transform: scale(0.45);
+   transform: scale(0.70);
+  "></iframe>
+]
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+m=fit.models(Surv(time,censored)~as.factor(arm),distr=c("wei","exp","gam","lno","llo"),data=dat)
+plot(m,mods=c(1,3),add.km=T,lab.profile=c("Control","Intervention"))+xlim(0,70)
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+plot(m,mods=c(1,3),add.km=T,lab.profile=c("Control","Intervention"),t=seq(0,70))
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=10,fig.height=7,fig.align='center',opts=list(width="60%",title="INSERT TEXT HERE")}
+plot(m,add.km=T,lab.profile=c("Control","Intervention"),t=seq(0,70))
+```
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+```{r echo=FALSE,comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=11,fig.height=8,fig.align='center',opts=list(width="50%",title="INSERT TEXT HERE")}
+model.fit.plot(m)
+```
+
+- **NB**: Any \*IC can only tell us about model fit **for the observed data**!     
+- Extrapolation (like missing data) is based on (virtually) untestable assumptions
+
+---
+
+count: false
+# Extrapolation
+
+## A recipe for disaster?...
+
+`r include_fig("xls_analysis.png",width="68%")`
+
+---
+
+count: false
+# Extrapolation using `survHE`
+
+.panelset[
+
+.panel[
+.panel-name[Code]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center',cache=TRUE}
+# Creates an object 'extr' with estimated values for the survival curve
+# Uses the output from the 'survHE' object named 'm.int' 
+# Considers the 1st distribution (Exponential)
+# Makes extrapolation for times 0-5000 
+# Does only 1 simulation
+extr=make.surv(m.int,mod=1,t=seq(0,5000),nsim=1)
+```
+]
+
+.panel[
+.panel-name[Processing (1)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center'}
+# inspects elements of the object 'extr'
+names(extr)           
+
+# number of simulated curves (one per treatment arm)
+length(extr$S)    
+```
+]
+
+.panel[
+.panel-name[Processing (2)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center'}
+# simulated survival curve for the first of the nsim (=1 in this case...) simulations
+extr$S
+```
+]
+
+.panel[
+.panel-name[Plotting (1)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='32%')}
+# Uses a specialised function to plot the extrapolated survival curve
+psa.plot(extr,labs="Extrapolated model (Exponential)")
+```
+]
+
+.panel[
+.panel-name[Plotting (2)]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='32%')}
+# Or directly using the 'plot' method - this time using 1000 simulations from the parameter distributions...
+plot(m.int,nsim=1000,mods=1,t=seq(0,5000))
+```
+]
+
+.panel[
+.panel-name[]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center'}
+# Computes the *mean* survival time for the 2nd model (Weibull)
+summary(m.int,mod=2,t=seq(0,5000))
+```
+]
+]
+
+---
+
+# Survival analysis in HTA
+
+## ... *To be or not to be (Bayesian)?*...
+
+- For more complex models, MLE-based estimates may fail to converge
+
+   – This may be an issue for multi-parameter models, where limited data (not compounded by relevant prior information) are not enough to fit all the model parameters
+   
+   – **NB**: you would normally need to fit more complex models for cases where the survival curves are "strange" and so the usual parametric models fail to provide sufficient fit
+
+.lightgray[
+- When there is strong correlation among the survival parameters, the results of the uncertainty analysis may be (strongly) biased under a more simplistic frequentist model
+
+   – This matters most in health economics, because this bias carries over the economic modelling, optimal decision making and assessment of the impact of parametric uncertainty!
+   
+   – **A full Bayesian approach propagates directly correlation and uncertainty in the model parameters through to the survival curves and the economic model**
+]
+
+---
+
+count: false
+# Survival analysis in HTA
+<!--
+See trick to highlight only bits of this here:
+https://stackoverflow.com/questions/52016911/highlight-selection-of-code-in-xaringan/52018533
+-->
+
+## ... *To be or not to be (Bayesian)?*...
+
+```{eval=FALSE}
+Model fit for the Generalised F model, obtained using Flexsurvreg 
+(Maximum Likelihood Estimate). `Running time: 1.157 seconds`
+
+                      mean        se        L95%        U95%
+mu              2.29139696 0.0798508 2.13489e+00 2.44790e+00
+sigma           0.58729598 0.0725044 4.61076e-01 7.48069e-01
+Q               0.84874994 0.2506424 3.57500e-01 1.34000e+00
+P               0.00268265 0.0902210 `6.33197e-32 1.13655e+26`
+as.factor(arm)1 0.34645851 0.0877892 1.74395e-01 5.18522e-01
+```
+
+`r vspace("2em")`
+
+```{eval=FALSE}
+Model fit for the Generalised F model, obtained using Stan 
+(Bayesian inference via Hamiltonian Monte Carlo). `Running time: 26.692 seconds`
+
+                    mean        se      L95%      U95%
+mu              2.256760 0.3455163 1.1897086 3.0865904
+sigma           0.507861 0.0762112 0.3608566 0.6582047
+Q               0.700062 0.3358360 0.0786118 1.3880582
+P               1.131968 0.5837460 `0.3908284 2.634276`
+as.factor(arm)1 0.345516 0.0865904 0.1745665 0.5176818
+```
+
+---
+
+count: false
+# Survival analysis in HTA
+
+## ... *To be or not to be (Bayesian)?*...
+
+.lightgray[
+- For more complex models, MLE-based estimates may fail to converge
+
+   – This may be an issue for multi-parameter models, where limited data (not compounded by relevant prior information) are not enough to fit all the model parameters
+   
+   – **NB**: you would normally need to fit more complex models for cases where the survival curves are "strange" and so the usual parametric models fail to provide sufficient fit
+]
+
+
+- When there is strong correlation among the survival parameters, the results of the uncertainty analysis may be (strongly) biased under a more simplistic frequentist model
+
+   – This matters most in health economics, because this bias carries over the economic modelling, optimal decision making and assessment of the impact of parametric uncertainty!
+   
+   – .olive[**A full Bayesian approach propagates directly correlation and uncertainty in the model parameters through to the survival curves and the economic model**]
+
+---
+
+# Bayesian survival analysis using `survHE`
+
+- In theory, coding up a survival model in standard Bayesian software (eg `BUGS` or `JAGS`) is not that complicated
+
+   - **NB**: although they differ in how they take care of censoring, so some care is needed!
+
+`r vspace("20px")`
+   
+- **BUT**: Gibbs sampling can struggle with survival models
+
+   - Compilation and running time can be rather long   
+   - Because the main outcome $t$ has missing values in the data (the censored times), it is generally useful to set initial values for $t$, in a clever way to avoid problems in running the MCMC
+   - Convergence may be difficult to reach even with relatively simple models (eg Weibull Proportional Hazard)
+
+--
+
+`r vspace("20ptx")`
+
+- `survHE` uses alternative modes of Bayesian inference to overcome/limit these issues
+   - `r icon::icon_style(icon::fontawesome("firefox"),fill="orange")` [Integrated Nested Laplace Approximation](https://www.r-inla.org/) (INLA)
+      - Very fast and accurate, but at present can only run a limited number of survival models
+      
+   - `r icon::icon_style(icon::fontawesome("firefox"),fill="orange")` [Hamiltonian Monte Carlo](https://mc-stan.org/docs/2_25/reference-manual/hamiltonian-monte-carlo.html) (HMC)
+      - MCMC algorithm, slightly cleverer than Gibbs sampling (for some models...)
+      - **Very** efficient for survival analysis
+      - Can implement virtually *any* model &ndash; `rstan` allows easy-ish building blocks to define new sampling distributions (accounting for censoring etc...)
+
+---
+
+count: false
+# **Bayesian** survival analysis using `survHE`
+
+`r include_fig("table_mod2.png",width="70%")`
+
+---
+
+count: false
+# **Bayesian** survival analysis using `survHE`
+
+### HMC
+
+.panelset[
+
+.panel[
+.panel-name[Running the model]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center',cache=TRUE,results="hide"}
+# Calls the 'survHE' function 'fit.models' to run the model 
+# 1. using HMC as inferential engine (with the option: 'method="hmc"')
+# 2. specifying a Weibull distribution for the data ('distr="weibull"')
+m.hmc=fit.models(Surv(TIME,EVENT)~as.factor(treatment),
+                 data=dat,
+                 distr="weibull",
+                 method="hmc" #<<
+)
+```
+]
+
+.panel[
+.panel-name[Checks]
+.pull-left[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='55%'),fig.align='center',cache=TRUE,results="hide"}
+# Check convergence of the model using standard 'rstan' tools: Traceplots
+rstan::traceplot(m.hmc$models[[1]])
+```
+]
+.pull-right[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='55%'),fig.align='center',cache=TRUE,results="hide"}
+# Check convergence of the model using standard 'rstan' tools: Autocorrelation
+rstan::stan_ac(m.hmc$models[[1]])
+```
+]
+]
+
+.panel[
+.panel-name[Output]
+.pull-left[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='52%'),fig.align='center',cache=TRUE}
+# Shows the parameter estimates in the formatting of 'survHE'...
+print(m.hmc,digits=4)
+```
+]
+.pull-right[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='50%'),fig.align='center',cache=TRUE}
+# ...or in 'rstan' original formatting (adding the option 'original=TRUE')...
+print(m.hmc,digits=2, original=TRUE)
+```
+]
+]
+
+]
+
+---
+
+count: false
+# **Bayesian** survival analysis using `survHE`
+
+### INLA
+
+.panelset[
+
+.panel[
+.panel-name[Running the model]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,out.width='50%',fig.align='center',cache=TRUE,results="hide"}
+# Calls the 'survHE' function 'fit.models' to run the model 
+# 1. using INLA as inferential engine (with the option: 'method="inla"')
+# 2. specifying a Weibull distribution for the data ('distr="weibull"')
+m.inla=fit.models(Surv(TIME,EVENT)~as.factor(treatment),
+                  data=dat,distr="weibull",
+                  method="inla" #<<
+)
+```
+]
+
+.panel[
+.panel-name[Comparing the results]
+.pull-left[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='52%'),fig.align='center',cache=TRUE}
+# INLA output with parameters estimates
+print(m.inla,digits=4)
+```
+]
+.pull-right[
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='52%'),fig.align='center',cache=TRUE}
+# HMC output with parameters estimates
+print(m.hmc,digits=4)
+```
+]
+]
+
+.panel[
+.panel-name[Graphical comparison]
+```{r comment=NA,warning=FALSE,error=FALSE,message=FALSE,fig.width=7,fig.height=7,opts=list(width='32%'),fig.align='center',cache=TRUE}
+plot(INLA=m.inla,HMC=m.hmc,lab.profile=c("Control","Intervention"))
+```
+]
+
+]
+
+---
+
+# **Bayesian** survival analysis and **PSA**
+
+- `survHE` uses the simulations produced by the **full joint posterior distribution** of all the model parameters
+
+   - If the parameters are not highly correlated, these will look pretty much like the bootstrap-based simulations of flexsurv
+   - **BUT** if the they are correlated, they won’t be the same as the bootstrap!
+   
+.pull-left[
+```{r eval=FALSE,echo=TRUE}
+# Uses the 'survHE' method 'plot' to do the
+# extrapolation for 1000 simulations from
+# the joint posterior distribution, over
+# a time horizon of 0-50
+plot(m.hmc,
+     nsim=1000,
+     t=seq(0,50),
+     lab.profile=c("Control","Intervention")
+)
+```
+]
+.pull-right[
+```{r eval=TRUE,echo=FALSE,fig.width=7,fig.height=7,opts=list(width='80%')}
+plot(m.hmc,nsim=1000,t=seq(0,50),lab.profile=c("Control","Intervention"))
+```
+]
+
+
+---
+
+# Example: ICD & Cardiac death
+
+.alignright[`r icon::academicons$pubmed` [Benaglia et al (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4847642/)]
+
+## Set up/interventions
+
+- ICD (Implantable Cardioverter Defibrillators) compared to anti-arrhythmic drugs (AAD) for prevention of sudden cardiac death in people with cardiac arrhythmia
+
+--
+
+## Data
+
+- Individual data from cohort of 535 UK cardiac arrhythmia patients implanted with ICDs between 1991 and 2002
+
+-  Meta-analysis of three (non-UK) RCTs providing published HRs
+   – Relatively short-term follow-up: approximately 75% people, followed for less than 5 years, maximum 10 years
+   
+- UK population mortality statistics by age, sex, cause of death
+
+--
+
+## Objective
+
+- Estimate the survival curve over the lifetime of ICD and AAD patients in UK 
+
+- Extrapolate the output to inform the wider economic model
+
+---
+
+count: false
+# Example: ICD & Cardiac death
+
+## Basic idea
+
+Use UK population data (matched by age/sex) to "**anchor**" the ICD population at risk
+
+`r include_fig("ICD1.png",width="45%")`
+
+---
+
+count: false
+# Example: ICD & Cardiac death
+
+## Basic idea
+
+Use UK population data (matched by age/sex) to "**anchor**" the ICD population at risk
+
+- Perhaps the easiest way to do this is to relate the hazard between the two populations &ndash; eg **proportional hazard** (PH) model
+`r vspace("-20px")`
+   $$\class{myblue}{h_{\rm{ICD}}(t) = e^{\beta}h_{\rm{UK}}(t) \qquad \Leftrightarrow \qquad \HR = \frac{h_{\rm{ICD}}(t)}{h_{\rm{UK}}(t)} = e^{\beta} = `r sftext("Constant")`}$$
+   
+`r vspace("-20px")`
+   
+- Relatively easy to model &ndash; but probably very unrealistic!
+
+   - ICD patients are at (much?) greater risk of arrhythmia death 
+   - If the proportion of deaths caused by arrythmia changes over time, we would induce bias, because we would be extrapolate a constant HR for all causes mortality
+   
+--
+
+- Formally account for multiple mortality causes (.blue[**Poly-Weibull**] model `r icon::academicons$pubmed` [Demiris et al, 2015](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4456429/)):
+\begin{align}
+\class{myblue}{h_{\rm{ICD}}(t)} &\class{myblue}{= h}_{\rm{\class{red}{ICD}}}^{\rm{\class{myblue}{arr}}}\class{myblue}{(t) + h}_{\rm{\class{red}{ICD}}}^{\rm{\class{myblue}{oth}}}\class{myblue}{(t)} \\
+&\class{myblue}{=} \class{orange}{e^\beta} \class{myblue}{h^{\rm{arr}}}_{\rm{\class{blue}{UK}}}\class{myblue}{(t)} + \class{myblue}{h^{\rm{oth}}}_{\rm{\class{blue}{UK}}}\class{myblue}{(t)} \\
+&\class{myblue}{=} \class{orange}{e^\beta}\class{myblue}{\alpha_1 \mu_1 t^{\alpha_1-1} + \alpha_2 \mu_2 t^{\alpha_2-1}}
+\end{align}
+
+`r vspace("-20px")`
+- This assumes that
+   -  Arrhythmia hazard is .orange[**proportional**] to matched UK population
+   - Other causes hazard is **identical** to matched UK population
+
+---
+
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+```{css echo=FALSE}
+.left-column30 {
+  width: 30%;
+  height: 92%;
+  float: left;
+}
+.left-column30 h2, .left-column h3 {
+  color: #035AA699;
+}
+.left-column30 h2:last-of-type, .left-column h3:last-child {
+  color: #035AA6;
+}
+.right-column70 {
+  width: 65%;
+  float: right;
+  padding-top: 0em;
+}
+
+```
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". 
+]
+
+---
+
+count: false
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". **But: don't they?...**
+]
+
+---
+
+count: false
+# `r icon::fontawesome("music")` You don't know what you're doing...
+
+.left-column30[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JhTCOVnU0gY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+.right-column70[
+- To set up a full Bayesian model including a reasonable specification of the priors can be a hard task
+- Often people claim that they have "no prior information". **But: don't they?...**
+
+`r vspace("2em")`
+- In the ICD case, age at entry is around 60 &ndash; we **know** that people won't survive more than 60 more years
+   - Setting a prior for the scale $\mu_i \sim \dunif(0,100)$ implies that the prior mean survival of the resulting Weibull distribution is 
+   $$\class{myblue}{\mu_i\Gamma\left(1+\frac{1}{\alpha}\right) < 60}$$
+   
+- Can also include some knowledge on the shape $\alpha$ and the coefficient $\beta$ to limit their variations in reasonable ranges...
+
+]
+
+---
+
+# Results
+
+`r include_fig("ICD2.png",width="85%")`
+
+- Ignoring cause-specific mortality (.red[Weibull]) results in larger bias, especially for females (because the arrhythmia proportion of deaths does vary over time in that subgroup)
+
+.small[.alignright[`r icon::fontawesome("arrow-circle-right")` [Next lecture](../07_ALD/index.html)]]
