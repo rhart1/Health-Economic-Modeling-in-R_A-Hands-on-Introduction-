@@ -1,0 +1,781 @@
+---
+title: "Working with the R package BCEA"
+author: Gianluca Baio
+institute: "[Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London"
+params: 
+   conference: "UCL statistical software writers workshop"
+   short_conference: "UCL stats software workshop"
+   location: "Internetville"
+   short_title: "HTA and BCEA"
+   date: 7 February 2022
+output:
+  xaringan::moon_reader:
+    includes: 
+       in_header: "assets/latex_macros.html" 
+       # This line adds a logo based on the format selected in the file 'assets/include_logo.html'
+       # NB: the actual options (eg placement of the logo and actual logo file) can be changed there
+       after_body: "assets/ucl-stats/insert-logo.html"
+    seal: false
+    yolo: no
+    lib_dir: libs
+    nature:
+      beforeInit: ["https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: yes
+      highlightSpans: true
+      countIncrementalSlides: no
+      ratio: '16:9'
+      titleSlideClass:
+      - center
+      - middle
+    self_contained: false 
+    css:
+    - "assets/ucl-stats.css"
+---
+
+```{r echo=F,message=FALSE,warning=FALSE,comment=NA}
+# Sources the R file with all the relevant setup and commands
+source("assets/setup.R")
+
+# Stuff from 'xaringanExtra' (https://pkg.garrickadenbuie.com/xaringanExtra)
+# This allows the use of panels (from 'xaringanExtra')
+xaringanExtra::use_panelset()
+# This allows to copy code from the slides directly
+xaringanExtra::use_clipboard()
+# This freezes the frame for when there's a gif included
+xaringanExtra::use_freezeframe()
+
+# Defines the path to the file with the .bib entries (in case there are references)
+bibfile=ReadBib("~/Dropbox/Perso/Office/CV/mypubs.bib",check = FALSE)
+
+# Removes '>' from R printouts
+knitr::opts_chunk$set(prompt=FALSE)
+
+# Installs the old version (CRAN) of BCEA so it can be used NB: ONLY DO THIS ONCE! 
+#tmp_lib="~/Dropbox/HE/Ispor/Workshop_Modelling_R/BCEA/tmp"
+#dir.create(tmp_lib)
+#install.packages("BCEA",lib=tmp_lib)
+tmp_lib="~/Dropbox/HE/Ispor/Workshop_Modelling_R/BCEA_talk/tmp"
+```
+
+class: title-slide
+
+# `r rmarkdown::metadata$title``r vspace("10px")` `r rmarkdown::metadata$subtitle`
+
+## `r rmarkdown::metadata$author`
+
+### `r rmarkdown::metadata$institute`    
+
+.title-small[
+`r icon::icon_style(icon::fontawesome("envelope",style = "solid"),scale=.8,fill="#00acee")`  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://gianluca.statistica.it](https://gianluca.statistica.it)
+`r icon::icon_style(icon::fontawesome("firefox"),scale=.8,fill="#EA7600")`  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio](https://github.com/giabaio)
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+`r icon::icon_style(icon::fontawesome("twitter"),scale=.8,fill="#00acee")`  [@gianlubaio](https://twitter.com/gianlubaio)
+]
+
+### `r rmarkdown::metadata$params$conference`, `r rmarkdown::metadata$params$location` 
+<!-- Can also separate the various components of the extra argument 'params', eg as in 
+### `r paste(rmarkdown::metadata$params, collapse=", ")`
+-->
+
+`r ifelse(is.null(rmarkdown::metadata$params$date),format(Sys.Date(),"%e %B %Y"),rmarkdown::metadata$params$date)`
+
+.logo-stats[]
+
+<!-- This adds a footer (optional and with other possibilities...) 
+.footer-left[ 
+<span style="position: relative; bottom: 0px; color: #D5D5D5;"> &nbsp; &copy; Gianluca Baio (UCL)</span>
+]
+-->
+
+`r postit(text=paste0('Check out our departmental podcast "Random Talks" on Soundcloud!', add_podcast()), top="75%",left="2.5%",height="6.3em",width="6.3em",rotate="-8deg")`
+
+
+`r postit(text=paste0("Follow our departmental social media accounts", add_twitter(url="https://twitter.com/stats_ucl",title="@stats_UCL",fill="#00acee"), add_linkedin(url="https://www.linkedin.com/in/statistical-science-ucl-906b9a201",title="LinkedIn"), add_instagram(url="https://www.instagram.com/ucl.stats/",title="Instagram")),top="53%",left="6.5%",height="6.2em",width="6.2em")`
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&nbsp; &copy; Gianluca Baio (UCL) | `r add_twitter()` `r add_github()` `r add_email()` `r add_website()` 
+]
+.aligncenter[
+`r rmarkdown::metadata$params$short_title` 
+]
+.alignright[
+`r rmarkdown::metadata$params$short_conference`, `r short_date`
+]
+] 
+
+---
+
+# `BCEA` 
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+### What is `BCEA` not?
+
+- `BCEA` is **not** a package to automatically run a Bayesian analysis
+   - It cannot build the health economic model for you
+   - It does not prepare the data to be used in the model
+   - It does not automatically run the MCMC simulations
+   - It does not choose the prior distributions for you
+
+--
+
+### So what *is* it then?
+
+- `BCEA`  provides a set of specific functions to systematically post-process the output of a Bayesian health economic model
+
+- Uses `R` [http://cran.r-project.org/](http://cran.r-project.org/)
+   -  Very good at interacting with standard MCMC software
+   - `BUGS`: [www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml](www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml)
+   - `JAGS`: [www.mcmc-jags.sourceforge.net/](www.mcmc-jags.sourceforge.net/)    
+   - `rstan`: [https://mc-stan.org/users/interfaces/rstan](https://mc-stan.org/users/interfaces/rstan)
+   - .red[**Free**] and there is a very large community of contributors
+   - Specifically designed for statistical analysis and has very good graphical capabilities
+
+---
+
+# `BCEA`
+
+## A `R` package for (Bayesian) cost-effectiveness analysis
+
+### `BCEA` and its use directly in `R` are designed with these objectives in mind
+
+1. Checking the model assumptions
+
+   - Do we mean what we mean (eg in terms of PSA simulations)?...
+   - Simulation error (especially, **but not only**, for a Bayesian approach)
+
+--
+
+2. Produce the base-case economic evaluation
+   - What’s the most cost-effective intervention, given current evidence?
+   - Cost-effectiveness plane, Expected Incremental Benefit (as a function of $k$),...
+
+--
+ 
+3. Perform uncertainty analysis
+   - Standard PSA (mandatory): Cost-effectiveness Plane, CEAC, ...
+   - Fairly easy (but not always used): CEAF
+   - More advanced/"too difficult" (rarely used): EVP(P)I/EVSI
+
+--
+
+4. Standardised reporting
+   - Graphical tools (use **excellent** `R` facilities)
+
+    
+---
+
+count: false
+
+# `BCEA` 
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+```{r bcea_scheme,engine='tikz', echo=F, out.width="85%",opts=list(width="75%",title="INSERT TEXT HERE"),eval=FALSE}
+\begin{tikzpicture}
+
+\draw(0,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](1){\texttt{bcea}};
+
+\draw(-2,-2.9) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.6cm,minimum height=2.6cm,text depth=2.0cm](2){\texttt{plot}};
+
+\draw(-2.0,-3.1) node[align=left,rectangle,rounded corners,draw,fill=red,font=\sffamily\fontsize{6}{7}\selectfont,text width=1.7cm](18){
+\tiny$\bullet$ \texttt{ceplane.plot} \\
+\tiny$\bullet$ \texttt{contour} \\
+\tiny$\bullet$ \texttt{contour2} \\
+\tiny$\bullet$ \texttt{ceac.plot} \\
+\tiny$\bullet$ \texttt{evi.plot} \\
+\tiny$\bullet$ \texttt{eib.plot} \\
+\tiny$\bullet$ \texttt{ib.plot} \\
+};
+
+\draw(1.5,-3) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](3){\texttt{summary}};
+
+\draw(3,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](4){\texttt{evppi}};
+
+\draw(0,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](5){\texttt{CreateInputs}};
+
+\draw(-3,2.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](6){\texttt{struct.psa}};
+
+\draw(5,3.0) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](7){\texttt{plot}};
+
+\draw(5,2.0) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](8){\texttt{diag.evppi}};
+
+\draw(-3,0.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](9){\texttt{multi.ce}};
+
+\draw(-5,1) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](10){\texttt{mce.plot}};
+
+\draw(-5,0) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](11){\texttt{ceaf.plot}};
+
+\draw(-5,-1.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=red,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](12){\texttt{ceef.plot}};
+
+\draw(3,.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](13){\texttt{CEriskav}};
+
+\draw(5,.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](14){\texttt{plot}};
+
+\draw(3,-1.5) node[align=center,rectangle,rounded corners=2ex,draw,fill=blue!40,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](15){\texttt{mixedAn}};
+
+\draw(5,-1) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](16){\texttt{plot}};
+
+\draw(5,-2) node[align=center,rectangle,rounded corners=2ex,draw,fill=orange,font=\sffamily\fontsize{7}{8}\selectfont,minimum width=1.2cm,minimum height=.6cm](17){\texttt{summary}};
+
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (2.70) -- (1.210);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.240) -- (18.0);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (3.90) -- (1.300);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.160) -- (9.360);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.140) -- (6.310);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.50) -- (4.220);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.20) -- (13.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.340) -- (15.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (1.west) -- (12.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (7.west) -- (4.15);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (4.340) -- (8.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (16.west) -- (15.15);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (17.west) -- (15.345);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (14.west) -- (13.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (5.east) -- (4.west);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (5.west) -- (6.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (9.160) -- (10.east);
+\draw [->,>=latex,shorten >=0pt,auto,node distance=1cm,ultra thin] (9.200) -- (11.east);
+
+\end{tikzpicture}
+```
+
+`r include_fig("bcea_scheme-1.png",width="65%",title="")`
+
+`r vspace("-50px")`
+ 
+.small[
+`r icon::fontawesome("firefox")` [www.statistica.it/gianluca/BCEA](www.statistica.it/gianluca/BCEA)     
+`r icon::icon_style(icon::fontawesome("github"),scale=.8,fill="black")`  [https://github.com/giabaio/BCEA](https://github.com/giabaio/BCEA)
+]
+
+---
+
+# How does `BCEA` work?
+
+.panelset[
+.panel[
+.panel-name[Installation]
+- `BCEA` is available from [CRAN](https://cran.r-project.org/)
+   - Current *stable* version: 2.3-1.1 (26 August 2019)
+
+- But it is also under constant development in the [GitHub repository](https://github.com/giabaio/BCEA)
+   - Current *stable* version: 2.3-2 (30 January 2020)
+   - Current *development* version: 2.4-1 (23 November 2021) &ndash; **major** update (soon to be released!)
+
+```{r howwork1,eval=FALSE}
+# Install BCEA (only required once and needs an internet connection!). 
+
+# You can either get the "official" version from CRAN
+install.packages("BCEA")
+
+# Or the development version from the GitHub repository
+devtools::install_github("giabaio/BCEA")               # stable version (2.3-2)
+
+devtools::install_github("giabaio/BCEA",ref="devel")   # development version (2.4-1)
+```
+
+`r vspace("30px")`
+NB: The beauty of the GitHub version is that it can be updated on the fly and be immediately available for users!
+]
+
+.panel[
+.panel-name[Using BCEA]
+```{r howwork2,eval=TRUE,echo=FALSE}
+library(BCEA,lib=tmp_lib)
+data(Vaccine)
+inp = CreateInputs(vaccine, print.lincom=FALSE)
+```
+```{r howwork3,eval=FALSE}
+library(dplyr)  # (Not necessary - helpful for data manipulation!)
+
+library(BCEA)   # Then loads the package (so you can access its functions)
+data(Vaccine)   # Loads an example dataset 
+```
+
+`r vspace("40px")`
+- The "Vaccine" example is a fictional cost-effectiveness model for and influenza vaccine, based on evidence synthesis (and a real case)
+
+- 2 treatment options ("Standard of care" vs "Vaccination") and overall 63 parameters
+
+- Discussed in details in `r icon::fontawesome("book-open")` [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/) and `r icon::academicons$pubmed` [Baio and Dawid, 2011](https://pubmed.ncbi.nlm.nih.gov/21930515/)
+
+- In this case, PSA simulations obtained from a full Bayesian model, but could be done in a spreadsheet and imported into `R`
+]
+
+.panel[
+.panel-name[Show. Me. The. Data]
+`r vspace("-10px")`
+```{r howwork4,eval=FALSE}
+# Creates a matrix with the underlying model simulations
+inp = CreateInputs(vaccine, `print.lincom=FALSE`)           `# NB: this option will be slightly different in 2.4-1!`
+# Visualise the output
+inp$mat `%>% as_tibble()`                                   `# "piping" ('%>%') and formatting nicely`
+```
+
+```{r howwork5,echo=FALSE,R.options=list(width=160)}
+inp$mat %>% as_tibble()
+```
+]
+
+.panel[
+.panel-name[Economic model]
+
+```{r howwork6,eval=FALSE}
+# Defines the number of simulations considered
+n.sims=`inp$mat %>% nrow()`       `# applies the function 'nrow' (number of rows) to the object 'inp$mat'`
+
+                                `# NB: in R 4.1.0, can also use 'native' pipe ('|>')`
+                                `# (probably a bit quicker, but in most cases, may be immaterial...)`
+
+# Aggregates the model inputs to compute (e,c)
+QALYs.inf = QALYs.pne <- QALYs.hosp <- QALYs.adv <- QALYs.death <- matrix(0,n.sims,2)
+for (t in 1:2) {
+  QALYs.inf[,t] = ((Infected[,t,1] + Infected[,t,2])*omega[,1]/365)/N
+  QALYs.pne[,t] = ((Pneumonia[,t,1] + Pneumonia[,t,2])*omega[,4]/365)/N
+  QALYs.hosp[,t] = ((Hospital[,t,1] + Hospital[,t,2])*omega[,5]/365)/N
+  QALYs.death[,t] = ((Death[,t,1] + Death[,t,2])*omega[,6])/N
+}
+QALYs.adv[,2] = (Adverse.events*omega[,7]/365)/N
+e = -(QALYs.inf + QALYs.pne + QALYs.adv + QALYs.hosp + QALYs.death) + ...
+```
+
+`r vspace("40px")`
+- NB: The data stored in the `Vaccine` object (built-in in `BCEA`) already contains the objects `e,c` that can be used to run the decision analysis...
+
+- So, this step is actually not needed (but documented in `r icon::fontawesome("book-open")` [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/))
+]
+
+.panel[
+.panel-name[Cost & effects]
+```{r howwork7,eval=FALSE}
+cbind(e,c) %>% as_tibble(`.name_repair="universal"`)     `# ensures that the columns are named` 
+```
+```{r howwork8,echo=FALSE}
+cbind(e,c) %>% as_tibble(.name_repair="universal")
+```
+
+`r vspace("40px")`
+
+- These calculations *can* be done also in a spreadsheet (nothing more than algebra, **once you have the simulations**)
+]
+]
+
+---
+
+count: false
+# How does `BCEA` work?
+
+- At this point, we are ready to call the function `bcea` that runs the economic analysis, for example something like 
+
+```{r howwork9}
+treats = c("Status quo","Vaccination")
+m = bcea(e=e,c=c,ref=2,interventions=treats,Kmax=50000)
+```
+
+- The inputs to the function are
+   - `e`: a **matrix** containing the simulations for the clinical benefits (that is $n_{\rm{sim}}\times n_{\rm{int}}$ values)
+   - `c`: a **matrix** containing the simulations for the costs (that is $n_{\rm{sim}}\times n_{\rm{int}}$ values)
+   -  `ref`: an indication of which intervention is to be taken as reference (default: the intervention in the first column of `e` or `c`)
+   - `interventions`: a vector of labels for the interventions being compared 
+   - `Kmax`: the maximum value of $k$, the parameter of willingness to pay
+
+
+--
+
+
+- The output is an object `m` containing several elements
+```{r howwork10, R.options=list(width=100)}
+names(m)
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+Can visualise the output in various formats (tables/graphs)
+
+```{r howwork11}
+# The 'summary' "method" produces a tabular output
+summary(m)
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+Can visualise the output in various formats (tables/graphs)
+
+```{r howwork12,opts=list(title="",width="40%")}
+# The 'plot' "method" produces a *specific* version of graphical output
+plot(m)
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+```{r howwork13,opts=list(title="",width="45%")}
+ceplane.plot(m,wtp=20000,xlim=c(-.002,.002),ylim=c(-10,20))
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+```{r howwork14a,eval=FALSE}
+# Using 'ggplot', you can go crazy with customisation...
+ceplane.plot(m,wtp=10000,`graph="gg"`,point_colors="blue",point_sizes=.8,area_color="springgreen3")
+
+```
+
+```{r howwork14,opts=list(title="",width="45%"),echo=FALSE}
+# Using 'ggplot', you can go crazy with customisation...
+ceplane.plot(m,wtp=10000,graph="gg",point_colors="blue",point_sizes=.8,area_color="springgreen3")
+```
+
+`r vspace("-40px")`
+.small[`r icon::fontawesome("firefox")` [https://ggplot2.tidyverse.org/](https://ggplot2.tidyverse.org/)]
+
+---
+
+count: false
+# How does `BCEA` work?
+
+```{r howwork15,opts=list(title="",width="45%")}
+# Plots the Cost-Effectiveness Acceptability Curve
+ceac.plot(m)
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+```{r howwork16,opts=list(title="",width="45%")}
+# Plots the Expected Value of Partial Information (EVPI)
+evi.plot(m)
+```
+
+---
+
+# Specialised plots
+
+- Can generate a *contour* plot of the cost-effectiveness plane and estimate the proportion of points in each quadrant
+
+.left-column[
+```{r howwork17,opts=list(title="",width="45%"),eval=FALSE}
+# "Basic" contourplot
+contour(m)
+```
+]
+
+.right-column[
+```{r howwork18,opts=list(title="",width="65%"),echo=FALSE}
+# "Basic" contourplot
+contour(m)
+```
+]
+
+---
+
+count: false
+# Specialised plots
+
+- The specialised function `contour2` also shows the **sustainability area**
+
+.pull-left[
+```{r howwork19,opts=list(title="",width="80%")}
+contour2(m)
+```
+]
+
+.pull-right[
+`r vspace("-0px")`
+```{r howwork20,opts=list(title="",width="80%")}
+contour2(m,wtp=100)
+```
+]
+---
+
+count: false
+# Specialised plots
+### Cost-effectiveness efficiency frontier
+
+.pull-left[
+```{r howwork20bis,opts=list(title="",width="80%")}
+ceef.plot(m,print.plot=FALSE)
+```
+]
+
+.pull-right[
+`r vspace("-0px")`
+```{r howwork20tris,opts=list(title="",width="80%")}
+ceef.plot(m,print.summary=FALSE)
+```
+]
+
+---
+
+exclude: TRUE
+# Exporting graphical output
+
+- `R` has excellent graphical facilities and the graphs produced by `BCEA` can be easily exported to many different formats
+
+```{r howwork21,eval=FALSE}
+# "Opens" the graphical device
+pdf("NAME_OF_THE_FILE",width=`8`,height=`8`)      `# for 'pdf', units are in inches`
+# Makes the plot
+ceplane.plot(`BCEA_OBJECT`)                     `# of course, specify whatever name you've chosen when creating the object...`
+# "Closes" the graphical device
+dev.off()
+
+
+# "Open" the graphical device"
+jpeg("NAME_OF_FILE.jpg",width=`480`,height=`480`)  `# for 'jpeg' units are in px`
+# Makes the plot
+ceplane.plot(BCEA_OBJECT)
+# "Closes" the graphical device
+dev.off()
+```
+
+
+`r vspace("30px")`
+**NB**: `Rstudio` and [`rmarkdown`](https://rmarkdown.rstudio.com/) can do even more &ndash; that's for another time...
+---
+
+exclude: TRUE
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+```{r depression1,echo=FALSE}
+n.samples<-1000 
+
+# Number and names of treatments
+n.treat<-3
+t.names<-c("No treatment","CBT","Antidepressant")
+
+# Over a 30 year time horizon
+# Costs for recovery, relapse, and no recovery
+c.rec<-rnorm(n=n.samples, mean=1000, sd=50)
+c.rel<-rnorm(n=n.samples, mean=2000, sd=100)
+c.norec<-rnorm(n=n.samples, mean=2500, sd=125)
+# Over a 30 year time horizon
+# QALYs for recovery, relapse, and no recovery
+q.rec<-rnorm(n=n.samples, mean=26, sd=2)
+q.rel<-rnorm(n=n.samples, mean=23, sd=3)
+q.norec<-rnorm(n=n.samples, mean=20, sd=4)
+
+# Probabilities of recovery and relapse following recover
+p.rec<-p.rel<-matrix(nrow=n.samples, ncol=n.treat)
+
+# Probabilities for no treatment
+p.rec[,1]<-rbeta(n=n.samples, shape1=6, shape2=200)
+p.rel[,1]<-rbeta(n=n.samples, shape1=2, shape2=100)
+
+# Probabilities for CBT
+# Probability of recovery higher than on no treatment
+p.rec[,2]<-rbeta(n=n.samples, shape1=6, shape2=130)
+# Probability of relapse lower than on no treatment
+p.rel[,2]<-rbeta(n=n.samples, shape1=2, shape2=200)
+
+# Probabilities for antidepressant
+# Probability of recovery lower than no treatment or CBT
+p.rec[,3]<-rbeta(n=n.samples, shape1=6, shape2=120)
+# Probability relase lower than no treatment, higher than CBT
+p.rel[,3]<-rbeta(n=n.samples, shape1=2, shape2=120)
+# Cost of treatment 
+c.treat<-t(matrix(rep(c(0,300,30),n.samples),ncol=n.samples,nrow=3))
+# Total cost and effects 
+costs<-c.treat+p.rec*(1-p.rel)*c.rec+p.rec*p.rel*c.rel+(1-p.rec)*c.norec
+effects<-p.rec*(1-p.rel)*q.rec+p.rec*p.rel*q.rel+(1-p.rec)*q.norec
+```
+
+- Fictional model comparing antidepressants to cognitive behaviour therapy (CBT) and no treatment in people with depression
+
+- Statistical modelling based on evidence synthesis
+   - Benefits: based on QALYs
+   - Costs: associated with treatments and various resources use
+   
+- Economic modelling: two matrices with relevant population summaries
+   - `effects`
+   - `costs`
+   
+`r vspace("30px")`
+- NB: The details of the actual modelling are *not* important for the purposes of demonstrating the example...
+   
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+```{r depression2,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="60%"),eval=FALSE}
+# Intervention labels
+t.names<-c("No treatment","CBT","Antidepressant")
+
+# "Standard" analysis: pairwise comparisons
+depression.bcea = bcea(effects,costs,
+                       interventions=t.names,`ref=3`)  
+# `the third intervention is the reference`
+
+# Plots the results
+plot(depression.bcea)
+```
+]
+.pull-right[
+```{r depression3,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="90%"),echo=FALSE}
+# Intervention labels
+t.names<-c("No treatment","CBT","Antidepressant")
+
+# "Standard" analysis: pairwise comparisons
+depression.bcea = bcea(effects,costs,interventions=t.names,ref=3)
+
+# Plots the results
+plot(depression.bcea)
+```
+
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+```{r depression4,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="60%"),eval=FALSE}
+# For `multiple treatment comparison`
+depression.multi.ce = `multi.ce`(depression.bcea)
+
+# `Specialised plot method `
+ `mce.plot`(
+   depression.multi.ce, pos=c(1,0.8),
+   graph=c("base","ggplot2")
+)
+```
+]
+.pull-right[
+```{r depression5,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="90%"),echo=FALSE}
+depression.multi.ce = multi.ce(depression.bcea)
+mce.plot(depression.multi.ce,pos=c(1,0.8),graph=c("base","ggplot2"))
+```
+
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+`r vspace("20px")`
+- Can use `ggplot` to customise the graph 
+```{r depression6,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="60%"),eval=FALSE}
+mce.plot(
+   depression.multi.ce,pos=c(1,1),
+   graph="ggplot2"
+) + ggplot2::stat_summary(
+   fun=max, geom="line",
+   colour="grey25", 
+   alpha=.3, lwd=2.5
+)
+```
+]
+.pull-right[
+```{r depression7,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="90%"),echo=FALSE}
+mce.plot(depression.multi.ce,pos=c(1,1),graph="ggplot2") + 
+  ggplot2::stat_summary(fun=max, geom="line", colour="grey25", alpha=.3, lwd=2.5)
+```
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+`r vspace("20px")`
+- Can use a specialised plotting method for the *cost-effectiveness acceptability **frontier***
+```{r depression8,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="60%"),eval=FALSE}
+# Specialised plot
+ceaf.plot(depression.multi.ce)
+```
+]
+.pull-right[
+```{r depression9,fig.width=8,fig.height=8,fig.align='center',message=FALSE,warning=FALSE,opts=list(width="90%"),echo=FALSE}
+ceaf.plot(depression.multi.ce)
+```
+]
+
+---
+
+# `BCEAweb`
+
+-  Inspired by similar projects &ndash; eg [SAVI](http://savi.shef.ac.uk/SAVI/)
+
+- Create a web interface to use BCEA without even opening R (or even having it installed on your computer!)
+`r vspace("40px")`
+
+--
+
+- Typical work flow
+   1. Design the economic model (eg Markov model, decision tree, ...)
+   2. Run the statistical analysis to estimate the quantities of interest (eg survival analysis, evidence synthesis, ...)
+   3. Run the economic model and obtain "PSA samples"     
+
+--
+`r vspace("40px")`
+  
+   4. Upload "PSA samples", including values for $(e,c)$ to `BCEAweb`
+   5. Use `BCEA` in the background to do **all** the economic analysis
+   6. Create reports that can be used as the basis for papers, reimbursement files, ...
+
+
+---
+
+count: false
+# `BCEAweb`
+
+```{r eval=FALSE}
+# Creates a matrix with the underlying model simulations
+inp = CreateInputs(vaccine, print.lincom=FALSE)
+
+# Runs BCEAweb
+BCEAweb(e=e,                 # matrix of simulations for the effectiveness
+        c=c,                 # matrix of simulations for the costs
+        parameters=inp$mat   # matrix of simulations for all the model parameters
+       )
+```
+
+`r vspace("30px")`
+
+- `BCEAweb` exists as a standalone webapp
+   
+   - Can access it `r icon::fontawesome("firefox")`  [here](https://egon.stats.ucl.ac.uk/projects/BCEAweb/) 
+   
+- **Or**, you can launch your own "local" version from the `BCEA` package (as in the code above)!
+   
+   - This will launch a web page from which you can manipulate your output (`r icon::fontawesome("arrow-circle-right")` Live Demo)
+
+---
+class: thankyou-michelle 

@@ -54,7 +54,7 @@ knitr::opts_chunk$set(prompt=FALSE)
 #tmp_lib="~/Dropbox/HE/Ispor/Workshop_Modelling_R/BCEA/tmp"
 #dir.create(tmp_lib)
 #install.packages("BCEA",lib=tmp_lib)
-tmp_lib="~/Dropbox/HE/Ispor/Workshop_Modelling_R/BCEA/tmp"
+tmp_lib="~/Dropbox/HE/Ispor/Workshop_Modelling_R/BCEA_talk/tmp"
 ```
 
 class: title-slide

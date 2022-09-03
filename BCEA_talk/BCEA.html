@@ -294,24 +294,20 @@ inp$mat `%&gt;% as_tibble()`                                   `# "piping" ('%&g
 
 ```
 # A tibble: 1,000 x 56
-   Adverse.events Death.1.1. Death.2.1. Death.2.2. GP.1.1. GP.2.1. GP.2.2. Hospital.1.1. Hospital.2.1. Hospital.2.2. Infected.1.1. Infected.2.1.
-            &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;
- 1           1466          1          0          0    1664     958     230             0             1             0          5992          3401
- 2           5329          1          1          0    1414     748     276             0             0             1          7471          4024
- 3           5203          1          1          0     809     489      80             0             0             0          6718          4300
- 4           2351          2          0          0    1761    1157     261             1             0             0          4837          3269
- 5           8303          1          2          0    2472     964     432             1             1             0          4749          1894
- 6           3607          1          1          0    2224    1342     260             1             0             0          4938          2976
- 7           6304          4          1          1    3478    1107     591             2             1             0         11080          3547
- 8           4337          1          1          1    1483     799     189             0             0             0          3867          2164
- 9           5482          0          0          0    1587     798     279             0             0             0          5163          2532
-10           3125          2          2          0    2578    1681     243             0             0             0          7265          4766
-# … with 990 more rows, and 44 more variables: Infected.2.2. &lt;dbl&gt;, Mild.Compl.1.1. &lt;dbl&gt;, Mild.Compl.2.1. &lt;dbl&gt;, Mild.Compl.2.2. &lt;dbl&gt;,
-#   Pneumonia.1.1. &lt;dbl&gt;, Pneumonia.2.1. &lt;dbl&gt;, Pneumonia.2.2. &lt;dbl&gt;, Trt.1.1.1. &lt;dbl&gt;, Trt.2.1.1. &lt;dbl&gt;, Trt.1.2.1. &lt;dbl&gt;, Trt.2.2.1. &lt;dbl&gt;,
-#   Trt.1.2.2. &lt;dbl&gt;, Trt.2.2.2. &lt;dbl&gt;, beta.1. &lt;dbl&gt;, beta.2. &lt;dbl&gt;, beta.3. &lt;dbl&gt;, beta.4. &lt;dbl&gt;, beta.5. &lt;dbl&gt;, beta.6. &lt;dbl&gt;, beta.7. &lt;dbl&gt;,
-#   delta &lt;dbl&gt;, eta &lt;dbl&gt;, gamma.1. &lt;dbl&gt;, gamma.2. &lt;dbl&gt;, lambda &lt;dbl&gt;, n.1.2. &lt;dbl&gt;, n.2.2. &lt;dbl&gt;, phi &lt;dbl&gt;, pi.1.2. &lt;dbl&gt;, psi.1. &lt;dbl&gt;,
-#   psi.2. &lt;dbl&gt;, psi.3. &lt;dbl&gt;, psi.4. &lt;dbl&gt;, psi.5. &lt;dbl&gt;, psi.6. &lt;dbl&gt;, psi.7. &lt;dbl&gt;, psi.8. &lt;dbl&gt;, q.1. &lt;dbl&gt;, q.4. &lt;dbl&gt;, q.5. &lt;dbl&gt;, q.6. &lt;dbl&gt;,
-#   q.7. &lt;dbl&gt;, rho.2. &lt;dbl&gt;, xi &lt;dbl&gt;
+   Adverse.events Death.1.1. Death.2.1. Death.2.2. GP.1.1. GP.2.1. GP.2.2. Hospital.1.1. Hospital.2.1. Hospital.2.2. Infected.1.1. Infected.2.1. Infected.2.2. Mild.Compl.1.1. Mild.Compl.2.1. Mild.Compl.2.2. Pneumonia.1.1. Pneumonia.2.1. Pneumonia.2.2. Trt.1.1.1. Trt.2.1.1. Trt.1.2.1. Trt.2.2.1.
+            &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+ 1           1466          1          0          0    1664     958     230             0             1             0          5992          3401           876             691             405             102             18             15              5        714        565        411        330
+ 2           5329          1          1          0    1414     748     276             0             0             1          7471          4024          1536             570             308             112             12             15              3        588        463        322        255
+ 3           5203          1          1          0     809     489      80             0             0             0          6718          4300           788             332             214              40             10              2              4        345        266        211        174
+ 4           2351          2          0          0    1761    1157     261             1             0             0          4837          3269           702             739             479             109             19             17              5        735        609        505        395
+ 5           8303          1          2          0    2472     964     432             1             1             0          4749          1894           846            1049             425             177             25             11              2       1048        838        427        337
+ 6           3607          1          1          0    2224    1342     260             1             0             0          4938          2976           596             915             560             100             35             21              2        962        720        575        455
+ 7           6304          4          1          1    3478    1107     591             2             1             0         11080          3547          2045            1505             482             247             66             19             10       1437       1258        449        388
+ 8           4337          1          1          1    1483     799     189             0             0             0          3867          2164           525             622             333              65             22              7              3        630        501        351        259
+ 9           5482          0          0          0    1587     798     279             0             0             0          5163          2532           910             675             332             115             25             11              4        697        535        338        269
+10           3125          2          2          0    2578    1681     243             0             0             0          7265          4766           700            1063             711             102             41             17              3       1082        864        699        577
+# … with 990 more rows, and 33 more variables: Trt.1.2.2. &lt;dbl&gt;, Trt.2.2.2. &lt;dbl&gt;, beta.1. &lt;dbl&gt;, beta.2. &lt;dbl&gt;, beta.3. &lt;dbl&gt;, beta.4. &lt;dbl&gt;, beta.5. &lt;dbl&gt;, beta.6. &lt;dbl&gt;, beta.7. &lt;dbl&gt;, delta &lt;dbl&gt;, eta &lt;dbl&gt;, gamma.1. &lt;dbl&gt;, gamma.2. &lt;dbl&gt;, lambda &lt;dbl&gt;, n.1.2. &lt;dbl&gt;, n.2.2. &lt;dbl&gt;, phi &lt;dbl&gt;,
+#   pi.1.2. &lt;dbl&gt;, psi.1. &lt;dbl&gt;, psi.2. &lt;dbl&gt;, psi.3. &lt;dbl&gt;, psi.4. &lt;dbl&gt;, psi.5. &lt;dbl&gt;, psi.6. &lt;dbl&gt;, psi.7. &lt;dbl&gt;, psi.8. &lt;dbl&gt;, q.1. &lt;dbl&gt;, q.4. &lt;dbl&gt;, q.5. &lt;dbl&gt;, q.6. &lt;dbl&gt;, q.7. &lt;dbl&gt;, rho.2. &lt;dbl&gt;, xi &lt;dbl&gt;
 ```
 ]
 
@@ -405,8 +401,7 @@ names(m)
 ```
 
 ```
- [1] "n.sim"         "n.comparators" "n.comparisons" "delta.e"       "delta.c"       "ICER"          "Kmax"          "k"             "ceac"         
-[10] "ib"            "eib"           "kstar"         "best"          "U"             "vi"            "Ustar"         "ol"            "evi"          
+ [1] "n.sim"         "n.comparators" "n.comparisons" "delta.e"       "delta.c"       "ICER"          "Kmax"          "k"             "ceac"          "ib"            "eib"           "kstar"         "best"          "U"             "vi"            "Ustar"         "ol"            "evi"          
 [19] "interventions" "ref"           "comp"          "step"          "e"             "c"            
 ```
 

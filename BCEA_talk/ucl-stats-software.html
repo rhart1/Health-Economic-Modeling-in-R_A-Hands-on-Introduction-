@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Working with the R package BCEA</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gianluca Baio" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <script src="libs/freezeframe/freezeframe.min.js"></script>
+    <script src="libs/xaringanExtra-freezeframe/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <!-- (Re)Defines a bunch of LaTeX commands that can then be used directly in the .Rmd file as '\command{...}' -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        /* This enables color macros */
+        extensions: ["color.js"],
+        Macros: {
+          /* Probability & mathematical symbols */
+          Pr: "{\\style{font-family:inherit; font-size: 110%;}{\\text{Pr}}}",
+          exp: "{\\style{font-family:inherit; font-size: 105%;}{\\text{exp}}}",
+          log: "{\\style{font-family:inherit; font-size: 105%;}{\\text{log}}}",
+          ln: "{\\style{font-family:inherit; font-size: 105%;}{\\text{ln}}}",
+          logit: "{\\style{font-family:inherit; font-size: 100%;}{\\text{logit}}}",
+          HR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{HR}}}",
+          OR: "{\\style{font-family:inherit; font-size: 105%;}{\\text{OR}}}",
+          E: "{\\style{font-family:inherit; font-size: 105%;}{\\text{E}}}",
+          Var: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Var}}}",
+          Cov: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Cov}}}",
+          Corr: "{\\style{font-family:inherit; font-size: 105%;}{\\text{Corr}}}",
+          DIC: "{\\style{font-family:inherit; font-size: 105%;}{\\text{DIC}}}",
+          se: "{\\style{font-family:inherit; font-size: 100%;}{\\text{se}}}",
+          sd: "{\\style{font-family:inherit; font-size: 100%;}{\\text{sd}}}",
+          /* Distributions */
+          dnorm: "{\\style{font-family:inherit;}{\\text{Normal}}}",
+          dt: "{\\style{font-family:inherit;}{\\text{t}}}",
+          ddirch: "{\\style{font-family:inherit;}{\\text{Dirichlet}}}",
+          dmulti: "{\\style{font-family:inherit;}{\\text{Multinomial}}}",
+          dbeta: "{\\style{font-family:inherit;}{\\text{Beta}}}",
+          dgamma: "{\\style{font-family:inherit;}{\\text{Gamma}}}",
+          dbern: "{\\style{font-family:inherit;}{\\text{Bernoulli}}}",
+          dbin: "{\\style{font-family:inherit;}{\\text{Binomial}}}",
+          dpois: "{\\style{font-family:inherit;}{\\text{Poisson}}}",
+          dweib: "{\\style{font-family:inherit;}{\\text{Weibull}}}",
+          dexp: "{\\style{font-family:inherit;}{\\text{Exponential}}}",
+          dlnorm: "{\\style{font-family:inherit;}{\\text{logNormal}}}",
+          dunif: "{\\style{font-family:inherit;}{\\text{Uniform}}}",
+          /* LaTeX formatting */
+          bm: ["{\\boldsymbol #1}",1],
+          /* These create macros to typeset numbers in maths with the basic font */
+          0: "{\\style{font-family:inherit; font-size: 105%;}{\\text{0}}}",
+          1: "{\\style{font-family:inherit; font-size: 105%;}{\\text{1}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{2}}}",
+          3: "{\\style{font-family:inherit; font-size: 105%;}{\\text{3}}}",
+          4: "{\\style{font-family:inherit; font-size: 105%;}{\\text{4}}}",
+          5: "{\\style{font-family:inherit; font-size: 105%;}{\\text{5}}}",
+          6: "{\\style{font-family:inherit; font-size: 105%;}{\\text{6}}}",
+          7: "{\\style{font-family:inherit; font-size: 105%;}{\\text{7}}}",
+          8: "{\\style{font-family:inherit; font-size: 105%;}{\\text{8}}}",
+          9: "{\\style{font-family:inherit; font-size: 105%;}{\\text{9}}}",
+          /* Health economics quantities */
+          icer: "{\\style{font-family:inherit; font-size: 100%;}{\\text{ICER}}}",
+          nb: "{\\style{font-family:inherit; font-size: 100%;}{\\text{NB}}}",
+          ol: "{\\style{font-family:inherit; font-size: 100%;}{\\text{OL}}}",
+          ceac: "{\\style{font-family:inherit; font-size: 100%;}{\\text{CEAC}}}",
+          evpi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPI}}}",
+          evppi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVPPI}}}",
+          evsi: "{\\style{font-family:inherit; font-size: 100%;}{\\text{EVSI}}}"
+        }
+      }
+    });
+    </script>
+    <link rel="stylesheet" href="assets/ucl-stats.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide
+
+# Working with the R package BCEA&lt;span style="display:block; margin-top: 10px ;"&gt;&lt;/span&gt; 
+
+## Gianluca Baio
+
+### [Department of Statistical Science](https://www.ucl.ac.uk/statistics/) | University College London    
+
+.title-small[
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:#00acee;height:0.8em;"&gt;  [ comment ]  &lt;path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"&gt;&lt;/path&gt;&lt;/svg&gt;  [g.baio@ucl.ac.uk](mailto:g.baio@ucl.ac.uk)
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:#EA7600;height:0.8em;"&gt;  [ comment ]  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;&lt;/svg&gt;  [https://gianluca.statistica.it](https://gianluca.statistica.it)
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:#EA7600;height:0.8em;"&gt;  [ comment ]  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;&lt;/svg&gt;  [https://egon.stats.ucl.ac.uk/research/statistics-health-economics/](https://egon.stats.ucl.ac.uk/research/statistics-health-economics/)
+&lt;svg viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:black;height:0.8em;"&gt;  [ comment ]  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt;  [https://github.com/giabaio](https://github.com/giabaio)
+&lt;svg viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:black;height:0.8em;"&gt;  [ comment ]  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt;  [https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:#00acee;height:0.8em;"&gt;  [ comment ]  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;&lt;/svg&gt;  [@gianlubaio](https://twitter.com/gianlubaio)
+]
+
+### UCL statistical software writers workshop, Internetville 
+&lt;!-- Can also separate the various components of the extra argument 'params', eg as in 
+### UCL statistical software writers workshop, UCL stats software workshop, Internetville, HTA and BCEA, 7 February 2022
+--&gt;
+
+7 February 2022
+
+.logo-stats[]
+
+&lt;!-- This adds a footer (optional and with other possibilities...) 
+.footer-left[ 
+&lt;span style="position: relative; bottom: 0px; color: #D5D5D5;"&gt; &amp;nbsp; &amp;copy; Gianluca Baio (UCL)&lt;/span&gt;
+]
+--&gt;
+
+&lt;p style="position: absolute; top:75%; left:2.5%; font-family: Nanum Pen Script; font-size:85%; text-decoration: none; color: #000; background: #ffc; display: block; height:6.3em; width:6.3em; padding: .5em; box-shadow: 5px 5px 7px rgba(33,33,33,.7); transform: rotate(-8deg); border-bottom-right-radius: 60px 5px;"&gt;Check out our departmental podcast "Random Talks" on Soundcloud!&amp;nbsp;&lt;a href="https://soundcloud.com/uclsound/sets/sample-space"; title="Random Talks"&gt;&lt;svg viewBox="0 0 640 512" style="position:relative;display:inline-block;top:.1em;fill:#FE5000;height:0.8em;bottom:1em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M111.4 256.3l5.8 65-5.8 68.3c-.3 2.5-2.2 4.4-4.4 4.4s-4.2-1.9-4.2-4.4l-5.6-68.3 5.6-65c0-2.2 1.9-4.2 4.2-4.2 2.2 0 4.1 2 4.4 4.2zm21.4-45.6c-2.8 0-4.7 2.2-5 5l-5 105.6 5 68.3c.3 2.8 2.2 5 5 5 2.5 0 4.7-2.2 4.7-5l5.8-68.3-5.8-105.6c0-2.8-2.2-5-4.7-5zm25.5-24.1c-3.1 0-5.3 2.2-5.6 5.3l-4.4 130 4.4 67.8c.3 3.1 2.5 5.3 5.6 5.3 2.8 0 5.3-2.2 5.3-5.3l5.3-67.8-5.3-130c0-3.1-2.5-5.3-5.3-5.3zM7.2 283.2c-1.4 0-2.2 1.1-2.5 2.5L0 321.3l4.7 35c.3 1.4 1.1 2.5 2.5 2.5s2.2-1.1 2.5-2.5l5.6-35-5.6-35.6c-.3-1.4-1.1-2.5-2.5-2.5zm23.6-21.9c-1.4 0-2.5 1.1-2.5 2.5l-6.4 57.5 6.4 56.1c0 1.7 1.1 2.8 2.5 2.8s2.5-1.1 2.8-2.5l7.2-56.4-7.2-57.5c-.3-1.4-1.4-2.5-2.8-2.5zm25.3-11.4c-1.7 0-3.1 1.4-3.3 3.3L47 321.3l5.8 65.8c.3 1.7 1.7 3.1 3.3 3.1 1.7 0 3.1-1.4 3.1-3.1l6.9-65.8-6.9-68.1c0-1.9-1.4-3.3-3.1-3.3zm25.3-2.2c-1.9 0-3.6 1.4-3.6 3.6l-5.8 70 5.8 67.8c0 2.2 1.7 3.6 3.6 3.6s3.6-1.4 3.9-3.6l6.4-67.8-6.4-70c-.3-2.2-2-3.6-3.9-3.6zm241.4-110.9c-1.1-.8-2.8-1.4-4.2-1.4-2.2 0-4.2.8-5.6 1.9-1.9 1.7-3.1 4.2-3.3 6.7v.8l-3.3 176.7 1.7 32.5 1.7 31.7c.3 4.7 4.2 8.6 8.9 8.6s8.6-3.9 8.6-8.6l3.9-64.2-3.9-177.5c-.4-3-2-5.8-4.5-7.2zm-26.7 15.3c-1.4-.8-2.8-1.4-4.4-1.4s-3.1.6-4.4 1.4c-2.2 1.4-3.6 3.9-3.6 6.7l-.3 1.7-2.8 160.8s0 .3 3.1 65.6v.3c0 1.7.6 3.3 1.7 4.7 1.7 1.9 3.9 3.1 6.4 3.1 2.2 0 4.2-1.1 5.6-2.5 1.7-1.4 2.5-3.3 2.5-5.6l.3-6.7 3.1-58.6-3.3-162.8c-.3-2.8-1.7-5.3-3.9-6.7zm-111.4 22.5c-3.1 0-5.8 2.8-5.8 6.1l-4.4 140.6 4.4 67.2c.3 3.3 2.8 5.8 5.8 5.8 3.3 0 5.8-2.5 6.1-5.8l5-67.2-5-140.6c-.2-3.3-2.7-6.1-6.1-6.1zm376.7 62.8c-10.8 0-21.1 2.2-30.6 6.1-6.4-70.8-65.8-126.4-138.3-126.4-17.8 0-35 3.3-50.3 9.4-6.1 2.2-7.8 4.4-7.8 9.2v249.7c0 5 3.9 8.6 8.6 9.2h218.3c43.3 0 78.6-35 78.6-78.3.1-43.6-35.2-78.9-78.5-78.9zm-296.7-60.3c-4.2 0-7.5 3.3-7.8 7.8l-3.3 136.7 3.3 65.6c.3 4.2 3.6 7.5 7.8 7.5 4.2 0 7.5-3.3 7.5-7.5l3.9-65.6-3.9-136.7c-.3-4.5-3.3-7.8-7.5-7.8zm-53.6-7.8c-3.3 0-6.4 3.1-6.4 6.7l-3.9 145.3 3.9 66.9c.3 3.6 3.1 6.4 6.4 6.4 3.6 0 6.4-2.8 6.7-6.4l4.4-66.9-4.4-145.3c-.3-3.6-3.1-6.7-6.7-6.7zm26.7 3.4c-3.9 0-6.9 3.1-6.9 6.9L227 321.3l3.9 66.4c.3 3.9 3.1 6.9 6.9 6.9s6.9-3.1 6.9-6.9l4.2-66.4-4.2-141.7c0-3.9-3-6.9-6.9-6.9z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp;&lt;/p&gt;
+
+
+&lt;p style="position: absolute; top:53%; left:6.5%; font-family: Nanum Pen Script; font-size:85%; text-decoration: none; color: #000; background: #ffc; display: block; height:6.2em; width:6.2em; padding: .5em; box-shadow: 5px 5px 7px rgba(33,33,33,.7); transform: rotate(6deg); border-bottom-right-radius: 60px 5px;"&gt;Follow our departmental social media accounts&amp;nbsp;&lt;a href="https://twitter.com/stats_ucl"; title="@stats_UCL"&gt;&lt;svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:#00acee;height:0.8em;bottom:1em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://www.linkedin.com/in/statistical-science-ucl-906b9a201"; title="LinkedIn"&gt;&lt;svg viewBox="0 0 448 512" style="position:relative;display:inline-block;top:.1em;fill:#2867b2;height:0.8em;bottom:1em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://www.instagram.com/ucl.stats/"; title="Instagram"&gt;&lt;svg viewBox="0 0 448 512" style="position:relative;display:inline-block;top:.1em;fill:#2867b2;height:0.8em;bottom:1em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp;&lt;/p&gt;
+
+---
+
+layout: true  
+
+.my-footer[ 
+.alignleft[ 
+&amp;nbsp; &amp;copy; Gianluca Baio (UCL) | &amp;nbsp;&lt;a href="https://twitter.com/giabaio"; title="Follow me on Twitter"&gt;&lt;svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:#bcc0c4;height:0.8em;bottom:1em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp; &amp;nbsp;&lt;a href="https://github.com/giabaio"; title="Check out my repos"&gt;&lt;svg viewBox="0 0 496 512" style="position:relative;display:inline-block;top:.1em;fill:#bcc0c4;height:0.8em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp; &amp;nbsp;&lt;a href="mailto:g.baio@ucl.ac.uk"; title="Email me"&gt;&lt;svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:#bcc0c4;height:0.8em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp; &amp;nbsp;&lt;a href="https://gianluca.statistica.it"; title="Visit my website"&gt;&lt;svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:#bcc0c4;height:0.8em;" xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;
+&lt;/svg&gt;&lt;/a&gt;&amp;nbsp; 
+]
+.aligncenter[
+HTA and BCEA 
+]
+.alignright[
+UCL stats software workshop,  7 Feb 2022
+]
+] 
+
+---
+
+# `BCEA` 
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+### What is `BCEA` not?
+
+- `BCEA` is **not** a package to automatically run a Bayesian analysis
+   - It cannot build the health economic model for you
+   - It does not prepare the data to be used in the model
+   - It does not automatically run the MCMC simulations
+   - It does not choose the prior distributions for you
+
+--
+
+### So what *is* it then?
+
+- `BCEA`  provides a set of specific functions to systematically post-process the output of a Bayesian health economic model
+
+- Uses `R` [http://cran.r-project.org/](http://cran.r-project.org/)
+   -  Very good at interacting with standard MCMC software
+   - `BUGS`: [www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml](www.mrc-bsu.cam.ac.uk/bugs/winbugs/contents.shtml)
+   - `JAGS`: [www.mcmc-jags.sourceforge.net/](www.mcmc-jags.sourceforge.net/)    
+   - `rstan`: [https://mc-stan.org/users/interfaces/rstan](https://mc-stan.org/users/interfaces/rstan)
+   - .red[**Free**] and there is a very large community of contributors
+   - Specifically designed for statistical analysis and has very good graphical capabilities
+
+---
+
+# `BCEA`
+
+## A `R` package for (Bayesian) cost-effectiveness analysis
+
+### `BCEA` and its use directly in `R` are designed with these objectives in mind
+
+1. Checking the model assumptions
+
+   - Do we mean what we mean (eg in terms of PSA simulations)?...
+   - Simulation error (especially, **but not only**, for a Bayesian approach)
+
+--
+
+2. Produce the base-case economic evaluation
+   - What’s the most cost-effective intervention, given current evidence?
+   - Cost-effectiveness plane, Expected Incremental Benefit (as a function of `\(k\)`),...
+
+--
+ 
+3. Perform uncertainty analysis
+   - Standard PSA (mandatory): Cost-effectiveness Plane, CEAC, ...
+   - Fairly easy (but not always used): CEAF
+   - More advanced/"too difficult" (rarely used): EVP(P)I/EVSI
+
+--
+
+4. Standardised reporting
+   - Graphical tools (use **excellent** `R` facilities)
+
+    
+---
+
+count: false
+
+# `BCEA` 
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+
+
+&lt;center&gt;&lt;img src=./img/bcea_scheme-1.png width='65%' title=''&gt;&lt;/center&gt;
+
+&lt;span style="display:block; margin-top: -50px ;"&gt;&lt;/span&gt;
+ 
+.small[
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;&lt;/svg&gt; [www.statistica.it/gianluca/BCEA](www.statistica.it/gianluca/BCEA)     
+&lt;svg viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg" style="position:relative;display:inline-block;top:.1em;fill:black;height:0.8em;"&gt;  [ comment ]  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt;  [https://github.com/giabaio/BCEA](https://github.com/giabaio/BCEA)
+]
+
+---
+
+# How does `BCEA` work?
+
+.panelset[
+.panel[
+.panel-name[Installation]
+- `BCEA` is available from [CRAN](https://cran.r-project.org/)
+   - Current *stable* version: 2.3-1.1 (26 August 2019)
+
+- But it is also under constant development in the [GitHub repository](https://github.com/giabaio/BCEA)
+   - Current *stable* version: 2.3-2 (30 January 2020)
+   - Current *development* version: 2.4-1 (23 November 2021) &amp;ndash; **major** update (soon to be released!)
+
+
+```r
+# Install BCEA (only required once and needs an internet connection!). 
+
+# You can either get the "official" version from CRAN
+install.packages("BCEA")
+
+# Or the development version from the GitHub repository
+devtools::install_github("giabaio/BCEA")               # stable version (2.3-2)
+
+devtools::install_github("giabaio/BCEA",ref="devel")   # development version (2.4-1)
+```
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+NB: The beauty of the GitHub version is that it can be updated on the fly and be immediately available for users!
+]
+
+.panel[
+.panel-name[Using BCEA]
+
+
+```r
+library(dplyr)  # (Not necessary - helpful for data manipulation!)
+
+library(BCEA)   # Then loads the package (so you can access its functions)
+data(Vaccine)   # Loads an example dataset 
+```
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- The "Vaccine" example is a fictional cost-effectiveness model for and influenza vaccine, based on evidence synthesis (and a real case)
+
+- 2 treatment options ("Standard of care" vs "Vaccination") and overall 63 parameters
+
+- Discussed in details in &lt;svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M542.22 32.05c-54.8 3.11-163.72 14.43-230.96 55.59-4.64 2.84-7.27 7.89-7.27 13.17v363.87c0 11.55 12.63 18.85 23.28 13.49 69.18-34.82 169.23-44.32 218.7-46.92 16.89-.89 30.02-14.43 30.02-30.66V62.75c.01-17.71-15.35-31.74-33.77-30.7zM264.73 87.64C197.5 46.48 88.58 35.17 33.78 32.05 15.36 31.01 0 45.04 0 62.75V400.6c0 16.24 13.13 29.78 30.02 30.66 49.49 2.6 149.59 12.11 218.77 46.95 10.62 5.35 23.21-1.94 23.21-13.46V100.63c0-5.29-2.62-10.14-7.27-12.99z"&gt;&lt;/path&gt;&lt;/svg&gt; [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/) and &lt;svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  &lt;g label="icon" id="layer6" groupmode="layer"&gt;    &lt;path id="path2" d="M 120.19265,177.73779 C 123.18778,77.35076 64.277527,63.999998 64.277527,63.999998 v 31.26245 C 40.834519,83.611374 18.32863,81.929634 18.32863,81.929634 V 337.10903 c 0,0 98.10414,-11.41744 98.10414,84.40952 0,0 36.58424,-153.37442 248.86103,26.48145 0,-61.59342 0.37757,-216.93925 0.37757,-268.28471 C 169.9561,37.131382 120.1931,177.73779 120.1931,177.73779 Z m 187.20631,173.82056 -12.37599,-97.65441 h -0.448 l -40.72819,97.65441 h -17.55994 l -38.9362,-97.65441 h -0.448 l -14.17589,97.65441 h -43.87514 l 28.8015,-169.61925 h 43.42716 l 34.43518,90.6496 36.46566,-90.6496 h 43.87513 l 25.6817,169.61925 h -44.13938 z" style="stroke-width:0.0675239"&gt;&lt;/path&gt;  &lt;/g&gt;&lt;/svg&gt; [Baio and Dawid, 2011](https://pubmed.ncbi.nlm.nih.gov/21930515/)
+
+- In this case, PSA simulations obtained from a full Bayesian model, but could be done in a spreadsheet and imported into `R`
+]
+
+.panel[
+.panel-name[Show. Me. The. Data]
+&lt;span style="display:block; margin-top: -10px ;"&gt;&lt;/span&gt;
+
+```r
+# Creates a matrix with the underlying model simulations
+inp = CreateInputs(vaccine, `print.lincom=FALSE`)           `# NB: this option will be slightly different in 2.4-1!`
+# Visualise the output
+inp$mat `%&gt;% as_tibble()`                                   `# "piping" ('%&gt;%') and formatting nicely`
+```
+
+
+```
+# A tibble: 1,000 × 56
+   Adverse.events Death.1.1. Death.2.1. Death.2.2. GP.1.1. GP.2.1. GP.2.2. Hospital.1.1. Hospital.2.1. Hospital.2.2. Infected.1.1. Infected.2.1. Infected.2.2.
+            &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;
+ 1           1466          1          0          0    1664     958     230             0             1             0          5992          3401           876
+ 2           5329          1          1          0    1414     748     276             0             0             1          7471          4024          1536
+ 3           5203          1          1          0     809     489      80             0             0             0          6718          4300           788
+ 4           2351          2          0          0    1761    1157     261             1             0             0          4837          3269           702
+ 5           8303          1          2          0    2472     964     432             1             1             0          4749          1894           846
+ 6           3607          1          1          0    2224    1342     260             1             0             0          4938          2976           596
+ 7           6304          4          1          1    3478    1107     591             2             1             0         11080          3547          2045
+ 8           4337          1          1          1    1483     799     189             0             0             0          3867          2164           525
+ 9           5482          0          0          0    1587     798     279             0             0             0          5163          2532           910
+10           3125          2          2          0    2578    1681     243             0             0             0          7265          4766           700
+# … with 990 more rows, and 43 more variables: Mild.Compl.1.1. &lt;dbl&gt;, Mild.Compl.2.1. &lt;dbl&gt;, Mild.Compl.2.2. &lt;dbl&gt;, Pneumonia.1.1. &lt;dbl&gt;, Pneumonia.2.1. &lt;dbl&gt;,
+#   Pneumonia.2.2. &lt;dbl&gt;, Trt.1.1.1. &lt;dbl&gt;, Trt.2.1.1. &lt;dbl&gt;, Trt.1.2.1. &lt;dbl&gt;, Trt.2.2.1. &lt;dbl&gt;, Trt.1.2.2. &lt;dbl&gt;, Trt.2.2.2. &lt;dbl&gt;, beta.1. &lt;dbl&gt;,
+#   beta.2. &lt;dbl&gt;, beta.3. &lt;dbl&gt;, beta.4. &lt;dbl&gt;, beta.5. &lt;dbl&gt;, beta.6. &lt;dbl&gt;, beta.7. &lt;dbl&gt;, delta &lt;dbl&gt;, eta &lt;dbl&gt;, gamma.1. &lt;dbl&gt;, gamma.2. &lt;dbl&gt;,
+#   lambda &lt;dbl&gt;, n.1.2. &lt;dbl&gt;, n.2.2. &lt;dbl&gt;, phi &lt;dbl&gt;, pi.1.2. &lt;dbl&gt;, psi.1. &lt;dbl&gt;, psi.2. &lt;dbl&gt;, psi.3. &lt;dbl&gt;, psi.4. &lt;dbl&gt;, psi.5. &lt;dbl&gt;, psi.6. &lt;dbl&gt;,
+#   psi.7. &lt;dbl&gt;, psi.8. &lt;dbl&gt;, q.1. &lt;dbl&gt;, q.4. &lt;dbl&gt;, q.5. &lt;dbl&gt;, q.6. &lt;dbl&gt;, q.7. &lt;dbl&gt;, rho.2. &lt;dbl&gt;, xi &lt;dbl&gt;
+```
+]
+
+.panel[
+.panel-name[Economic model]
+
+
+```r
+# Defines the number of simulations considered
+n.sims=`inp$mat %&gt;% nrow()`       `# applies the function 'nrow' (number of rows) to the object 'inp$mat'`
+
+                                `# NB: in R 4.1.0, can also use 'native' pipe ('|&gt;')`
+                                `# (probably a bit quicker, but in most cases, may be immaterial...)`
+
+# Aggregates the model inputs to compute (e,c)
+QALYs.inf = QALYs.pne &lt;- QALYs.hosp &lt;- QALYs.adv &lt;- QALYs.death &lt;- matrix(0,n.sims,2)
+for (t in 1:2) {
+  QALYs.inf[,t] = ((Infected[,t,1] + Infected[,t,2])*omega[,1]/365)/N
+  QALYs.pne[,t] = ((Pneumonia[,t,1] + Pneumonia[,t,2])*omega[,4]/365)/N
+  QALYs.hosp[,t] = ((Hospital[,t,1] + Hospital[,t,2])*omega[,5]/365)/N
+  QALYs.death[,t] = ((Death[,t,1] + Death[,t,2])*omega[,6])/N
+}
+QALYs.adv[,2] = (Adverse.events*omega[,7]/365)/N
+e = -(QALYs.inf + QALYs.pne + QALYs.adv + QALYs.hosp + QALYs.death) + ...
+```
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+- NB: The data stored in the `Vaccine` object (built-in in `BCEA`) already contains the objects `e,c` that can be used to run the decision analysis...
+
+- So, this step is actually not needed (but documented in &lt;svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M542.22 32.05c-54.8 3.11-163.72 14.43-230.96 55.59-4.64 2.84-7.27 7.89-7.27 13.17v363.87c0 11.55 12.63 18.85 23.28 13.49 69.18-34.82 169.23-44.32 218.7-46.92 16.89-.89 30.02-14.43 30.02-30.66V62.75c.01-17.71-15.35-31.74-33.77-30.7zM264.73 87.64C197.5 46.48 88.58 35.17 33.78 32.05 15.36 31.01 0 45.04 0 62.75V400.6c0 16.24 13.13 29.78 30.02 30.66 49.49 2.6 149.59 12.11 218.77 46.95 10.62 5.35 23.21-1.94 23.21-13.46V100.63c0-5.29-2.62-10.14-7.27-12.99z"&gt;&lt;/path&gt;&lt;/svg&gt; [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/))
+]
+
+.panel[
+.panel-name[Cost &amp; effects]
+
+```r
+cbind(e,c) %&gt;% as_tibble(`.name_repair="universal"`)     `# ensures that the columns are named` 
+```
+
+```
+# A tibble: 1,000 × 4
+   Status.Quo...1 Vaccination...2 Status.Quo...3 Vaccination...4
+            &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+ 1      -0.00105        -0.000899          10.4            16.3 
+ 2      -0.000884       -0.000732           5.83            9.37
+ 3      -0.000890       -0.000698           5.78           15.9 
+ 4      -0.00164        -0.00114           12.2            18.7 
+ 5      -0.00135        -0.000957           9.79           16.5 
+ 6      -0.00143        -0.000936           6.56            9.69
+ 7      -0.000960       -0.00105            8.45           11.3 
+ 8      -0.00181        -0.00139            6.76            9.99
+ 9      -0.000842       -0.000556           3.60           10.1 
+10      -0.00168        -0.00105            4.09           11.0 
+# … with 990 more rows
+```
+
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+- These calculations *can* be done also in a spreadsheet (nothing more than algebra, **once you have the simulations**)
+]
+]
+
+---
+
+count: false
+# How does `BCEA` work?
+
+- At this point, we are ready to call the function `bcea` that runs the economic analysis, for example something like 
+
+
+```r
+treats = c("Status quo","Vaccination")
+m = bcea(e=e,c=c,ref=2,interventions=treats,Kmax=50000)
+```
+
+- The inputs to the function are
+   - `e`: a **matrix** containing the simulations for the clinical benefits (that is `\(n_{\rm{sim}}\times n_{\rm{int}}\)` values)
+   - `c`: a **matrix** containing the simulations for the costs (that is `\(n_{\rm{sim}}\times n_{\rm{int}}\)` values)
+   -  `ref`: an indication of which intervention is to be taken as reference (default: the intervention in the first column of `e` or `c`)
+   - `interventions`: a vector of labels for the interventions being compared 
+   - `Kmax`: the maximum value of `\(k\)`, the parameter of willingness to pay
+
+
+--
+
+
+- The output is an object `m` containing several elements
+
+```r
+names(m)
+```
+
+```
+ [1] "n.sim"         "n.comparators" "n.comparisons" "delta.e"       "delta.c"       "ICER"         
+ [7] "Kmax"          "k"             "ceac"          "ib"            "eib"           "kstar"        
+[13] "best"          "U"             "vi"            "Ustar"         "ol"            "evi"          
+[19] "interventions" "ref"           "comp"          "step"          "e"             "c"            
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+Can visualise the output in various formats (tables/graphs)
+
+
+```r
+# The 'summary' "method" produces a tabular output
+summary(m)
+```
+
+```
+
+Cost-effectiveness analysis summary 
+
+Reference intervention:  Vaccination
+Comparator intervention: Status quo
+
+Optimal decision: choose Status quo for k&lt;20100 and Vaccination for k&gt;=20100
+
+
+Analysis for willingness to pay parameter k = 25000
+
+            Expected utility
+Status quo           -36.054
+Vaccination          -34.826
+
+                             EIB  CEAC  ICER
+Vaccination vs Status quo 1.2284 0.529 20098
+
+Optimal intervention (max expected utility) for k=25000: Vaccination
+           
+EVPI 2.4145
+```
+
+---
+
+count: false
+# How does `BCEA` work?
+
+Can visualise the output in various formats (tables/graphs)
+
+
+```r
+# The 'plot' "method" produces a *specific* version of graphical output
+plot(m)
+```
+
+&lt;img src="./img/howwork12-1.png" style="display: block; margin: auto;" title="" width="40%"&gt;
+
+---
+
+exclude: TRUE
+count: false
+# How does `BCEA` work?
+
+
+```r
+ceplane.plot(m,wtp=20000,xlim=c(-.002,.002),ylim=c(-10,20))
+```
+
+&lt;img src="./img/howwork13-1.png" style="display: block; margin: auto;" title="" width="45%"&gt;
+
+---
+
+count: false
+# How does `BCEA` work?
+
+
+```r
+# Using 'ggplot', you can go crazy with customisation...
+ceplane.plot(m,wtp=10000,`graph="gg"`,point_colors="blue",point_sizes=.8,area_color="springgreen3")
+```
+
+&lt;img src="./img/howwork14-1.png" style="display: block; margin: auto;" title="" width="45%"&gt;
+
+&lt;span style="display:block; margin-top: -40px ;"&gt;&lt;/span&gt;
+.small[&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;&lt;/svg&gt; [https://ggplot2.tidyverse.org/](https://ggplot2.tidyverse.org/)]
+
+---
+
+exclude: TRUE
+count: false
+# How does `BCEA` work?
+
+
+```r
+# Plots the Cost-Effectiveness Acceptability Curve
+ceac.plot(m)
+```
+
+&lt;img src="./img/howwork15-1.png" style="display: block; margin: auto;" title="" width="45%"&gt;
+
+---
+
+exclude: TRUE
+count: false
+# How does `BCEA` work?
+
+
+```r
+# Plots the Expected Value of Partial Information (EVPI)
+evi.plot(m)
+```
+
+&lt;img src="./img/howwork16-1.png" style="display: block; margin: auto;" title="" width="45%"&gt;
+
+---
+
+exclude: TRUE
+# Specialised plots
+
+- Can generate a *contour* plot of the cost-effectiveness plane and estimate the proportion of points in each quadrant
+
+.left-column[
+
+```r
+# "Basic" contourplot
+contour(m)
+```
+]
+
+.right-column[
+&lt;img src="./img/howwork18-1.png" style="display: block; margin: auto;" title="" width="65%"&gt;
+]
+
+---
+
+exclude: TRUE
+count: false
+# Specialised plots
+
+- The specialised function `contour2` also shows the **sustainability area**
+
+.pull-left[
+
+```r
+contour2(m)
+```
+
+&lt;img src="./img/howwork19-1.png" style="display: block; margin: auto;" title="" width="80%"&gt;
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: -0px ;"&gt;&lt;/span&gt;
+
+```r
+contour2(m,wtp=100)
+```
+
+&lt;img src="./img/howwork20-1.png" style="display: block; margin: auto;" title="" width="80%"&gt;
+]
+---
+
+exclude: TRUE
+count: false
+# Specialised plots
+### Cost-effectiveness efficiency frontier
+
+.pull-left[
+
+```r
+ceef.plot(m,print.plot=FALSE)
+```
+
+```
+
+Cost-effectiveness efficiency frontier summary 
+
+Interventions on the efficiency frontier:
+            Effectiveness   Costs Increase slope Increase angle
+Status quo    -0.00105595  9.6555             NA             NA
+Vaccination   -0.00080537 14.6914          20098         1.5707
+```
+]
+
+.pull-right[
+&lt;span style="display:block; margin-top: -0px ;"&gt;&lt;/span&gt;
+
+```r
+ceef.plot(m,print.summary=FALSE)
+```
+
+&lt;img src="./img/howwork20tris-1.png" style="display: block; margin: auto;" title="" width="80%"&gt;
+]
+
+---
+
+exclude: TRUE
+# Exporting graphical output
+
+- `R` has excellent graphical facilities and the graphs produced by `BCEA` can be easily exported to many different formats
+
+
+```r
+# "Opens" the graphical device
+pdf("NAME_OF_THE_FILE",width=`8`,height=`8`)      `# for 'pdf', units are in inches`
+# Makes the plot
+ceplane.plot(`BCEA_OBJECT`)                     `# of course, specify whatever name you've chosen when creating the object...`
+# "Closes" the graphical device
+dev.off()
+
+
+# "Open" the graphical device"
+jpeg("NAME_OF_FILE.jpg",width=`480`,height=`480`)  `# for 'jpeg' units are in px`
+# Makes the plot
+ceplane.plot(BCEA_OBJECT)
+# "Closes" the graphical device
+dev.off()
+```
+
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+**NB**: `Rstudio` and [`rmarkdown`](https://rmarkdown.rstudio.com/) can do even more &amp;ndash; that's for another time...
+---
+
+exclude: TRUE
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+
+
+- Fictional model comparing antidepressants to cognitive behaviour therapy (CBT) and no treatment in people with depression
+
+- Statistical modelling based on evidence synthesis
+   - Benefits: based on QALYs
+   - Costs: associated with treatments and various resources use
+   
+- Economic modelling: two matrices with relevant population summaries
+   - `effects`
+   - `costs`
+   
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+- NB: The details of the actual modelling are *not* important for the purposes of demonstrating the example...
+   
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+
+```r
+# Intervention labels
+t.names&lt;-c("No treatment","CBT","Antidepressant")
+
+# "Standard" analysis: pairwise comparisons
+depression.bcea = bcea(effects,costs,
+                       interventions=t.names,`ref=3`)  
+# `the third intervention is the reference`
+
+# Plots the results
+plot(depression.bcea)
+```
+]
+.pull-right[
+&lt;img src="./img/depression3-1.png" style="display: block; margin: auto;" width="90%"&gt;
+
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+
+```r
+# For `multiple treatment comparison`
+depression.multi.ce = `multi.ce`(depression.bcea)
+
+# `Specialised plot method `
+ `mce.plot`(
+   depression.multi.ce, pos=c(1,0.8),
+   graph=c("base","ggplot2")
+)
+```
+]
+.pull-right[
+&lt;img src="./img/depression5-1.png" style="display: block; margin: auto;" width="90%"&gt;
+
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Can use `ggplot` to customise the graph 
+
+```r
+mce.plot(
+   depression.multi.ce,pos=c(1,1),
+   graph="ggplot2"
+) + ggplot2::stat_summary(
+   fun=max, geom="line",
+   colour="grey25", 
+   alpha=.3, lwd=2.5
+)
+```
+]
+.pull-right[
+&lt;img src="./img/depression7-1.png" style="display: block; margin: auto;" width="90%"&gt;
+]
+
+---
+
+exclude: TRUE
+count: false
+# Multiple treatment comparisons
+## Probabilistic "depression model"
+
+.pull-left[
+&lt;span style="display:block; margin-top: 20px ;"&gt;&lt;/span&gt;
+- Can use a specialised plotting method for the *cost-effectiveness acceptability **frontier***
+
+```r
+# Specialised plot
+ceaf.plot(depression.multi.ce)
+```
+]
+.pull-right[
+&lt;img src="./img/depression9-1.png" style="display: block; margin: auto;" width="90%"&gt;
+]
+
+---
+
+# `BCEAweb`
+
+-  Inspired by similar projects &amp;ndash; eg [SAVI](http://savi.shef.ac.uk/SAVI/)
+
+- Create a web interface to use BCEA without even opening R (or even having it installed on your computer!)
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+
+--
+
+- Typical work flow
+   1. Design the economic model (eg Markov model, decision tree, ...)
+   2. Run the statistical analysis to estimate the quantities of interest (eg survival analysis, evidence synthesis, ...)
+   3. Run the economic model and obtain "PSA samples"     
+
+--
+&lt;span style="display:block; margin-top: 40px ;"&gt;&lt;/span&gt;
+  
+   4. Upload "PSA samples", including values for `\((e,c)\)` to `BCEAweb`
+   5. Use `BCEA` in the background to do **all** the economic analysis
+   6. Create reports that can be used as the basis for papers, reimbursement files, ...
+
+
+---
+
+count: false
+# `BCEAweb`
+
+
+```r
+# Creates a matrix with the underlying model simulations
+inp = CreateInputs(vaccine, print.lincom=FALSE)
+
+# Runs BCEAweb
+BCEAweb(e=e,                 # matrix of simulations for the effectiveness
+        c=c,                 # matrix of simulations for the costs
+        parameters=inp$mat   # matrix of simulations for all the model parameters
+       )
+```
+
+&lt;span style="display:block; margin-top: 30px ;"&gt;&lt;/span&gt;
+
+- `BCEAweb` exists as a standalone webapp
+   
+   - Can access it &lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M503.52,241.48c-.12-1.56-.24-3.12-.24-4.68v-.12l-.36-4.68v-.12a245.86,245.86,0,0,0-7.32-41.15c0-.12,0-.12-.12-.24l-1.08-4c-.12-.24-.12-.48-.24-.6-.36-1.2-.72-2.52-1.08-3.72-.12-.24-.12-.6-.24-.84-.36-1.2-.72-2.4-1.08-3.48-.12-.36-.24-.6-.36-1-.36-1.2-.72-2.28-1.2-3.48l-.36-1.08c-.36-1.08-.84-2.28-1.2-3.36a8.27,8.27,0,0,0-.36-1c-.48-1.08-.84-2.28-1.32-3.36-.12-.24-.24-.6-.36-.84-.48-1.2-1-2.28-1.44-3.48,0-.12-.12-.24-.12-.36-1.56-3.84-3.24-7.68-5-11.4l-.36-.72c-.48-1-.84-1.8-1.32-2.64-.24-.48-.48-1.08-.72-1.56-.36-.84-.84-1.56-1.2-2.4-.36-.6-.6-1.2-1-1.8s-.84-1.44-1.2-2.28c-.36-.6-.72-1.32-1.08-1.92s-.84-1.44-1.2-2.16a18.07,18.07,0,0,0-1.2-2c-.36-.72-.84-1.32-1.2-2s-.84-1.32-1.2-2-.84-1.32-1.2-1.92-.84-1.44-1.32-2.16a15.63,15.63,0,0,0-1.2-1.8L463.2,119a15.63,15.63,0,0,0-1.2-1.8c-.48-.72-1.08-1.56-1.56-2.28-.36-.48-.72-1.08-1.08-1.56l-1.8-2.52c-.36-.48-.6-.84-1-1.32-1-1.32-1.8-2.52-2.76-3.72a248.76,248.76,0,0,0-23.51-26.64A186.82,186.82,0,0,0,412,62.46c-4-3.48-8.16-6.72-12.48-9.84a162.49,162.49,0,0,0-24.6-15.12c-2.4-1.32-4.8-2.52-7.2-3.72a254,254,0,0,0-55.43-19.56c-1.92-.36-3.84-.84-5.64-1.2h-.12c-1-.12-1.8-.36-2.76-.48a236.35,236.35,0,0,0-38-4H255.14a234.62,234.62,0,0,0-45.48,5c-33.59,7.08-63.23,21.24-82.91,39-1.08,1-1.92,1.68-2.4,2.16l-.48.48H124l-.12.12.12-.12a.12.12,0,0,0,.12-.12l-.12.12a.42.42,0,0,1,.24-.12c14.64-8.76,34.92-16,49.44-19.56l5.88-1.44c.36-.12.84-.12,1.2-.24,1.68-.36,3.36-.72,5.16-1.08.24,0,.6-.12.84-.12C250.94,20.94,319.34,40.14,367,85.61a171.49,171.49,0,0,1,26.88,32.76c30.36,49.2,27.48,111.11,3.84,147.59-34.44,53-111.35,71.27-159,24.84a84.19,84.19,0,0,1-25.56-59,74.05,74.05,0,0,1,6.24-31c1.68-3.84,13.08-25.67,18.24-24.59-13.08-2.76-37.55,2.64-54.71,28.19-15.36,22.92-14.52,58.2-5,83.28a132.85,132.85,0,0,1-12.12-39.24c-12.24-82.55,43.31-153,94.31-170.51-27.48-24-96.47-22.31-147.71,15.36-29.88,22-51.23,53.16-62.51,90.36,1.68-20.88,9.6-52.08,25.8-83.88-17.16,8.88-39,37-49.8,62.88-15.6,37.43-21,82.19-16.08,124.79.36,3.24.72,6.36,1.08,9.6,19.92,117.11,122,206.38,244.78,206.38C392.77,503.42,504,392.19,504,255,503.88,250.48,503.76,245.92,503.52,241.48Z"&gt;&lt;/path&gt;&lt;/svg&gt;  [here](https://egon.stats.ucl.ac.uk/projects/BCEAweb/) 
+   
+- **Or**, you can launch your own "local" version from the `BCEA` package (as in the code above)!
+   
+   - This will launch a web page from which you can manipulate your output (&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm-28.9 143.6l75.5 72.4H120c-13.3 0-24 10.7-24 24v16c0 13.3 10.7 24 24 24h182.6l-75.5 72.4c-9.7 9.3-9.9 24.8-.4 34.3l11 10.9c9.4 9.4 24.6 9.4 33.9 0L404.3 273c9.4-9.4 9.4-24.6 0-33.9L271.6 106.3c-9.4-9.4-24.6-9.4-33.9 0l-11 10.9c-9.5 9.6-9.3 25.1.4 34.4z"&gt;&lt;/path&gt;&lt;/svg&gt; Live Demo)
+
+---
+class: thankyou-michelle 
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url("assets/ucl-stats/UCL-stats.png");
+  background-size: 14% 7%;
+  background-repeat: no-repeat;
+  position: absolute;
+  top:  2.625%; /* 2.65%em */
+  left: 85%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)' +
+    ':not(.thankyou-michelle)' +
+    ':not(.thankyou-barney)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
