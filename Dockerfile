@@ -15,7 +15,7 @@ RUN echo "Checking for 'apt.txt'..." \
         xargs -a apt.txt apt-get install --yes && \
         apt-get clean > /dev/null && \
         rm -rf /var/lib/apt/lists/* && \
-        ; fi
+        fi
 USER ${NB_USER}
 
 ## Run an install.R script, if it exists.
