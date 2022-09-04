@@ -5,3 +5,6 @@
 BCEA_talk/
 !BCEA
 R-HTA-BCEA/old_version/*
+R-HTA-BCEA/*.qmd
+R-HTA-BCEA/*.Rproj
+R-HTA-BCEA/**/*.qmd
