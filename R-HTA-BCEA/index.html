@@ -28,25 +28,70 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-    div.csl-bib-body { }
-    div.csl-entry {
-      clear: both;
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
     }
-    .hanging div.csl-entry {
-      margin-left:2em;
-      text-indent:-2em;
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
-    div.csl-left-margin {
-      min-width:2em;
-      float:left;
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    div.csl-right-inline {
-      margin-left:2em;
-      padding-left:1em;
-    }
-    div.csl-indent {
-      margin-left: 2em;
-    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="_extensions/giabaio/ucl/styles.css">
@@ -406,9 +451,6 @@
     }
   });
   </script>
-  
-  <script src="index_files/libs/kePrint-0.0.1/kePrint.js"></script>
-  <link href="index_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
@@ -557,746 +599,601 @@ Best opening sentence <a href="https://twitter.com/hashtag/ISPOREurope?src=hash&
 
 </div>
 </section>
+<section>
+<section id="bcea" class="title-slide slide level1 center">
+<h1><code>BCEA</code></h1>
 
-<!-- 
-## Fun with colours & spaces
-
-### With a subtitle
-
-This shows how to use colours in the slides. A bunch are pre-defined in the `.css` file and can be used simply as:
-
-- The [**predictive**]{.red} distribution can be computed as follows.
-
-. . .
-
-More can be created by simply modifying the `.css` file to add more `HEX` codes.
-
-- For example use
-
-   ```
-   {css}
-   .uclblue {
-     color: #002855;
-   }
-   ```
-   (though this colour is already defined)
-
-- The default is in [`assets/css/styles.css`](assets/css/styles.css){target="_blank"} template or create new ones...
-
-<span style="display:block; margin-top: 20px ;"></span>
-
-Can add vertical space using the command 
-
-::: {.cell layout-align="center"}
-
-```{.r .cell-code}
-`r vspace("XXX")`
-```
-:::
-
-where `XXX` is a suitable unit, eg `"20px"`.
-
-
-## Some maths
-
-We can also include maths, using standard $\rm\LaTeX$:
-
-$$\class{myblue}{p(y\mid\mathcal{D}) = \int p(y\mid\bm\theta)p(\boldsymbol\theta\mid\mathcal{D})d\boldsymbol\theta} $$
-
-To use colours with $\rm\LaTeX$, needs a little hack: `$\class{color}{expression}$`
-
-You can define a probabilistic assumption as
-[$$y \mid \bm\theta \sim \dpois(\bm\theta) $$]{.myblue}
-but in line it would look like this $\color{MidnightBlue}{y\sim \dnorm(\mu,\sigma^2)}$ or [$y\sim \dt(\mu,\sigma^2)$]{.red}
-
-These use the predefined $\rm\LaTeX$ macros, saved in the file [`assets/macros/latex_macros.html`](assets/macros/latex_macros.html){target="_blank"}. More can be (re)defined by simply adding to the file, which gets pre-loaded at the beginning of the resulting `.html` output
-
-<span style="display:block; margin-top: 2rem ;"></span>
-For instance, the command `$\dnorm$` translates to the text Normal (typeset in the current font)
-
-
-## Some maths {visibility="uncounted"}
-
-In case you have more text with the same title and don't want to increase the slide counter... (just add `{visibility="uncounted"}` to the slide title)
-
-- Similarly, just adding `{visibility="hidden"}` to the slide title makes it hidden
-
-. . .
-
-- Fontawesome works using `shortcodes`, for example  
-```
-[{{< fa smile >}}]{.red65blue}
-```
-renders as []{.red65blue}
-
-- Other utilities (eg from `ai`) can be included using pure `HTML`, eg
-
-```
-<i class="ai ai-pubmed"></i>
-```
-produces <i class="ai ai-pubmed"></i>
-
-## Other LaTeX stuff
-
-There's also a file [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"}, which can be used in LaTeX chunks, eg
-```
-\input{assets/macros/latex_colours.tex}
-\begin{center}
-\begin{tikzpicture}
-...
-
-```
-
-- This would be an `{r}` chunk with header like this: 
-```
-{r}
-#| engine: "tikz"
-#| echo: false
-#| opts: list(width="85%",title="INSERT TEXT HERE")
-```
-
-- Then all the colours and, possibly other advanced LaTeX macro defined in [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"} are accessible by `tikz` chunks
-
-
-- But also, the "extension" `"color.js"` (loaded in [`assets/macros/latex_colours.tex`](assets/macros/latex_colours.tex){target="_blank"}) enables semi-standard LaTeX colouring
-
-- For example `$\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)$` renders as
-$\displaystyle \color{olive} x^2=\frac{d}{dx}f(x)$, which essentially looks the same as when using `$\class{color}{math formula}$` or even `[math formula]{.color}` (assuming `color` is defined!)
-
-
-## Numbered lists & references
-- This is a bullet list and $\class{spanish-yellow}{\theta \sim \dgamma(\alpha,\beta)}$ [@Baio:2012]
-   - Test
-
-- And another
-   1. With a numbered item [@Baio:2019]
-   2. And another
-
-- With more items
-
-
-Can reset the counter of a list
-```
-<ol style="counter-reset: fancy-counter 9;">
-  <li>Number Ten</li>
-  <li>Number Eleven</li>
+</section>
+<section id="a-r-package-for-bayesian-cost-effectiveness-analysis" class="slide level2">
+<h2>A <code>R</code> package for (Bayesian) cost-effectiveness analysis</h2>
+<h3 id="bcea-and-its-use-directly-in-r-are-designed-with-these-objectives-in-mind"><code>BCEA</code> and its use directly in <code>R</code> are designed with these objectives in mind</h3>
+<ol type="1">
+<li><p>Checking the model assumptions</p>
+<ul>
+<li>Do we mean what we mean (eg in terms of PSA simulations)?…</li>
+<li>Simulation error (especially, <strong>but not only</strong>, for a Bayesian approach)</li>
+</ul></li>
 </ol>
-```
-which renders as
-
-<ol style="counter-reset: fancy-counter 9;">
-  <li>Number Ten</li>
-  <li>Number Eleven</li>
+<div class="fragment">
+<ol style="counter-reset: fancy-counter 1;">
+<li>
+Produce the base-case economic evaluation
+</li>
+<ul>
+<li>
+What’s the most cost-effective intervention, given current evidence?
+</li>
+<li>
+Cost-effectiveness plane, Expected Incremental Benefit (as a function of <span class="math inline">\(k\)</span>),…
+</li>
+</ul>
 </ol>
+</div>
+<div class="fragment">
+<ol style="counter-reset: fancy-counter 2;">
+<li>
+Perform uncertainty analysis
+</li>
+<ul>
+<li>
+Standard PSA (mandatory): Cost-effectiveness Plane, CEAC, …
+</li>
+<li>
+Fairly easy (but not always used): CEAF
+</li>
+<li>
+More advanced/“too difficult” (rarely used): EVP(P)I/EVSI
+</li>
+</ul>
+</ol>
+</div>
+<div class="fragment">
+<ol style="counter-reset: fancy-counter 3;">
+<li>
+Standardised reporting
+</li>
+<ul>
+<li>
+Graphical tools (use <strong>excellent</strong> <code>R</code> facilities)
+</li>
+<li>
+Embed code in structured reports (<code>docx</code>/<code>pdf</code>)
+</li>
+</ul>
+</ol>
+</div>
+</section>
+<section id="bcea-1" class="slide level2">
+<h2><code>BCEA</code></h2>
+<h3 id="an-r-package-for-bayesian-cost-effectiveness-analysis">An <code>R</code> package for (Bayesian) cost-effectiveness analysis</h3>
 
+<img data-src="img/bcea_scheme-1.png" style="width:80.0%" class="r-stretch"><div style="position: absolute; left: 68%; top: 75%;">
+<p><i class="fa-brands fa-firefox"></i> <a href="https://gianluca.statistica.it/software/bcea">https://gianluca.statistica.it/software/bcea</a></p>
+<p><i class="fa-brands fa-github"></i> <a href="https://github.com/giabaio/BCEA">https://github.com/giabaio/BCEA</a></p>
+</div>
+</section></section>
+<section>
+<section id="using-bcea-to-summarise-outputs-of-an-economic-model" class="title-slide slide level1 center">
+<h1>Using <code>BCEA</code> to summarise outputs of an economic model</h1>
 
-## A page with left & right columns
-
-:::: {.columns}
-::: {.column width="40%"}
-
-Some content here
-
-::: {.content-visible when-format="html"}
-
-::: {.cell layout-align="center"}
-::: {.cell-output-display}
-
-`````{=html}
-<table class="table" style="font-size: 28px; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;border-bottom: 1px solid"> Name </th>
-   <th style="text-align:left;border-bottom: 1px solid"> Sex </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;width: 25%; "> Gianluca </td>
-   <td style="text-align:left;width: 65%; "> Male </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;width: 25%; "> Marta </td>
-   <td style="text-align:left;width: 65%; "> Female </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;width: 25%; "> Kobi </td>
-   <td style="text-align:left;width: 65%; "> Male </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;width: 25%; border-bottom: 1px solid"> Anna </td>
-   <td style="text-align:left;width: 65%; border-bottom: 1px solid"> Female </td>
-  </tr>
-</tbody>
-</table>
-
-`````
-
-:::
-:::
-
-:::
-:::
-
-::: {.column width="60%"}
-Just a test to see what happens here even if the text is really long
-:::
-::::
-
-
-## Or panelsets {.scrollable}
-
-::: {.panel-tabset}
-
-## Plot
-
-
-::: {.cell layout-align="center"}
-
-:::
-
-
-## Data
-
-
-::: {.cell layout-align="center"}
-::: {.cell-output-display}
-
-`````{=html}
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;">   </th>
-   <th style="text-align:right;"> mpg </th>
-   <th style="text-align:right;"> cyl </th>
-   <th style="text-align:right;"> disp </th>
-   <th style="text-align:right;"> hp </th>
-   <th style="text-align:right;"> drat </th>
-   <th style="text-align:right;"> wt </th>
-   <th style="text-align:right;"> qsec </th>
-   <th style="text-align:right;"> vs </th>
-   <th style="text-align:right;"> am </th>
-   <th style="text-align:right;"> gear </th>
-   <th style="text-align:right;"> carb </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Mazda RX4 </td>
-   <td style="text-align:right;"> 21.0 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 160.0 </td>
-   <td style="text-align:right;"> 110 </td>
-   <td style="text-align:right;"> 3.90 </td>
-   <td style="text-align:right;"> 2.620 </td>
-   <td style="text-align:right;"> 16.46 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Mazda RX4 Wag </td>
-   <td style="text-align:right;"> 21.0 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 160.0 </td>
-   <td style="text-align:right;"> 110 </td>
-   <td style="text-align:right;"> 3.90 </td>
-   <td style="text-align:right;"> 2.875 </td>
-   <td style="text-align:right;"> 17.02 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Datsun 710 </td>
-   <td style="text-align:right;"> 22.8 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 108.0 </td>
-   <td style="text-align:right;"> 93 </td>
-   <td style="text-align:right;"> 3.85 </td>
-   <td style="text-align:right;"> 2.320 </td>
-   <td style="text-align:right;"> 18.61 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Hornet 4 Drive </td>
-   <td style="text-align:right;"> 21.4 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 258.0 </td>
-   <td style="text-align:right;"> 110 </td>
-   <td style="text-align:right;"> 3.08 </td>
-   <td style="text-align:right;"> 3.215 </td>
-   <td style="text-align:right;"> 19.44 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Hornet Sportabout </td>
-   <td style="text-align:right;"> 18.7 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 360.0 </td>
-   <td style="text-align:right;"> 175 </td>
-   <td style="text-align:right;"> 3.15 </td>
-   <td style="text-align:right;"> 3.440 </td>
-   <td style="text-align:right;"> 17.02 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Valiant </td>
-   <td style="text-align:right;"> 18.1 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 225.0 </td>
-   <td style="text-align:right;"> 105 </td>
-   <td style="text-align:right;"> 2.76 </td>
-   <td style="text-align:right;"> 3.460 </td>
-   <td style="text-align:right;"> 20.22 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Duster 360 </td>
-   <td style="text-align:right;"> 14.3 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 360.0 </td>
-   <td style="text-align:right;"> 245 </td>
-   <td style="text-align:right;"> 3.21 </td>
-   <td style="text-align:right;"> 3.570 </td>
-   <td style="text-align:right;"> 15.84 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 240D </td>
-   <td style="text-align:right;"> 24.4 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 146.7 </td>
-   <td style="text-align:right;"> 62 </td>
-   <td style="text-align:right;"> 3.69 </td>
-   <td style="text-align:right;"> 3.190 </td>
-   <td style="text-align:right;"> 20.00 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 230 </td>
-   <td style="text-align:right;"> 22.8 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 140.8 </td>
-   <td style="text-align:right;"> 95 </td>
-   <td style="text-align:right;"> 3.92 </td>
-   <td style="text-align:right;"> 3.150 </td>
-   <td style="text-align:right;"> 22.90 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 280 </td>
-   <td style="text-align:right;"> 19.2 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 167.6 </td>
-   <td style="text-align:right;"> 123 </td>
-   <td style="text-align:right;"> 3.92 </td>
-   <td style="text-align:right;"> 3.440 </td>
-   <td style="text-align:right;"> 18.30 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 280C </td>
-   <td style="text-align:right;"> 17.8 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 167.6 </td>
-   <td style="text-align:right;"> 123 </td>
-   <td style="text-align:right;"> 3.92 </td>
-   <td style="text-align:right;"> 3.440 </td>
-   <td style="text-align:right;"> 18.90 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 450SE </td>
-   <td style="text-align:right;"> 16.4 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 275.8 </td>
-   <td style="text-align:right;"> 180 </td>
-   <td style="text-align:right;"> 3.07 </td>
-   <td style="text-align:right;"> 4.070 </td>
-   <td style="text-align:right;"> 17.40 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 450SL </td>
-   <td style="text-align:right;"> 17.3 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 275.8 </td>
-   <td style="text-align:right;"> 180 </td>
-   <td style="text-align:right;"> 3.07 </td>
-   <td style="text-align:right;"> 3.730 </td>
-   <td style="text-align:right;"> 17.60 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merc 450SLC </td>
-   <td style="text-align:right;"> 15.2 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 275.8 </td>
-   <td style="text-align:right;"> 180 </td>
-   <td style="text-align:right;"> 3.07 </td>
-   <td style="text-align:right;"> 3.780 </td>
-   <td style="text-align:right;"> 18.00 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Cadillac Fleetwood </td>
-   <td style="text-align:right;"> 10.4 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 472.0 </td>
-   <td style="text-align:right;"> 205 </td>
-   <td style="text-align:right;"> 2.93 </td>
-   <td style="text-align:right;"> 5.250 </td>
-   <td style="text-align:right;"> 17.98 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Lincoln Continental </td>
-   <td style="text-align:right;"> 10.4 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 460.0 </td>
-   <td style="text-align:right;"> 215 </td>
-   <td style="text-align:right;"> 3.00 </td>
-   <td style="text-align:right;"> 5.424 </td>
-   <td style="text-align:right;"> 17.82 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Chrysler Imperial </td>
-   <td style="text-align:right;"> 14.7 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 440.0 </td>
-   <td style="text-align:right;"> 230 </td>
-   <td style="text-align:right;"> 3.23 </td>
-   <td style="text-align:right;"> 5.345 </td>
-   <td style="text-align:right;"> 17.42 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Fiat 128 </td>
-   <td style="text-align:right;"> 32.4 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 78.7 </td>
-   <td style="text-align:right;"> 66 </td>
-   <td style="text-align:right;"> 4.08 </td>
-   <td style="text-align:right;"> 2.200 </td>
-   <td style="text-align:right;"> 19.47 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Honda Civic </td>
-   <td style="text-align:right;"> 30.4 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 75.7 </td>
-   <td style="text-align:right;"> 52 </td>
-   <td style="text-align:right;"> 4.93 </td>
-   <td style="text-align:right;"> 1.615 </td>
-   <td style="text-align:right;"> 18.52 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Toyota Corolla </td>
-   <td style="text-align:right;"> 33.9 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 71.1 </td>
-   <td style="text-align:right;"> 65 </td>
-   <td style="text-align:right;"> 4.22 </td>
-   <td style="text-align:right;"> 1.835 </td>
-   <td style="text-align:right;"> 19.90 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Toyota Corona </td>
-   <td style="text-align:right;"> 21.5 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 120.1 </td>
-   <td style="text-align:right;"> 97 </td>
-   <td style="text-align:right;"> 3.70 </td>
-   <td style="text-align:right;"> 2.465 </td>
-   <td style="text-align:right;"> 20.01 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Dodge Challenger </td>
-   <td style="text-align:right;"> 15.5 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 318.0 </td>
-   <td style="text-align:right;"> 150 </td>
-   <td style="text-align:right;"> 2.76 </td>
-   <td style="text-align:right;"> 3.520 </td>
-   <td style="text-align:right;"> 16.87 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> AMC Javelin </td>
-   <td style="text-align:right;"> 15.2 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 304.0 </td>
-   <td style="text-align:right;"> 150 </td>
-   <td style="text-align:right;"> 3.15 </td>
-   <td style="text-align:right;"> 3.435 </td>
-   <td style="text-align:right;"> 17.30 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Camaro Z28 </td>
-   <td style="text-align:right;"> 13.3 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 350.0 </td>
-   <td style="text-align:right;"> 245 </td>
-   <td style="text-align:right;"> 3.73 </td>
-   <td style="text-align:right;"> 3.840 </td>
-   <td style="text-align:right;"> 15.41 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Pontiac Firebird </td>
-   <td style="text-align:right;"> 19.2 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 400.0 </td>
-   <td style="text-align:right;"> 175 </td>
-   <td style="text-align:right;"> 3.08 </td>
-   <td style="text-align:right;"> 3.845 </td>
-   <td style="text-align:right;"> 17.05 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 3 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Fiat X1-9 </td>
-   <td style="text-align:right;"> 27.3 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 79.0 </td>
-   <td style="text-align:right;"> 66 </td>
-   <td style="text-align:right;"> 4.08 </td>
-   <td style="text-align:right;"> 1.935 </td>
-   <td style="text-align:right;"> 18.90 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Porsche 914-2 </td>
-   <td style="text-align:right;"> 26.0 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 120.3 </td>
-   <td style="text-align:right;"> 91 </td>
-   <td style="text-align:right;"> 4.43 </td>
-   <td style="text-align:right;"> 2.140 </td>
-   <td style="text-align:right;"> 16.70 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Lotus Europa </td>
-   <td style="text-align:right;"> 30.4 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 95.1 </td>
-   <td style="text-align:right;"> 113 </td>
-   <td style="text-align:right;"> 3.77 </td>
-   <td style="text-align:right;"> 1.513 </td>
-   <td style="text-align:right;"> 16.90 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Ford Pantera L </td>
-   <td style="text-align:right;"> 15.8 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 351.0 </td>
-   <td style="text-align:right;"> 264 </td>
-   <td style="text-align:right;"> 4.22 </td>
-   <td style="text-align:right;"> 3.170 </td>
-   <td style="text-align:right;"> 14.50 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 4 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Ferrari Dino </td>
-   <td style="text-align:right;"> 19.7 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 145.0 </td>
-   <td style="text-align:right;"> 175 </td>
-   <td style="text-align:right;"> 3.62 </td>
-   <td style="text-align:right;"> 2.770 </td>
-   <td style="text-align:right;"> 15.50 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Maserati Bora </td>
-   <td style="text-align:right;"> 15.0 </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 301.0 </td>
-   <td style="text-align:right;"> 335 </td>
-   <td style="text-align:right;"> 3.54 </td>
-   <td style="text-align:right;"> 3.570 </td>
-   <td style="text-align:right;"> 14.60 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 8 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Volvo 142E </td>
-   <td style="text-align:right;"> 21.4 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 121.0 </td>
-   <td style="text-align:right;"> 109 </td>
-   <td style="text-align:right;"> 4.11 </td>
-   <td style="text-align:right;"> 2.780 </td>
-   <td style="text-align:right;"> 18.60 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 2 </td>
-  </tr>
-</tbody>
-</table>
-
-`````
-
-:::
-:::
-
-:::   
-
-Learn more: [Tabsets](https://quarto.org/docs/presentations/revealjs/#tabsets)
-
-
-## More on graphs
-
-- The file [`assets/setup.R`](assets/setup.R){target="_blank"} contains a bunch of `R` commands to create functions and shortcuts that can be used with the normal `qmd` code
-
-- Also, it contains some extra functions and customisation to tell `knitr` how to process the `qmd` file
-   - Specifically, in order to create an ["alternative text"](https://en.wikipedia.org/wiki/Alt_attribute), it uses a trick
-   - This essentially means that the width of any graph created by `R` is controlled by the extra "chunk" option 
-   
-   ```
-   {r} 
-   #| eval: false
-   #| echo: true
-   opts=list(...)
-   ```
-   
-   which contains various elements
-   
-   ```
-   {r} 
-   #| eval: false
-   #| echo: true
-   opts=list(
-    width="X%",
-    title="SOME TEXT",
-    alt="SOME TEXT",
-    ...
-   )
-   ```
-   
-   - `title` will produce the actual "alt text", while `alt` will simply add some text to the `html` file (that can be read out for accessibility)
-
-
-:::: {.nobar}
-## {background-iframe="https://r-hta.org/" background-interactive=true}
-
-::: footer
-:::
-
-::: {.notes}
-This block activates speaker's notes &ndash; and this slides shows how you can include full websites inside the slide using this code
-:::
-::::
-
--->
-<section id="references" class="slide level2 smaller scrollable">
-<h2>References</h2>
-<div id="refs" role="doc-bibliography">
+</section>
+<section id="how-does-bcea-work" class="slide level2">
+<h2>How does <code>BCEA</code> work?</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Installation</a></li><li><a href="#tabset-1-2">Using <code>BCEA</code></a></li><li><a href="#tabset-1-3">Show. Me. The. Data!</a></li><li><a href="#tabset-1-4">Economic model</a></li><li><a href="#tabset-1-5">Cost &amp; effects</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<ul>
+<li><code>BCEA</code> is available from <a href="https://cran.r-project.org/">CRAN</a>
+<ul>
+<li>Current <em>stable</em> version: 2.4-2 (3 September 2022)</li>
+</ul></li>
+<li>But it is also under constant development in the <a href="https://github.com/giabaio/BCEA">GitHub repository</a>
+<ul>
+<li>Current <em>stable</em> version: 2.4-2 (3 September 2022)</li>
+<li>Current <em>development</em> version: 2.4-2 (ongoing development, until integrated in the next stable release)</li>
+</ul></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Install BCEA (only required once and needs an internet connection!). </span></span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># You can either get the "official" version from CRAN</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">install.packages</span>(<span class="st">"BCEA"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co"># Can also install the stable from GitHub</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)                            <span class="co"># to install packages from GitHub       </span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"giabaio/BCEA"</span>)                <span class="co"># stable version (2.4.1)</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co"># And the *development* version (from GitHub)</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"giabaio/BCEA"</span>,<span class="at">ref=</span><span class="st">"devel"</span>)    <span class="co"># development version (2.4-1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span style="display:block; margin-top: 30px ;"></span> NB: The beauty of the GitHub version is that it can be updated on the fly and be immediately available for users!</p>
+</div>
+<div id="tabset-1-2">
+<div class="cell" data-layout-align="center">
 
 </div>
-<p><span style="display:block; margin-top: 500px ;"></span></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">library</span>(dplyr)  <span class="co"># (Not necessary - but very helpful for data manipulation!)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">library</span>(BCEA)   <span class="co"># Then loads the package (so you can access its functions)</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="fu">data</span>(Vaccine)   <span class="co"># Loads an example dataset </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span style="display:block; margin-top: 40px ;"></span></p>
+<ul>
+<li><p>The “Vaccine” example is a fictional cost-effectiveness model for and influenza vaccine, based on evidence synthesis (and a real case)</p></li>
+<li><p>2 treatment options (“Standard of care” vs “Vaccination”) and overall 63 parameters</p></li>
+<li><p>Discussed in details in <i class="fa-solid fa-book-open"></i> <a href="http://www.statistica.it/gianluca/book/bcea/">Baio et al, 2017</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/21930515/">Baio and Dawid, 2011</a></p></li>
+<li><p>In this case, PSA simulations obtained from a full Bayesian model, but could be done in a spreadsheet and imported into <code>R</code></p></li>
+</ul>
+</div>
+<div id="tabset-1-3">
+<div class="cell" data-layout-align="center" data-output-location="fragment">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># The object 'Vaccine' contains a matrix 'vaccine_mat', with all the simulated values for the many model parameters</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co"># BCEA can create a matrix with the underlying model simulations starting from various formats (BUGS/R/Excel)</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># and can get rid of "redundant" columns (those that are linear combination of each other...)</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>inp <span class="ot">=</span> <span class="fu">createInputs</span>(vaccine_mat,<span class="at">print_is_linear_comb=</span><span class="cn">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># Visualise the output</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>inp<span class="sc">$</span>mat <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()                                  <span class="co"># "piping" ('%&gt;%') and formatting nicely</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,000 × 56
+   Adverse.e…¹ Death…² Death…³ Death…⁴ GP.1.1. GP.2.1. GP.2.2. Hospi…⁵ Hospi…⁶ Hospi…⁷ Infec…⁸ Infec…⁹ Infec…˟ Mild.…˟ Mild.…˟ Mild.…˟ Pneum…˟ Pneum…˟
+         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1        1466       1       0       0    1664     958     230       0       1       0    5992    3401     876     691     405     102      18      15
+ 2        5329       1       1       0    1414     748     276       0       0       1    7471    4024    1536     570     308     112      12      15
+ 3        5203       1       1       0     809     489      80       0       0       0    6718    4300     788     332     214      40      10       2
+ 4        2351       2       0       0    1761    1157     261       1       0       0    4837    3269     702     739     479     109      19      17
+ 5        8303       1       2       0    2472     964     432       1       1       0    4749    1894     846    1049     425     177      25      11
+ 6        3607       1       1       0    2224    1342     260       1       0       0    4938    2976     596     915     560     100      35      21
+ 7        6304       4       1       1    3478    1107     591       2       1       0   11080    3547    2045    1505     482     247      66      19
+ 8        4337       1       1       1    1483     799     189       0       0       0    3867    2164     525     622     333      65      22       7
+ 9        5482       0       0       0    1587     798     279       0       0       0    5163    2532     910     675     332     115      25      11
+10        3125       2       2       0    2578    1681     243       0       0       0    7265    4766     700    1063     711     102      41      17
+# … with 990 more rows, 38 more variables: Pneumonia.2.2. &lt;dbl&gt;, Trt.1.1.1. &lt;dbl&gt;, Trt.2.1.1. &lt;dbl&gt;, Trt.1.2.1. &lt;dbl&gt;, Trt.2.2.1. &lt;dbl&gt;,
+#   Trt.1.2.2. &lt;dbl&gt;, Trt.2.2.2. &lt;dbl&gt;, beta.1. &lt;dbl&gt;, beta.2. &lt;dbl&gt;, beta.3. &lt;dbl&gt;, beta.4. &lt;dbl&gt;, beta.5. &lt;dbl&gt;, beta.6. &lt;dbl&gt;, beta.7. &lt;dbl&gt;,
+#   delta &lt;dbl&gt;, eta &lt;dbl&gt;, gamma.1. &lt;dbl&gt;, gamma.2. &lt;dbl&gt;, lambda &lt;dbl&gt;, n.1.2. &lt;dbl&gt;, n.2.2. &lt;dbl&gt;, phi &lt;dbl&gt;, pi.1.2. &lt;dbl&gt;, psi.1. &lt;dbl&gt;,
+#   psi.2. &lt;dbl&gt;, psi.3. &lt;dbl&gt;, psi.4. &lt;dbl&gt;, psi.5. &lt;dbl&gt;, psi.6. &lt;dbl&gt;, psi.7. &lt;dbl&gt;, psi.8. &lt;dbl&gt;, q.1. &lt;dbl&gt;, q.4. &lt;dbl&gt;, q.5. &lt;dbl&gt;, q.6. &lt;dbl&gt;,
+#   q.7. &lt;dbl&gt;, rho.2. &lt;dbl&gt;, xi &lt;dbl&gt;, and abbreviated variable names ¹​Adverse.events, ²​Death.1.1., ³​Death.2.1., ⁴​Death.2.2., ⁵​Hospital.1.1.,
+#   ⁶​Hospital.2.1., ⁷​Hospital.2.2., ⁸​Infected.1.1., ⁹​Infected.2.1., ˟​Infected.2.2., ˟​Mild.Compl.1.1., ˟​Mild.Compl.2.1., ˟​Mild.Compl.2.2.,
+#   ˟​Pneumonia.1.1., ˟​Pneumonia.2.1.</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-4">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5" data-code-line-numbers="1-5|6-15|16-20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Defines the number of simulations considered</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>n.sims<span class="ot">=</span>inp<span class="sc">$</span>mat <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()                               <span class="co"># applies the function 'nrow' (number of rows) to the object 'inp$mat'</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>                                                        <span class="co"># NB: in R 4.1.0, can also use 'native' pipe ('|&gt;')</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>                                                        <span class="co"># (probably a bit quicker, but in most cases, may be immaterial...)</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co"># Process the model parameters</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>QALYs.inf <span class="ot">=</span> QALYs.pne <span class="ot">&lt;-</span> QALYs.hosp <span class="ot">&lt;-</span> QALYs.adv <span class="ot">&lt;-</span> QALYs.death <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,n.sims,<span class="dv">2</span>)</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  QALYs.inf[,t] <span class="ot">=</span> ((Infected[,t,<span class="dv">1</span>] <span class="sc">+</span> Infected[,t,<span class="dv">2</span>])<span class="sc">*</span>omega[,<span class="dv">1</span>]<span class="sc">/</span><span class="dv">365</span>)<span class="sc">/</span>N</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  QALYs.pne[,t] <span class="ot">=</span> ((Pneumonia[,t,<span class="dv">1</span>] <span class="sc">+</span> Pneumonia[,t,<span class="dv">2</span>])<span class="sc">*</span>omega[,<span class="dv">4</span>]<span class="sc">/</span><span class="dv">365</span>)<span class="sc">/</span>N</span>
+<span id="cb5-12"><a href="#cb5-12"></a>  QALYs.hosp[,t] <span class="ot">=</span> ((Hospital[,t,<span class="dv">1</span>] <span class="sc">+</span> Hospital[,t,<span class="dv">2</span>])<span class="sc">*</span>omega[,<span class="dv">5</span>]<span class="sc">/</span><span class="dv">365</span>)<span class="sc">/</span>N</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  QALYs.death[,t] <span class="ot">=</span> ((Death[,t,<span class="dv">1</span>] <span class="sc">+</span> Death[,t,<span class="dv">2</span>])<span class="sc">*</span>omega[,<span class="dv">6</span>])<span class="sc">/</span>N</span>
+<span id="cb5-14"><a href="#cb5-14"></a>}</span>
+<span id="cb5-15"><a href="#cb5-15"></a>QALYs.adv[,<span class="dv">2</span>] <span class="ot">=</span> (Adverse.events<span class="sc">*</span>omega[,<span class="dv">7</span>]<span class="sc">/</span><span class="dv">365</span>)<span class="sc">/</span>N</span>
+<span id="cb5-16"><a href="#cb5-16"></a></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co"># Aggregates the model inputs to compute (e,c)</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a>eff <span class="ot">=</span> <span class="sc">-</span>(QALYs.inf <span class="sc">+</span> QALYs.pne <span class="sc">+</span> QALYs.adv <span class="sc">+</span> QALYs.hosp <span class="sc">+</span> QALYs.death) <span class="sc">+</span> ...</span>
+<span id="cb5-19"><a href="#cb5-19"></a>cost <span class="ot">=</span> cost.GP <span class="sc">+</span> cost.hosp <span class="sc">+</span> cost.otc <span class="sc">+</span> ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span style="display:block; margin-top: 40px ;"></span></p>
+<ul>
+<li><p>NB: The data stored in the <code>Vaccine</code> object (built-in in <code>BCEA</code>) already contains the objects (<code>eff,cost</code>) that can be used to run the decision analysis…</p></li>
+<li><p>So, this step is actually not needed (but documented in <i class="fa-solid fa-book-open"></i> <a href="https://gianluca.statistica.it/book/bcea/">Baio et al, 2017</a>)</p></li>
+</ul>
+</div>
+<div id="tabset-1-5">
+<div class="cell" data-layout-align="center">
 
-<aside><div>
-<p>See also <a href="https://quarto.org/docs/authoring/footnotes-and-citations.html">https://quarto.org/docs/authoring/footnotes-and-citations.html</a></p>
-</div></aside></section>
-<section id="section-2" class="slide level2 nobar" data-background-image="assets/images/reese.gif" data-background-size="cover">
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">cbind</span>(eff,cost) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>(<span class="at">.name_repair=</span><span class="st">"universal"</span>)       <span class="co"># ensures that the columns are named</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,000 × 4
+   Status.Quo...1 Vaccination...2 Status.Quo...3 Vaccination...4
+            &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+ 1      -0.00105        -0.000899          10.4            16.3 
+ 2      -0.000884       -0.000732           5.83            9.37
+ 3      -0.000890       -0.000698           5.78           15.9 
+ 4      -0.00164        -0.00114           12.2            18.7 
+ 5      -0.00135        -0.000957           9.79           16.5 
+ 6      -0.00143        -0.000936           6.56            9.69
+ 7      -0.000960       -0.00105            8.45           11.3 
+ 8      -0.00181        -0.00139            6.76            9.99
+ 9      -0.000842       -0.000556           3.60           10.1 
+10      -0.00168        -0.00105            4.09           11.0 
+# … with 990 more rows</code></pre>
+</div>
+</div>
+<p><span style="display:block; margin-top: 40px ;"></span></p>
+<ul>
+<li>These calculations <em>can</em> be done also in a spreadsheet (nothing more than algebra, <strong>once you have the simulations</strong>)</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="how-does-bcea-work-1" class="slide level2" data-visibility="uncounted">
+<h2>How does <code>BCEA</code> work?</h2>
+<ul>
+<li>At this point, we are ready to call the function <code>bcea</code> that runs the economic analysis, for example something like</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>treats <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Status quo"</span>,<span class="st">"Vaccination"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>m <span class="ot">=</span> <span class="fu">bcea</span>(<span class="at">e=</span>eff,<span class="at">c=</span>cost,<span class="at">ref=</span><span class="dv">2</span>,<span class="at">interventions=</span>treats,<span class="at">Kmax=</span><span class="dv">50000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>The inputs to the function are
+<ul>
+<li><code>eff</code>: a <strong>matrix</strong> containing the simulations for the clinical benefits (that is <span class="math inline">\(n_{\rm{sim}}\times n_{\rm{int}}\)</span> values)</li>
+<li><code>cost</code>: a <strong>matrix</strong> containing the simulations for the costs (that is <span class="math inline">\(n_{\rm{sim}}\times n_{\rm{int}}\)</span> values)</li>
+<li><code>ref</code>: an indication of which intervention is to be taken as reference (default: the intervention in the first column of <code>eff</code> or <code>cost</code>)</li>
+<li><code>interventions</code>: a vector of labels for the interventions being compared</li>
+<li><code>Kmax</code>: the maximum value of <span class="math inline">\(k\)</span>, the parameter of willingness to pay</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The output is an object <code>m</code> containing several elements</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">names</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "n_sim"         "n_comparators" "n_comparisons" "delta_e"       "delta_c"       "ICER"          "Kmax"          "k"             "ceac"         
+[10] "ib"            "eib"           "kstar"         "best"          "U"             "vi"            "Ustar"         "ol"            "evi"          
+[19] "ref"           "comp"          "step"          "interventions" "e"             "c"            </code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="how-does-bcea-work-2" class="slide level2" data-visibility="uncounted">
+<h2>How does <code>BCEA</code> work?</h2>
+<p>Can visualise the output in various formats (tables/graphs)</p>
+<div class="cell" data-layout-align="center">
+<style type="text/css">
+.cell-output-stdout {
+  overflow-y: scroll;
+  height: 800px!important;
+}
+</style>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># The 'summary' "method" produces a tabular output</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">summary</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Cost-effectiveness analysis summary 
+
+Reference intervention:  Vaccination
+Comparator intervention: Status quo
+
+Optimal decision: choose Status quo for k &lt; 20100 and Vaccination for k &gt;= 20100
+
+
+Analysis for willingness to pay parameter k = 25000
+
+            Expected net benefit
+Vaccination              -36.054
+Status quo               -34.826
+
+                             EIB  CEAC  ICER
+Vaccination vs Status quo 1.2284 0.529 20098
+
+Optimal intervention (max expected net benefit) for k = 25000: Vaccination
+           
+EVPI 2.4145</code></pre>
+</div>
+</div>
+</section>
+<section id="how-does-bcea-work-3" class="slide level2" data-visibility="uncounted">
+<h2>How does <code>BCEA</code> work?</h2>
+<p><span style="display:block; margin-top: -30px ;"></span></p>
+<p>Can visualise the output in various formats (tables/graphs)</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># The 'plot' "method" produces a *specific* version of graphical output</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">plot</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork12-1.png"></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">ceplane.plot</span>(m,<span class="at">wtp=</span><span class="dv">20000</span>,<span class="at">xlim=</span><span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">002</span>,.<span class="dv">002</span>),<span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork13-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="how-does-bcea-work-4" class="slide level2" data-visibility="uncounted">
+<h2>How does <code>BCEA</code> work?</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Using 'ggplot', you can go crazy with customisation...</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">ceplane.plot</span>(m,<span class="at">wtp=</span><span class="dv">10000</span>,<span class="at">graph=</span><span class="st">"gg"</span>,<span class="at">point=</span><span class="fu">list</span>(<span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="fl">1.8</span>),<span class="at">area=</span><span class="fu">list</span>(<span class="at">fill=</span><span class="st">"springgreen3"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img src="./img/howwork14-1.png" class="r-stretch"><div style="position: absolute; left: 60%; top: 75%; font-size: 1.5rem;">
+<p><i class="fa-brands fa-firefox"></i> <a href="https://ggplot2.tidyverse.org/">https://ggplot2.tidyverse.org/</a></p>
+<p><i class="fa-brands fa-firefox"></i> <a href="https://n8thangreen.github.io/BCEA/">https://n8thangreen.github.io/BCEA/</a></p>
+</div>
+</section>
+<section id="section-2" class="slide level2 nobar" data-background-iframe="https://n8thangreen.github.io/BCEA" data-background-interactive="true">
+<h2></h2>
+<div class="footer">
+
+</div>
+</section>
+<section id="how-does-bcea-work-5" class="slide level2" data-visibility="uncounted">
+<h2>How does <code>BCEA</code> work?</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Plots the Cost-Effectiveness Acceptability Curve</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">ceac.plot</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork15-1.png"></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Plots the Expected Value of Partial Information (EVPI)</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">evi.plot</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork16-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="specialised-plots" class="slide level2">
+<h2>Specialised plots</h2>
+<p><span style="display:block; margin-top: -30px ;"></span></p>
+<ul>
+<li>Can generate a <em>contour</em> plot of the cost-effectiveness plane and estimate the proportion of points in each quadrant</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:30%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># "Basic" contourplot</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="fu">contour</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:65%;">
+<div class="cell" data-layout-align="center">
+<p><img src="./img/howwork18-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="specialised-plots-1" class="slide level2" data-visibility="uncounted">
+<h2>Specialised plots</h2>
+<p>The specialised function <code>contour2</code> also shows the <strong>sustainability area</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">contour2</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork19-1.png"></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">contour2</span>(m,<span class="at">wtp=</span><span class="dv">100</span>,<span class="at">xlim=</span><span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">0005</span>,<span class="fl">0.0015</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork20-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="specialised-plots-2" class="slide level2" data-visibility="uncounted">
+<h2>Specialised plots</h2>
+<p><strong>Cost-effectiveness efficiency frontier</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">ceef.plot</span>(m,<span class="at">print.plot=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Cost-effectiveness efficiency frontier summary 
+
+Interventions on the efficiency frontier:
+            Effectiveness  Costs Increase slope Increase angle
+Vaccination   -0.00080537 14.691             NA             NA
+
+Interventions not on the efficiency frontier:
+           Effectiveness  Costs     Dominance type
+Status quo    -0.0010559 9.6555 Extended dominance</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">ceef.plot</span>(m,<span class="at">print.summary=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./img/howwork20tris-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="exporting-graphical-output" class="slide level2">
+<h2>Exporting graphical output</h2>
+<ul>
+<li><code>R</code> has excellent graphical facilities and the graphs produced by <code>BCEA</code> can be easily exported to many different formats</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># "Opens" the graphical device</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="fu">pdf</span>(<span class="st">"NAME_OF_THE_FILE"</span>,<span class="at">width=</span><span class="st">`</span><span class="at">8</span><span class="st">`</span>,<span class="at">height=</span><span class="st">`</span><span class="at">8</span><span class="st">`</span>)      <span class="st">`</span><span class="at"># for 'pdf', units are in inches</span><span class="st">`</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co"># Makes the plot</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="fu">ceplane.plot</span>(<span class="st">`</span><span class="at">BCEA_OBJECT</span><span class="st">`</span>)                     <span class="st">`</span><span class="at"># of course, specify whatever name you've chosen when creating the object...</span><span class="st">`</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co"># "Closes" the graphical device</span></span>
+<span id="cb24-6"><a href="#cb24-6"></a><span class="fu">dev.off</span>()</span>
+<span id="cb24-7"><a href="#cb24-7"></a></span>
+<span id="cb24-8"><a href="#cb24-8"></a></span>
+<span id="cb24-9"><a href="#cb24-9"></a><span class="co"># "Open" the graphical device"</span></span>
+<span id="cb24-10"><a href="#cb24-10"></a><span class="fu">jpeg</span>(<span class="st">"NAME_OF_FILE.jpg"</span>,<span class="at">width=</span><span class="st">`</span><span class="at">480</span><span class="st">`</span>,<span class="at">height=</span><span class="st">`</span><span class="at">480</span><span class="st">`</span>)  <span class="st">`</span><span class="at"># for 'jpeg' units are in px</span><span class="st">`</span></span>
+<span id="cb24-11"><a href="#cb24-11"></a><span class="co"># Makes the plot</span></span>
+<span id="cb24-12"><a href="#cb24-12"></a><span class="fu">ceplane.plot</span>(BCEA_OBJECT)</span>
+<span id="cb24-13"><a href="#cb24-13"></a><span class="co"># "Closes" the graphical device</span></span>
+<span id="cb24-14"><a href="#cb24-14"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span style="display:block; margin-top: 30px ;"></span> <strong>NB</strong>: <code>Rstudio</code> and <a href="https://rmarkdown.rstudio.com/"><code>rmarkdown</code></a> can do even more – that’s for another time…</p>
+</section></section>
+<section>
+<section id="advanced-use-of-bcea" class="title-slide slide level1 center">
+<h1>Advanced use of <code>BCEA</code></h1>
+
+</section>
+<section id="multiple-treatment-comparisons" class="slide level2">
+<h2>Multiple treatment comparisons</h2>
+<h3 id="probabilistic-depression-model">Probabilistic “depression model”</h3>
+<div class="cell" data-layout-align="center">
+
+</div>
+<ul>
+<li><p>Fictional model comparing antidepressants to cognitive behaviour therapy (CBT) and no treatment in people with depression</p></li>
+<li><p>Statistical modelling based on evidence synthesis</p>
+<ul>
+<li>Benefits: based on QALYs</li>
+<li>Costs: associated with treatments and various resources use</li>
+</ul></li>
+<li><p>Economic modelling: two matrices with relevant population summaries</p>
+<ul>
+<li><code>effects</code></li>
+<li><code>costs</code></li>
+</ul></li>
+</ul>
+<p><span style="display:block; margin-top: 30px ;"></span></p>
+<ul>
+<li>NB: The details of the actual modelling are <em>not</em> important for the purposes of demonstrating the example…</li>
+</ul>
+</section>
+<section id="multiple-treatment-comparisons-1" class="slide level2" data-visibility="uncounted">
+<h2>Multiple treatment comparisons</h2>
+<h3 id="probabilistic-depression-model-1">Probabilistic “depression model”</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># Intervention labels</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>t.names<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"No treatment"</span>,<span class="st">"CBT"</span>,<span class="st">"Antidepressant"</span>)</span>
+<span id="cb25-3"><a href="#cb25-3"></a></span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="co"># "Standard" analysis: pairwise comparisons</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a>depression.bcea <span class="ot">=</span> <span class="fu">bcea</span>(effects,costs,</span>
+<span id="cb25-6"><a href="#cb25-6"></a>                       <span class="at">interventions=</span>t.names,<span class="at">ref=</span><span class="dv">3</span>)  </span>
+<span id="cb25-7"><a href="#cb25-7"></a><span class="co"># the third intervention is the reference</span></span>
+<span id="cb25-8"><a href="#cb25-8"></a></span>
+<span id="cb25-9"><a href="#cb25-9"></a><span class="co"># Plots the results</span></span>
+<span id="cb25-10"><a href="#cb25-10"></a><span class="fu">plot</span>(depression.bcea)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<p><img src="./img/depression3-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="multiple-treatment-comparisons-2" class="slide level2" data-visibility="uncounted">
+<h2>Multiple treatment comparisons</h2>
+<h3 id="probabilistic-depression-model-2">Probabilistic “depression model”</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># For `multiple treatment comparison`</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>depression.multi.ce <span class="ot">=</span> <span class="fu">multi.ce</span>(depression.bcea)</span>
+<span id="cb26-3"><a href="#cb26-3"></a></span>
+<span id="cb26-4"><a href="#cb26-4"></a><span class="co"># Specialised plot method</span></span>
+<span id="cb26-5"><a href="#cb26-5"></a><span class="fu">ceac.plot</span>(depression.multi.ce,<span class="at">pos=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>),<span class="at">graph=</span><span class="st">"ggplot2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span style="display:block; margin-top: 30px ;"></span></p>
+<p>NB: In older releases of <code>BCEA</code>, this graph was done using the <strong>deprecated</strong> function <code>mce.plot</code></p>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<p><img src="./img/depression5-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="multiple-treatment-comparisons-3" class="slide level2" data-visibility="uncounted">
+<h2>Multiple treatment comparisons</h2>
+<h3 id="probabilistic-depression-model-3">Probabilistic “depression model”</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Can use <code>ggplot</code> to customise the graph</li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">ceac.plot</span>(depression.multi.ce,<span class="at">pos=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">graph=</span><span class="st">"ggplot2"</span>) <span class="sc">+</span> </span>
+<span id="cb27-2"><a href="#cb27-2"></a>  ggplot2<span class="sc">::</span><span class="fu">stat_summary</span>(<span class="at">fun=</span>max, <span class="at">geom=</span><span class="st">"line"</span>, </span>
+<span id="cb27-3"><a href="#cb27-3"></a>                        <span class="at">colour=</span><span class="st">"grey25"</span>, <span class="at">alpha=</span>.<span class="dv">3</span>, <span class="at">lwd=</span><span class="fl">2.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<p><img src="./img/depression7-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="multiple-treatment-comparisons-4" class="slide level2" data-visibility="uncounted">
+<h2>Multiple treatment comparisons</h2>
+<h3 id="probabilistic-depression-model-4">Probabilistic “depression model”</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Can also use the specialised function <code>ceaf.plot</code></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># Specialised plot</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a><span class="fu">ceaf.plot</span>(depression.multi.ce)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-layout-align="center">
+<p><img src="./img/depression9-1.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="bceaweb" class="slide level2">
+<h2><code>BCEAweb</code></h2>
+<ul>
+<li><p>Inspired by similar projects – eg <a href="http://savi.shef.ac.uk/SAVI/">SAVI</a></p></li>
+<li><p>Create a web interface to use BCEA without even opening R (or even having it installed on your computer!) <span style="display:block; margin-top: 40px ;"></span></p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Typical work flow
+<ol type="1">
+<li>Design the economic model (eg Markov model, decision tree, …)</li>
+<li>Run the statistical analysis to estimate the quantities of interest (eg survival analysis, evidence synthesis, …)</li>
+<li>Run the economic model and obtain “PSA samples”<br>
+</li>
+<li>Upload “PSA samples”, including values for <span class="math inline">\((e,c)\)</span> to <code>BCEAweb</code></li>
+<li>Use <code>BCEA</code> in the background to do <strong>all</strong> the economic analysis</li>
+<li>Create reports that can be used as the basis for papers, reimbursement files, …</li>
+</ol></li>
+</ul>
+</div>
+</section>
+<section id="bceaweb-1" class="slide level2" data-visibility="uncounted">
+<h2><code>BCEAweb</code></h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb29" data-code-line-numbers="1-2|3-8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># Creates a matrix with the underlying model simulations</span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>inp <span class="ot">=</span> <span class="fu">createInputs</span>(vaccine_mat, <span class="at">print_is_linear_comb=</span><span class="cn">FALSE</span>)</span>
+<span id="cb29-3"><a href="#cb29-3"></a></span>
+<span id="cb29-4"><a href="#cb29-4"></a><span class="co"># Runs BCEAweb</span></span>
+<span id="cb29-5"><a href="#cb29-5"></a><span class="fu">BCEAweb</span>(<span class="at">e=</span>e,                 <span class="co"># matrix of simulations for the effectiveness</span></span>
+<span id="cb29-6"><a href="#cb29-6"></a>        <span class="at">c=</span>c,                 <span class="co"># matrix of simulations for the costs</span></span>
+<span id="cb29-7"><a href="#cb29-7"></a>        <span class="at">parameters=</span>inp<span class="sc">$</span>mat   <span class="co"># matrix of simulations for all the model parameters</span></span>
+<span id="cb29-8"><a href="#cb29-8"></a>       )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><span style="display:block; margin-top: 30px ;"></span></p>
+<ul>
+<li><p><code>BCEAweb</code> exists as a standalone webapp</p>
+<ul>
+<li>Can access it <i class="fa-brands fa-firefox"></i> <a href="https://egon.stats.ucl.ac.uk/projects/BCEAweb/">here</a></li>
+</ul></li>
+<li><p><strong>Or</strong>, you can launch your own “local” version from the <code>BCEA</code> package (as in the code above)!</p>
+<ul>
+<li>This will launch a web page from which you can manipulate your output (<i class="fa-solid fa-arrow-circle-right"></i> Live Demo)</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="section-3" class="slide level2 nobar" data-background-image="assets/images/reese.gif" data-background-size="cover">
 <h2></h2>
 <div class="footer">
 
@@ -1304,7 +1201,7 @@ This block activates speaker's notes &ndash; and this slides shows how you can i
 </section>
 <div class="footer footer-default">
 <p>© Gianluca Baio (UCL) &nbsp; | &nbsp; <a style="border-bottom: 0px!important;" href="https://twitter.com/giabaio" title="Follow me on Twitter"><i class="fa-brands fa-twitter" style="color:black;"></i></a>&nbsp; &nbsp;<a style="border-bottom: 0px!important;" href="https://github.com/giabaio" title="Check out my repos"><i class="fa-brands fa-github" style="color:black"></i></a>&nbsp; &nbsp; <a style="border-bottom: 0px!important;" href="mailto:g.baio@ucl.ac.uk" title="Email me"><i class="fa-solid fa-envelope" style="color:black"></i></a>&nbsp; &nbsp; <a style="border-bottom: 0px!important;" href="https://gianluca.statistica.it" title="Visit my website"><i class="fa-brands fa-firefox" style="color:black"></i></a> &nbsp; | &nbsp; Intro to R in HTA &amp; <a href="https://gianluca.statistica.it/software/bcea">BCEA</a> &nbsp; | &nbsp; <a href="https://www.ispor.org/conferences-education/conferences/upcoming-conferences/ispor-europe-2022">ISPOR Europe 2022</a> &nbsp; | &nbsp; <a href="https://en.wikipedia.org/wiki/November_06" title="On this day..." target="_blank"> 6 Nov 2022</a></p>
-</div>
+</div></section>
     </div>
   </div>
 
