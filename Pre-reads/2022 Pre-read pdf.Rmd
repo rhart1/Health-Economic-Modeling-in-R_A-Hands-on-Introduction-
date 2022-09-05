@@ -41,23 +41,35 @@ This document outlines course the structure and pre-read materials for the ISPOR
 The planned itinerary for the course will can be found on [\textcolor{colourblue}{ISPOR short course}](https://www.ispor.org/conferences-education/event/2022/11/06/default-calendar/november-6-health-economic-modeling-in-r-a-hands-on-introduction---in-person-at-ispor-europe-2022) once it has been made available
 \newline
 
-  13:00 – 13:05 Welcome and introductions \newline 
-  13:05 – 14:00 Introduction to R for Health Economics using BCEA   \newline 
-  14:00 – 15:00 Markov modelling  \newline
-  15:00 – 15:15 BREAK \newline 
-  15:15 – 16:15 Discrete-time cohort Markov models in R \newline 
-  16:15 – 17:00 Additional useful packages for R modelling \newline
+  08:00 – 08:05 Welcome and introductions \newline 
+  08:05 – 09:00 Introduction to R for Health Economics using BCEA   \newline 
+  09:00 – 10:00 Markov modelling  \newline
+  10:00 – 10:15 BREAK \newline 
+  10:15 – 11:15 Discrete-time cohort Markov models in R \newline 
+  11:15 – 12:00 Additional useful packages for R modelling \newline
 
 All parts of the course will have practical demonstrations and exercises for attendees to view in-session and will be available post-session via our combined [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-)</u>.
 
 It is recommended that you read through this document prior to attending the short course, and action the necessary points. There are further recommended materials provided; these will be discussed in the course but can be completed after the session by attendees. 
 
+# Objectives of short course
+
+1.	Understand the advantages of R over Microsoft Excel for health economic modelling  
+2.	Implement deterministic and probabilistic discrete-time cohort Markov models in R  
+3.	Use the BCEA package to generate graphical and statistical summaries of health economic models  
+4.	Understand and be able to use additional useful packages in R to increase user-friendliness and accessibility  
+
+
+# Description summary
+
+This highly practical course will outline the computational and transparency advantages of using R, for those used to health economic modelling using Microsoft Excel. This course explores the use of R for health economic modelling in the context of health economics and outcomes research (HEOR) and faculty will guide the participants through practical examples of HEOR. The faculty are expert speakers who have diverse experience in academia, national Health Technology Assessment agencies (NICE, NCPE), and industry. The faculty will lead participants through practical examples of health economic modelling including using R for Markov models from deterministic analysis through to probabilistic sensitivity analysis and EVPI. Additional useful packages for modelling using R will also be discussed. All sessions will interchange between descriptive lectures and hands-on exercises. Participants will be provided with materials, including model examples in R and information on where to go for further learning. This course is designed for those with some familiarity with modelling techniques, such as the concepts of discrete time cohort Markov models and probabilistic sensitivity analysis, but familiarity with R coding is not required. Attendees will require a laptop with RStudio (v1.1.0 or higher) and R (v4.2.0 or higher) downloaded and installed. 
+
 
 # Pre-course requirements 
 
-## Download R {#DownloadR}
+## Download R and RStudio{#DownloadR}
 
-This online book [\textcolor{colourblue}{"An introduction to R"}](https://alexd106.github.io/intro2R/index.html) is a great place to start with learning R and is not specific to health economics. Please view the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) page to go through installing R and R Studio on your machines. Please install R version 4.2.0 or higher. Also, please look at the 'Introducing RStudio' video to familiarize yourself with the RStudio layout. 
+This online book [\textcolor{colourblue}{"An introduction to R"}](https://alexd106.github.io/intro2R/index.html) is a great place to start with learning R and is not specific to health economics. Please view the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) page to go through installing R and R Studio on your machines. Please install R version 4.2.0 or higher and RStudio version 1.1.0 or higher. Also, please look at the 'Introducing RStudio' video to familiarize yourself with the RStudio layout. 
 
 You may find this book useful for continued post-course learning, as it has many great (and free) [\textcolor{colourblue}{tutorials}](https://alexd106.github.io/intro2R/howto.html) and [\textcolor{colourblue}{exercises}](https://alexd106.github.io/intro2R/exercises.html) for beginners.
 
