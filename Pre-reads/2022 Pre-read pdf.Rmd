@@ -39,14 +39,13 @@ knitr::opts_chunk$set(
 This document outlines course the structure and pre-read materials for the ISPOR 2022 in-person short course entitled "Health Economic Modeling in R: A Hands-on Introduction".
 
 The planned itinerary for the course will can be found on [\textcolor{colourblue}{ISPOR short course}](https://www.ispor.org/conferences-education/event/2022/11/06/default-calendar/november-6-health-economic-modeling-in-r-a-hands-on-introduction---in-person-at-ispor-europe-2022) once it has been made available
-\newline
 
-  08:00 – 08:05 Welcome and introductions \newline 
-  08:05 – 09:00 Introduction to R for Health Economics using BCEA   \newline 
-  09:00 – 10:00 Markov Modelling in R - deterministic \newline
-  10:00 – 10:15 BREAK \newline 
-  10:15 – 11:15 Markov Modelling in R - probabilistic \newline 
-  11:15 – 12:00 Additional useful packages for R modelling \newline
+- 8.00-8.05: Welcome & introductions [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
+- 8.05-9.00: Introduction to R for Health Economics using BCEA [Gianluca Baio](https://gianluca.statistica.it)
+- 9.00-10.00: Discrete time Markov models (deterministic) [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
+- 10.00-10.15: **Coffee break**
+- 10.15-11.15: Discrete time Markov models (probabilistic) [Howard Thom](https://www.bristol.ac.uk/people/person/Howard-Thom-7d5ace0c-a4eb-4fa0-8c0b-37dc141c0e9f/)
+- 11.15-12.00: Additional Useful Packages for R Modelling ([shiny](https://shiny.rstudio.com/), [heesim](https://hesim-dev.github.io/hesim/), [rmarkdown](https://rmarkdown.rstudio.com/)) [Rose Hart](https://github.com/rhart1)
 
 All parts of the course will have practical demonstrations and exercises for attendees to view in-session and will be available post-session via our combined [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-)</u>.
 
