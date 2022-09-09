@@ -43,9 +43,9 @@ The planned itinerary for the course will can be found on [\textcolor{colourblue
 
   08:00 – 08:05 Welcome and introductions \newline 
   08:05 – 09:00 Introduction to R for Health Economics using BCEA   \newline 
-  09:00 – 10:00 Markov modelling  \newline
+  09:00 – 10:00 Markov Modelling in R - deterministic \newline
   10:00 – 10:15 BREAK \newline 
-  10:15 – 11:15 Discrete-time cohort Markov models in R \newline 
+  10:15 – 11:15 Markov Modelling in R - probabilistic \newline 
   11:15 – 12:00 Additional useful packages for R modelling \newline
 
 All parts of the course will have practical demonstrations and exercises for attendees to view in-session and will be available post-session via our combined [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-)</u>.
