@@ -1,0 +1,6 @@
+title: youtube-embed
+author: Mark Sellors
+version: 0.0.2
+contributes:
+  shortcodes:
+    - youtube.lua
