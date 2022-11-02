@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # <br/><br/>Additional useful packages for R modelling
 ]
 .subtitle[
-## ISPOR Europe 2022 - in-person short course
+## ISPOR Europe 2022 - In-person short course
 ]
 .author[
 ### Rose Hart
@@ -38,18 +38,14 @@ class: center, middle, inverse, title-slide
 `hesim` - an R package for implementing and analysing health economic simulation models
 &lt;br&gt;&lt;br&gt;
 
---
 
 `rmarkdown` - a file format for making documents with R
 &lt;br&gt;&lt;br&gt;
 
---
 
 `shiny` - a package that makes it possible to create interactive web applications from R code
 &lt;br&gt;&lt;br&gt;
 
-
---
 
 &lt;center&gt;&lt;img src="www/Picture1.png" width="600"&gt;&lt;/center&gt;
 
@@ -58,7 +54,6 @@ class: center, middle, inverse, title-slide
 
 By the end of this session you should:
 
---
 
 1) Be aware of additional useful packages in R that can be useful for building models, documenting them, and distributing them to a technical or non-technical audience
 &lt;br&gt;
@@ -77,15 +72,15 @@ By the end of this session you should:
 ---
 ## &lt;br&gt;Group discussion
 
+--
 
 In groups of two or three (those seated around you), please discuss the following questions and come up with at least 1 point for each:
 &lt;br&gt;&lt;br&gt;
 
---
 
 1) What do you most want to learn how to do in R?
 
-2) What are the key barriers to you developing and using R?
+2) What are the key barriers to you developing and using R for what you need?
 
 &lt;br&gt;&lt;br&gt;
 
@@ -143,7 +138,6 @@ Therefore, you will need to consider the following points for your project:
 
  - Do they know R?
  
---
 
 - What outputs do you need to effectively communicate this model, and make it as transparent as possible?
 
@@ -151,7 +145,6 @@ Therefore, you will need to consider the following points for your project:
   - Tables
   - Intermediate calculations
   
---
 
 - What documentation is required?
 
@@ -160,7 +153,7 @@ Therefore, you will need to consider the following points for your project:
 ## &lt;br&gt;R Markdown
 `rmarkdown` - a file format for making documents with R
 &lt;br&gt;&lt;br&gt; 
-There are two examples of this, one in html and one in pfd.
+There are two examples of this in [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R), one in html and one in pfd.
 
 Please open the *Additional useful packages* folder and open the *R Markdown scripts* folder. There are two scripts there.
 
@@ -179,7 +172,7 @@ Please open the *Additional useful packages* folder and open the *R Markdown scr
 --
 
 &lt;br&gt;&lt;br&gt;
-A default R Markdown document can be created from within RStudio
+A default R Markdown document can be created from within RStudio (5 minute example exercise)
 
 ---
 ## &lt;br&gt;R Markdown
@@ -245,7 +238,8 @@ At it's most basic, a shiny app usually consists of three scripts:
   - This contains the code for the app 'front-end'
 
 &lt;br&gt;&lt;br&gt;  
-However, it is possible to have the server function and ui within the app.R script (this is the case in the default app if created from RStudio)
+However, it is possible to have the server function and ui within the app.R script; this is the case in the default app if created from RStudio (5 minute example exercise)
+
 
 ---
 ### &lt;br&gt;Shiny reactivity
@@ -326,6 +320,7 @@ output$Results_graph &lt;- renderPlot({
 
 ---
 ### &lt;br&gt;app.R
+
 Please open the *hesim shiny app* folder within the *Additional useful packages* folder. Open the *app.R* script.
 
 If you have all the packages previously installed, you should be able to run the app either by clicking the 'Run App' button in the top right hand corner, &lt;img src="www/Picture6.png" width="150"&gt; or by highlighting all the text and pressing **Ctrl + Enter**
@@ -334,6 +329,33 @@ If you have all the packages previously installed, you should be able to run the
 
 &lt;br&gt;&lt;br&gt;
 Familiarize yourself with the layout of the app. All the functionality and graphs in the *hesim example model* are presented here
+&lt;br&gt;&lt;br&gt;
+
+---
+### &lt;br&gt;Shiny app learning and further examples
+
+There are some great tutorials for learning how to create shiny apps:
+
+
+1. https://mastering-shiny.org/basic-app.html
+
+2. https://shiny.rstudio.com/tutorial/
+
+--
+
+&lt;br&gt;&lt;br&gt;
+
+There are also some great examples of shiny apps that others have created:
+
+  
+1. R Studio gallery - https://shiny.rstudio.com/gallery/
+
+2. BCEA web application - https://gianluca--gianlucabaio.netlify.app/software/bceaweb/
+
+3. HTA model proof-of-concept - https://bresmed-intrface-hypothetical-car-t-model.shinyapps.io/IntRface_Model-PharmacoEconomics/
+
+
+&lt;br&gt;&lt;br&gt;
 
 
 ---
@@ -382,12 +404,6 @@ By the end of this session you should:
 
 
 &lt;center&gt;&lt;img src="www/image.jpg" width="300"&gt;&lt;/center&gt;
-
-
----
-class:center
-
-## &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;Discussion and questions 
 
 
 ---
