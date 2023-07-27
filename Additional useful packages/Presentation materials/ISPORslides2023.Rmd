@@ -1,9 +1,9 @@
 ---
 title: "<br/><br/>Additional useful packages for R modelling"
-subtitle: "ISPOR Europe 2022 - In-person short course"
+subtitle: "ISPOR Europe 2023 - In-person short course"
 author: "Rose Hart"
 institute: "Lumanity Inc., Sheffield, UK"
-date: "6 November 2022"
+date: "12 November 2023"
 output:
   xaringan::moon_reader:
     css: my-theme.css
@@ -101,7 +101,7 @@ Publication: https://www.researchgate.net/publication/349424271
 
 
 
-One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R) (*hesim example model.R* script in the *Additional useful packages* folder)
+One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Additional%20useful%20packages/hesim%20example%20model.R) (*hesim example model.R* script in the *Additional useful packages* folder)
 
 
 ---
@@ -140,7 +140,7 @@ Therefore, you will need to consider the following points for your project:
 ## <br>R Markdown
 `rmarkdown` - a file format for making documents with R
 <br><br> 
-There are two examples of this in [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R), one in html and one in pfd.
+There are two examples of this in [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/tree/main/Additional%20useful%20packages/R%20Markdown%20scripts), one in html and one in pdf.
 
 Please open the *Additional useful packages* folder and open the *R Markdown scripts* folder. There are two scripts there.
 

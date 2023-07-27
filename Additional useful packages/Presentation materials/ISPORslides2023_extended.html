@@ -4,7 +4,7 @@
     <title>  Additional useful packages for R modelling</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rose Hart" />
-    <meta name="date" content="2022-11-06" />
+    <meta name="date" content="2023-11-12" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <script src="libs/kePrint/kePrint.js"></script>
     <link href="libs/lightable/lightable.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 # <br/><br/>Additional useful packages for R modelling
 ]
 .subtitle[
-## ISPOR Europe 2022 - in-person short course
+## ISPOR Europe 2023 - in-person short course
 ]
 .author[
 ### Rose Hart
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### Lumanity Inc., Sheffield, UK
 ]
 .date[
-### 6 November 2022
+### 12 November 2023
 ]
 
 ---
@@ -121,7 +121,7 @@ Publication: https://www.researchgate.net/publication/349424271
 
 
 
-One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Advanced%20functionality%20of%20R/hesim%20example%20model.R) (*hesim example model.R* script in the *Additional useful packages* folder)
+One of the examples is recreated in the [short course GitHub repo](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/main/Additional%20useful%20packages/hesim%20example%20model.R) (*hesim example model.R* script in the *Additional useful packages* folder)
 
 
 ---
@@ -513,7 +513,7 @@ plot(Model_Diagram)
 ## Loading required namespace: diagram
 ```
 
-&lt;img src="ISPORslides2022_extended_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2023_extended_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ## &lt;br&gt;Define states and transitions (cont.)
@@ -580,7 +580,7 @@ Patient_plot &lt;- ggplot(patients, aes(x = age, fill = as.factor(female))) +
 Patient_plot
 ```
 
-&lt;img src="ISPORslides2022_extended_files/figure-html/unnamed-chunk-13-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2023_extended_files/figure-html/unnamed-chunk-13-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ## &lt;br&gt;Organizing the model
@@ -670,7 +670,7 @@ trialdata_plot &lt;- ggsurvplot(
 trialdata_plot
 ```
 
-&lt;img src="ISPORslides2022_extended_files/figure-html/unnamed-chunk-18-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+&lt;img src="ISPORslides2023_extended_files/figure-html/unnamed-chunk-18-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
 
 ---
 ### &lt;br&gt;Fit the survival data
@@ -754,12 +754,12 @@ head(transmod_data)
 
 ```
 ##    strategy_id patient_id strategy_name      age female
-## 1:           1          1           SOC 47.58237      0
-## 2:           1          2           SOC 49.55985      1
-## 3:           1          3           SOC 52.39102      1
-## 4:           1          4           SOC 33.60217      1
-## 5:           1          5           SOC 47.10905      0
-## 6:           1          6           SOC 43.82713      0
+## 1:           1          1           SOC 53.31101      1
+## 2:           1          2           SOC 46.26991      0
+## 3:           1          3           SOC 40.77342      0
+## 4:           1          4           SOC 45.53427      0
+## 5:           1          5           SOC 45.14715      1
+## 6:           1          6           SOC 42.60750      0
 ```
 
 ---
@@ -819,13 +819,13 @@ head(ictstm$disprog_)
 ```
 
 ```
-##    sample strategy_id patient_id grp_id from to final time_start  time_stop
-## 1:      1           1          1      1    1  3     1          0  5.8589122
-## 2:      1           1          2      1    1  3     1          0  4.7709020
-## 3:      1           1          3      1    1  3     1          0  0.9221539
-## 4:      1           1          4      1    1  3     1          0 13.9726633
-## 5:      1           1          5      1    1  3     1          0  3.4555656
-## 6:      1           1          6      1    1  3     1          0  6.2755376
+##    sample strategy_id patient_id grp_id from to final time_start time_stop
+## 1:      1           1          1      1    1  3     1   0.000000  3.628805
+## 2:      1           1          2      1    1  3     1   0.000000  9.635492
+## 3:      1           1          3      1    1  3     1   0.000000  5.855412
+## 4:      1           1          4      1    1  2     0   0.000000  2.338155
+## 5:      1           1          4      1    2  3     1   2.338155 11.129098
+## 6:      1           1          5      1    1  2     0   0.000000  3.756425
 ```
 
 ---
@@ -843,11 +843,11 @@ head(ictstm$stateprobs_)
 ```
 ##    sample strategy_id grp_id state_id          t  prob
 ## 1:      1           1      1        1 0.00000000 1.000
-## 2:      1           1      1        1 0.08333333 1.000
-## 3:      1           1      1        1 0.16666667 0.999
-## 4:      1           1      1        1 0.25000000 0.999
-## 5:      1           1      1        1 0.33333333 0.999
-## 6:      1           1      1        1 0.41666667 0.998
+## 2:      1           1      1        1 0.08333333 0.999
+## 3:      1           1      1        1 0.16666667 0.998
+## 4:      1           1      1        1 0.25000000 0.998
+## 5:      1           1      1        1 0.33333333 0.996
+## 6:      1           1      1        1 0.41666667 0.994
 ```
 
 ```r
@@ -862,7 +862,7 @@ Results_plot &lt;- autoplot(ictstm$stateprobs_, labels = labs_indiv,
 Results_plot 
 ```
 
-![](ISPORslides2022_extended_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+![](ISPORslides2023_extended_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
 
 ---
 ## &lt;br&gt;Generate the results: QALYs
@@ -876,12 +876,12 @@ head(ictstm$qalys_)
 
 ```
 ##    sample strategy_id grp_id state_id dr    qalys      lys
-## 1:      1           1      1        1  0 4.672791 5.993826
-## 2:      1           1      1        2  0 2.974364 4.885482
-## 3:      1           2      1        1  0 5.543115 7.110196
-## 4:      1           2      1        2  0 3.049523 5.008934
-## 5:      1           3      1        1  0 6.207944 7.962978
-## 6:      1           3      1        2  0 2.830190 4.648673
+## 1:      1           1      1        1  0 4.880167 5.900034
+## 2:      1           1      1        2  0 2.707772 5.156131
+## 3:      1           2      1        1  0 5.914691 7.150754
+## 4:      1           2      1        2  0 2.539676 4.836042
+## 5:      1           3      1        1  0 6.511403 7.872168
+## 6:      1           3      1        2  0 2.618584 4.986299
 ```
 
 ---
@@ -895,12 +895,12 @@ head(ictstm$costs_)
 
 ```
 ##    sample strategy_id grp_id state_id dr category      costs
-## 1:      1           1      1        1  0     Drug  11987.652
-## 2:      1           1      1        2  0     Drug   5909.378
-## 3:      1           2      1        1  0     Drug  85322.356
-## 4:      1           2      1        2  0     Drug   6057.896
-## 5:      1           3      1        1  0     Drug 119444.670
-## 6:      1           3      1        2  0     Drug   5622.582
+## 1:      1           1      1        1  0     Drug  11800.067
+## 2:      1           1      1        2  0     Drug   6238.957
+## 3:      1           2      1        1  0     Drug  85809.046
+## 4:      1           2      1        2  0     Drug   5851.475
+## 5:      1           3      1        1  0     Drug 118082.513
+## 6:      1           3      1        2  0     Drug   6032.459
 ```
 
 ---
@@ -930,58 +930,58 @@ kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption 
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.90 (7.15, 8.59) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 8.61 (7.89, 9.38) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 9.27 (8.58, 10.05) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.91 (7.22, 8.75) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.63 (8.00, 9.43) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.26 (8.59, 10.10) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 18,244 (16,873, 19,363) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 90,150 (83,838, 95,763) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 122,832 (114,249, 130,423) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,277 (17,207, 19,612) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,713 (85,738, 96,445) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 122,983 (116,644, 130,003) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 49,152 (7,972, 143,061) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 50,054 (7,876, 142,152) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 52,071 (8,009, 136,908) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 56,688 (5,366, 164,706) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 57,141 (5,536, 159,187) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 59,201 (5,881, 165,605) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 67,396 (26,340, 162,159) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 140,203 (96,180, 235,488) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 174,903 (127,861, 262,816) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 74,965 (23,262, 183,403) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 147,854 (94,391, 253,526) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 182,183 (126,250, 289,132) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 17,212 (15,986, 18,202) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 85,960 (80,165, 91,031) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 116,690 (108,905, 123,566) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,240 (16,282, 18,436) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 86,476 (81,934, 91,653) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 116,826 (111,123, 123,175) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 45,155 (7,293, 129,277) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 45,706 (7,162, 127,504) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 47,290 (7,241, 122,095) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 51,879 (4,958, 149,795) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 51,926 (5,093, 144,197) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 53,502 (5,379, 148,992) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 62,367 (24,616, 147,251) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 131,666 (91,429, 216,356) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 163,980 (121,179, 241,622) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 69,119 (21,791, 167,411) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 138,402 (89,892, 233,152) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 170,328 (119,794, 266,247) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 6.61 (6.07, 7.10) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.11 (6.61, 7.66) &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 7.56 (7.06, 8.11) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.61 (6.09, 7.22) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.12 (6.63, 7.68) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.55 (7.04, 8.14) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
