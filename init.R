@@ -1,5 +1,5 @@
 
-# Please read and run this script prior to taking part in the workshop on 6th November 2022
+# Please read and run this script prior to taking part in the ISPOR workshop
 
 # Please have an R version 4.2.0 or later - instructions for this are in the pre-read documents
 
