@@ -13,12 +13,12 @@ You can also use `BCEA-web` to check how things work. Go to its [website](https:
 
 The default tab gives you some description of what it can do. Move to the next tab `1. Parameter simulations`. From there:
 
-1. Click on the first slider `1. Import parameter simulations data from`, select `Spreadsheet` and then upload the file `parameter-simulations.csv`, which you can download from this GitHub repo
+1. Click on the first slider `1. Import parameter simulations data from`, select `Spreadsheet` and then upload the file [`model-parameter-simulations.csv`](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/docker/model-parameters-simulations.csv), which you can download from this GitHub repo. This contains the PSA simulations for all the `Vaccine` model parameters.
 2. Click on  the second slider `2. Select parameter of interest for checking`, which can be used to flip over the model parameters and check that the resulting histogram is consistent with the modelling assumptions you want to use.
 
 Now move to the next tab `2. Economic analysis`. 
 
-1. In the first slider `1. Import the simulations for (e,c) from:` select again `Spreadsheet` and upload the file `model-parameters-simulations.csv` that you can download from this repo.
+1. In the first slider `1. Import the simulations for (e,c) from:` select again `Spreadsheet` and upload the file `[cost-effectiveness-simulations.csv]`(https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-/blob/docker/cost-effectiveness-simulations.csv) that you can download from this repo. This contains the simulations for QALYs and costs for the two interventions.
 2. You *can* (but don't have to!) add labels for your interventions by typing new names instead of `Intervention1` and `Intervention2`.
 3. Click on the `Run` button to run the economic analysis. 
 4. Navigate the tabs on the right-hand side of the panel, `2.1 Cost-Effectiveness Analysis` to `2.4 Cost-Effectiveness Efficiency Frontier`
