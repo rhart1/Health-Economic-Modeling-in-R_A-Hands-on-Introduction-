@@ -13,6 +13,21 @@
   height: 100%;
 }
 
+.title-slide h1 {
+  color: black;
+  text-shadow: none;
+}
+
+.title-slide h2 {
+  color: black;
+  text-shadow: none
+}
+
+.title-slide h3 {
+  color: black;
+  text-shadow: none
+}
+
 .remark-slide-content:not(.title-slide){
   background-image: url(www/ContentISPOR.PNG);
   background-size: contain;
