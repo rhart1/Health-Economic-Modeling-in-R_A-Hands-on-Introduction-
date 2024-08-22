@@ -1,1 +1,14 @@
-R-HTA-BCEA
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+BCEA_talk/
+!BCEA
+R-HTA-BCEA/old_version/*
+R-HTA-BCEA/*.qmd
+R-HTA-BCEA/*.Rproj
+R-HTA-BCEA/**/*.qmd
+R-HTA-BCEA/_extensions
+R-HTA-BCEA/assets
+R-HTA-BCEA/img
+R-HTA-BCEA/index_files/*

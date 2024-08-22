@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>  Advanced functionality of R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rose Hart" />
+    <meta name="date" content="2021-06-17" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# <br/><br/>Advanced functionality of R
+]
+.subtitle[
+## Virtual ISPOR 2021
+]
+.author[
+### Rose Hart
+]
+.institute[
+### BresMed Health Solutions Ltd., Sheffield, UK
+]
+.date[
+### 17 June 2021
+]
+
+---
+
+
+
+
+## &lt;br&gt;Overview
+
+`hesim` - an R package for implementing and analysing health economic simulation models
+&lt;br&gt;&lt;br&gt;
+
+--
+
+`rmarkdown` - a file format for making documents with R
+&lt;br&gt;&lt;br&gt;
+
+--
+
+`shiny` - a package that makes it possible to create interactive web applications from R code
+&lt;br&gt;&lt;br&gt;
+
+
+--
+
+&lt;center&gt;&lt;img src="www/Picture1.png" width="600"&gt;&lt;/center&gt;
+
+---
+
+## &lt;br&gt;The hesim package
+
+`hesim` supports three types of health economic models:
+
+(i) **Cohort discrete time state transition models (cDTSTMs)** - These are Markov cohort models and can be time-homogeneous or time-inhomogeneous
+
+(ii) **N-state partitioned survival models (PSMs)** - Area under the curve model
+
+(iii) **Individual-level continuous time state transition models (iCTSTMs)** - individual-level simulations that can encompass both Markov and semi-Markov processes
+
+
+All models are implemented as R6 classes and have methods for simulating disease progression, QALYs, and costs.
+
+This package is well documented in its [CRAN vignette](https://cran.r-project.org/web/packages/hesim/vignettes/intro.html) and [publication](https://www.researchgate.net/publication/349424271_hesim_Health_Economic_Simulation_Modeling_and_Decision_Analysis/link/605c068192851cd8ce65e830/download)
+
+CRAN vignette: https://cran.r-project.org/web/packages/hesim/vignettes/intro.html &lt;br&gt;
+Publication: https://www.researchgate.net/publication/349424271
+
+---
+## &lt;br&gt;How this session will work
+
+If you have not done this already, please open your downloaded materials for this short course as a **project**
+- Instructions how to do this are in the pre-reads
+
+
+Please open the *Advanced functionality of R* folder and open the *hesim example model.R* script
+
+--
+
+There are three parts of this session: &lt;br&gt;&lt;br&gt;
+--
+
+1. The *hesim example model.R* script contains an example model code 
+
+   This is heavily based on the example in the [CRAN vignette](https://cran.r-project.org/web/packages/hesim/vignettes/intro.html) https://cran.r-project.org/web/packages/hesim/vignettes/intro.html 
+
+   We will go through this line by line &lt;br&gt;
+
+--
+
+2. Output the results of the model into RMarkdown PDF and HTML report examples &lt;br&gt;&lt;br&gt;
+
+--
+
+3. Demonstrates the model as a `shiny` application &lt;br&gt;&lt;br&gt;
+
+
+---
+## &lt;br&gt;hesim example model
+
+
+```r
+# Load packages ---------------
+# These will need installing if they have not been used before
+# install.packages("hesim")
+# install.packages("data.table")
+# install.packages("flexsurv")
+# install.packages("survminer")
+# install.packages("heemod")
+# install.packages("magrittr")
+library("hesim")      # Containing the mock trial data and the functions for model construction
+library("data.table") # Used for organising the data in this example
+library("flexsurv")   # used for fitting parametric models to the trial data
+library("survminer")  # useful for easily presenting Kaplan–Meier plots. It also loads `ggplot2` as a dependent, which is a versatile package for producing 
+                      # almost any type of graph
+library("heemod")     # Can produce a really simple model diagram - also has other useful 
+                      # functions for partitioned survival modelling
+library("magrittr")   # Structuring data sequences with left -&gt; right formatting instead of nested functions
+```
+
+
+
+Tip: for commenting / uncommenting lines, highlight the lines and type **ctrl + shift + c**
+
+---
+
+## &lt;br&gt;Informing the inputs
+
+First thing in an R model is always to consider how the inputs are entered and presented (with comments), and how they are to be used.
+
+The inputs included in this model are similar to most models:
+- States and transitions
+- Strategies
+- Patient characteristics
+- Trial data and fits
+- Costs
+- Utilities
+
+Click the document outline toggle in the top right corner of console to see inputs layout
+
+---
+## &lt;br&gt;Informing the inputs
+
+&lt;center&gt;&lt;img src="www/Picture2.png" width="400"&gt;&lt;/center&gt;
+
+---
+
+## &lt;br&gt;Inputs
+
+```r
+# Informing inputs --------------
+# ~ States and transitions ---------
+# ~~ Define matrix ---------------
+tmat &lt;- rbind(
+ c(NA, 1, 2),
+ c(NA, NA, 3),
+ c(NA, NA, NA)
+ )
+colnames(tmat) &lt;- rownames(tmat) &lt;- c("Stable", "Progression", "Death")
+print(tmat)
+```
+
+```
+##             Stable Progression Death
+## Stable          NA           1     2
+## Progression     NA          NA     3
+## Death           NA          NA    NA
+```
+
+---
+## &lt;br&gt;Define states and transitions
+
+```r
+# ~~ Define transitions ---------------
+transitions &lt;- create_trans_dt(tmat)
+print(transitions)
+```
+
+```
+##    transition_id from to   from_name     to_name
+## 1:             1    1  2      Stable Progression
+## 2:             2    1  3      Stable       Death
+## 3:             3    2  3 Progression       Death
+```
+
+```r
+Model_Diagram &lt;- define_transition( #this function is part of the heemod package
+  state_names = c("Stable", "Progression", "Death"),
+  Stable,transition_id_1, transition_id_2,
+  ,Progressed, transition_id_3,
+  , , Death
+)
+```
+
+---
+### &lt;br&gt; Creating a simple model diagram
+
+```r
+plot(Model_Diagram)
+```
+
+```
+## Loading required namespace: diagram
+```
+
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-5-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+
+---
+## &lt;br&gt;Define states and transitions (cont.)
+
+
+```r
+# ~~ Outline states and IDs in separate table for easy referencing --------------
+# Death is automatically added by get_labels() (below) in the code below in the default 
+# settings, but 'death_label = NULL' argument in get_labels() this will override this.
+# Current setup is to maintain simplicity
+states &lt;- data.table(
+  state_id = 1:2,
+  state_name = c("Stable", "Progression")
+)
+```
+
+---
+## &lt;br&gt;Strategies
+
+```r
+# ~ Strategies ----------------------
+# ~~ Outline strategy and IDs ----------------
+# Note: SOC = standard of care
+strategies &lt;- data.table(
+  strategy_id = 1:3,
+  strategy_name = c("SOC", "New 1", "New 2")
+  )
+print(strategies)
+```
+
+```
+##    strategy_id strategy_name
+## 1:           1           SOC
+## 2:           2         New 1
+## 3:           3         New 2
+```
+
+---
+## &lt;br&gt;Patients
+
+```r
+n_patients &lt;- 1000
+patients &lt;- data.table(
+  patient_id = 1:n_patients,
+  age = rnorm(n_patients, mean = 45, sd = 7),
+  female = rbinom(n_patients, size = 1, prob = .51)
+)
+# If groups are wanted, these can be defined in the 'grp_id' and 'grp_name' columns.
+# Otherwise can be commented and left blank.
+# patients[, grp_id := ifelse(female == 1, 1, 2)]
+# patients[, grp_name := ifelse(female == 1, "Female", "Male")]
+
+Patient_plot &lt;- ggplot(patients, aes(x = age, fill = as.factor(female))) + 
+      geom_histogram(binwidth = 1, colour = "#959595") + 
+      theme_bw() + 
+      scale_fill_manual("Gender:", values = c("#0D8E1E","#9552BB"),
+                        labels = c("Male","Female"))
+```
+
+---
+### &lt;br&gt;Patient samples
+
+```r
+Patient_plot
+```
+
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-9-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+
+---
+## &lt;br&gt;Organizing the model
+
+```r
+#Wrapping the dataframes of the model into the hesim_data() function,
+
+hesim_dat &lt;- hesim_data(
+   strategies = strategies,
+   patients = patients,
+   states = states,
+   transitions = transitions
+   )
+
+# Not printing this as it will take too much space on the slides
+```
+
+---
+
+## &lt;br&gt;Organizing the model
+
+```r
+# ~~ Setting up labels for state and strategy IDs ---------------
+labs_indiv &lt;- get_labels(hesim_dat)
+print(labs_indiv)
+```
+
+```
+## $strategy_id
+##   SOC New 1 New 2 
+##     1     2     3 
+## 
+## $state_id
+##      Stable Progression       Death 
+##           1           2           3
+```
+
+---
+## &lt;br&gt;Trial data
+
+```r
+# ~ 'Trial' data ----------
+# hesim package includes the 'onc3' data.table. This separates the three transitions by 'transition_id', where the IDs match the 'transitions' data
+# These individual transitions can be filtered for and have parametric models fitted
+# Data example showing patients 1 and 2:
+onc3[patient_id %in% c(1, 2)]
+```
+
+```
+##           from          to strategy_name female      age patient_id time_start
+## 1:      Stable Progression         New 2      0 59.85813          1   0.000000
+## 2:      Stable       Death         New 2      0 59.85813          1   0.000000
+## 3: Progression       Death         New 2      0 59.85813          1   2.420226
+## 4:      Stable Progression         New 2      0 62.57282          2   0.000000
+## 5:      Stable       Death         New 2      0 62.57282          2   0.000000
+##    time_stop status transition_id strategy_id      time
+## 1:  2.420226      1             1           3  2.420226
+## 2:  2.420226      0             2           3  2.420226
+## 3: 14.620258      1             3           3 12.200032
+## 4:  7.497464      0             1           3  7.497464
+## 5:  7.497464      0             2           3  7.497464
+```
+
+---
+### &lt;br&gt;View the trial data
+
+```r
+transition_id_view &lt;- 1
+TransitionData &lt;-
+  survfit(as.formula(Surv(time, status) ~ strategy_name), 
+          data = onc3[which(transition_id == transition_id_view),])
+
+trialdata_plot &lt;- ggsurvplot(
+  fit      = TransitionData,
+  data     = onc3,
+  xlab = 'Time (Years)',
+  ylab = 'Survival',
+  risk.table = TRUE,
+  legend = "top"
+)
+```
+
+---
+### &lt;br&gt;View the trial data
+
+```r
+trialdata_plot
+```
+
+&lt;img src="ISPORslides2021_files/figure-html/unnamed-chunk-14-1.png" width="\textwidth" style="display: block; margin: auto;" /&gt;
+
+---
+### &lt;br&gt;Fit the survival data
+
+```r
+n_trans &lt;- max(tmat, na.rm = TRUE)
+wei_fits &lt;- vector(length = n_trans, mode = "list")
+f &lt;- as.formula(Surv(time, status) ~ factor(strategy_name) + female + age)
+
+for (i in 1:length(wei_fits)){
+  if (i == 3) {f &lt;- update(f, .~.-factor(strategy_name))} 
+  wei_fits[[i]] &lt;- flexsurvreg(f, data = onc3,
+                               subset = (transition_id == i),
+                               dist = "weibull")
+}
+
+wei_fits &lt;- flexsurvreg_list(wei_fits) 
+#This is now a list of three sets of Weibull parameters, one for each transition.
+```
+
+---
+## &lt;br&gt;Drug costs
+
+
+
+```r
+drugcost_dt &lt;- data.table(drugcost_dt)
+
+drugcost_tbl &lt;- stateval_tbl(
+  drugcost_dt,
+  dist = "fixed")
+head(drugcost_tbl)
+```
+
+```
+##    strategy_id state_id time_id time_start time_stop   est
+## 1:           1        1       1       0.00      0.25  2000
+## 2:           1        1       2       0.25       Inf  2000
+## 3:           1        2       1       0.00      0.25  1500
+## 4:           1        2       2       0.25       Inf  1200
+## 5:           2        1       1       0.00      0.25 12000
+## 6:           2        1       2       0.25       Inf 12000
+```
+
+---
+## &lt;br&gt;Other costs
+
+```r
+# ~~ Medical costs ---------------
+medcost_tbl &lt;- stateval_tbl(
+  data.table(state_id = states$state_id,
+             mean = c(2000, 9500),
+             se = c(2000, 9500)
+  ),
+  dist = "gamma")
+#print(medcost_tbl)
+
+# ~ Utilities ----------------
+utility_tbl &lt;- stateval_tbl(
+  data.table(state_id = states$state_id,
+             mean = c(.8, .6),
+             se = c(0.02, .05)
+             ),
+  dist = "beta")
+#print(utility_tbl)
+```
+
+---
+## &lt;br&gt;Setting up the model
+
+```r
+# Setting up the model --------------
+# ~ Number of parameter samples is needed to use for the PSA
+n_samples &lt;- 100
+
+# ~ Expanding the data input dataframe to set up for running all patients with all strategies
+transmod_data &lt;- expand(hesim_dat,
+                        by = c("strategies", "patients"))
+head(transmod_data)
+```
+
+```
+##    strategy_id patient_id strategy_name      age female
+## 1:           1          1           SOC 45.71526      1
+## 2:           1          2           SOC 55.92342      0
+## 3:           1          3           SOC 52.51790      1
+## 4:           1          4           SOC 47.56598      1
+## 5:           1          5           SOC 47.76237      1
+## 6:           1          6           SOC 48.86596      1
+```
+
+---
+## &lt;br&gt;Setting up the model
+
+```r
+# ~ Wrapping inputs in hesim functions for use in model -------------
+# ~~ Efficacy -----------------
+transmod &lt;- create_IndivCtstmTrans(object = wei_fits, 
+                                   input_data = transmod_data,
+                                   trans_mat = tmat, n = n_samples,
+                                   uncertainty = "normal",
+                                   clock = "reset",
+                                   start_age = patients$age)
+```
+
+---
+## &lt;br&gt;Setting up the model
+
+```r
+# ~ Wrapping inputs in hesim functions for use in model -------------
+# ~~ Efficacy -----------------
+# ~~ Utilities -----------------
+utilitymod &lt;- create_StateVals(utility_tbl, n = n_samples,
+                               hesim_data = hesim_dat)
+
+# ~~ Costs ------------------
+drugcostmod &lt;- create_StateVals(drugcost_tbl, n = n_samples,
+                                time_reset = TRUE, hesim_data = hesim_dat)
+medcostmod &lt;- create_StateVals(medcost_tbl, n = n_samples,
+                                 hesim_data = hesim_dat)
+costmods &lt;- list(Drug = drugcostmod,
+                   Medical = medcostmod)
+```
+
+
+---
+## &lt;br&gt;Setting up the model
+
+```r
+# ~ Combining input into economic model -------------------
+ictstm &lt;- IndivCtstm$new(trans_model = transmod,
+                         utility_model = utilitymod,
+                         cost_models = costmods)
+```
+
+---
+## &lt;br&gt;Run the model 
+
+```r
+# Run the disease simulation ----------------
+# ~ Run simulation -------------
+# This runs the disease simulation, and it is assumed that the max patient age is 100 (after which they automatically transfer to 'Death' state)
+ictstm$sim_disease(max_age = 100, progress = FALSE)
+# This is the event data simulated for each patient
+head(ictstm$disprog_)
+```
+
+```
+##    sample strategy_id patient_id grp_id from to final time_start time_stop
+## 1:      1           1          1      1    1  3     1   0.000000  4.372644
+## 2:      1           1          2      1    1  3     1   0.000000  4.053958
+## 3:      1           1          3      1    1  2     0   0.000000  2.287221
+## 4:      1           1          3      1    2  3     1   2.287221 14.515718
+## 5:      1           1          4      1    1  2     0   0.000000  5.568338
+## 6:      1           1          4      1    2  3     1   5.568338 11.901399
+```
+
+---
+## &lt;br&gt;Generate the results 
+
+```r
+# ~ Generate outcomes --------------
+# ~~ Survival --------------
+# Create survival curves with set time intervals
+# Time is in years, so this will measure from 0 to 30 years, with 1/12 (1 month) intervals 
+ictstm$sim_stateprobs(t = seq(0, 30 , 1/12))
+head(ictstm$stateprobs_)
+```
+
+```
+##    sample strategy_id grp_id state_id          t  prob
+## 1:      1           1      1        1 0.00000000 1.000
+## 2:      1           1      1        1 0.08333333 1.000
+## 3:      1           1      1        1 0.16666667 0.999
+## 4:      1           1      1        1 0.25000000 0.999
+## 5:      1           1      1        1 0.33333333 0.997
+## 6:      1           1      1        1 0.41666667 0.996
+```
+
+```r
+Results_plot &lt;- autoplot(ictstm$stateprobs_, labels = labs_indiv,
+            ci = FALSE) + theme_bw()
+```
+
+---
+## &lt;br&gt;Generate the results: Survival
+
+```r
+Results_plot 
+```
+
+![](ISPORslides2021_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+---
+## &lt;br&gt;Generate the results: QALYs
+
+```r
+# ~~ QALYS -------------
+# QALYs and costs are simulated separately from the simulation of the disease
+ictstm$sim_qalys(dr = c(0,.03))
+head(ictstm$qalys_)
+```
+
+```
+##    sample strategy_id grp_id state_id dr    qalys      lys
+## 1:      1           1      1        1  0 4.563513 5.970049
+## 2:      1           1      1        2  0 3.255572 5.056079
+## 3:      1           2      1        1  0 5.308074 6.944094
+## 4:      1           2      1        2  0 3.004787 4.666597
+## 5:      1           3      1        1  0 5.786333 7.569758
+## 6:      1           3      1        2  0 3.485827 5.413678
+```
+
+---
+## &lt;br&gt;Generate the results: Costs
+
+```r
+# ~~ Costs ------------ 
+ictstm$sim_costs(dr = c(0,.01))
+head(ictstm$costs_)
+```
+
+```
+##    sample strategy_id grp_id state_id dr category      costs
+## 1:      1           1      1        1  0     Drug  11940.099
+## 2:      1           1      1        2  0     Drug   6113.495
+## 3:      1           2      1        1  0     Drug  83329.130
+## 4:      1           2      1        2  0     Drug   5645.067
+## 5:      1           3      1        1  0     Drug 113546.372
+## 6:      1           3      1        2  0     Drug   6546.213
+```
+
+---
+## &lt;br&gt;Generate the results: Summary
+
+```r
+# ~ Summarize ----------------
+ce_sim_ictstm &lt;- ictstm$summarize()
+
+Tableout &lt;- summary(ce_sim_ictstm, labels = labs_indiv) %&gt;% format()
+
+kbl(Tableout, booktabs = T, position = "h", align = "c", centering = T, caption = "Summary of total costs and QALYs")
+```
+
+&lt;table&gt;
+&lt;caption&gt;Summary of total costs and QALYs&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:center;"&gt; Discount rate &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Outcome &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; SOC &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; New 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; New 2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.89 (7.18, 8.54) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 8.59 (7.94, 9.24) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 9.25 (8.39, 9.93) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18,210 (16,924, 19,349) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 90,386 (84,488, 96,651) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 123,017 (115,760, 131,115) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61,772 (5,462, 164,145) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 62,927 (5,885, 165,445) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 65,701 (6,392, 157,566) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 79,982 (23,771, 182,866) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 153,314 (94,497, 254,998) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 188,718 (124,860, 281,844) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: Drug &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 17,182 (16,033, 18,203) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 86,181 (80,770, 91,899) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 116,867 (110,298, 124,152) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: Medical &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 56,730 (5,105, 149,994) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 57,429 (5,551, 150,380) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 59,634 (6,003, 142,700) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; Costs: total &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 73,912 (22,331, 167,640) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 143,610 (90,117, 235,774) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 176,500 (118,857, 260,804) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; QALYs &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 6.60 (6.07, 7.08) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.10 (6.60, 7.58) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 7.55 (6.93, 8.04) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+### &lt;br&gt;Other hesim functionalities
+&lt;center&gt;&lt;img src="www/Picture3.png" width="1000"&gt;&lt;/center&gt;
+
+---
+### &lt;br&gt;Starting your own models
+
+What is in this model? 
+&lt;br&gt;&lt;br&gt;
+--
+
+- Dataframes of inputs
+- Functions from packages with descriptive and freely available documentation
+- Graphs and tables displaying input data and results
+&lt;br&gt;&lt;br&gt;
+
+--
+
+Where do you start?
+&lt;br&gt;&lt;br&gt;
+--
+
+- Break model down into manageable chunks
+- Use existing examples to guide you
+
+---
+
+### &lt;br&gt;You've made your model. What's next?
+
+--
+
+You will now need to communicate it to a wider audience.
+
+--
+
+Therefore, you will need to consider the following points for your project:
+
+--
+
+- Who is your audience?
+
+ - Do they know R?
+ 
+--
+
+- What outputs do you need to effectively communicate this model, and make it as transparent as possible?
+
+  - Graphs
+  - Tables
+  - Intermediate calculations
+  
+--
+
+- What documentation is required?
+
+
+---
+## &lt;br&gt;R Markdown
+`rmarkdown` - a file format for making documents with R
+&lt;br&gt;&lt;br&gt; 
+There are two examples of this, one in html and one in pfd.
+
+Please open the *Advanced functionality of R* folder and open the *R Markdown scripts* folder. There are two scripts there.
+
+- Looking through, there are differences between a standard R script and an rmd script
+
+  - It is text (white background) interspaced by code 'chunks' (grey background)
+  - This means that you do not need to copy and paste R outputs to your report, you only need to write the report and interpret
+  
+--
+
+- There is really good documentation on how you can create one
+
+  - https://bookdown.org/yihui/rmarkdown - Online book
+  - https://rmarkdown.rstudio.com/gallery.html - Examples
+  
+---
+## &lt;br&gt;R Markdown
+The examples in this project are called from the *hesim example model.R* script
+
+
+```r
+library(rmarkdown)   # For creating markdown outputs (html and pdf)
+library(bookdown)    # For creating markdown outputs (html and pdf)
+library(knitr)       # For creating markdown outputs (html and pdf)
+library(kableExtra)  # For creating nice-looking tables in rmarkdown
+
+Export_params &lt;- list(
+  # Main results
+  Stateprobs            = ictstm$stateprobs_,
+  Summarisedf           = ce_sim_ictstm,
+  labs_indiv            = labs_indiv
+)
+
+Markdown_location &lt;- "./Additional useful packages/R Markdown scripts/"
+```
+
+---
+## &lt;br&gt;R Markdown
+
+
+```r
+# html document
+rmarkdown::render(
+  input = file.path(Markdown_location,"hesim html report.Rmd"),
+  output_format = 'bookdown::html_document2',
+  output_file = "./Additional useful packages/hesim-html-report.html",
+  params = Export_params,
+  envir = environment()
+)
+
+# pdf document
+rmarkdown::render(
+  input = file.path(Markdown_location,"hesim pdf report.Rmd"),
+  output_format = 'bookdown::pdf_document2',
+  output_file = "./Additional useful packages/hesim-pdf-report.pdf", 
+  params = Export_params,
+  envir = environment()
+)
+```
+
+If you are unable to generate these documents at present, the generated html and pdf documents are in the *Advanced functionality of R* folder at the top level.
+
+---
+## &lt;br&gt;Shiny
+`shiny` - a package that makes it possible to create interactive web applications from R code
+
+Creating an R shiny app considerably increases the accessibility of your R code. However, it is a further learning curve and can be time consuming. 
+
+At it's most basic, a shiny app consists of three scripts:
+- app.R 
+  - The application is called from this script
+- server.R
+  - The app functionality. This is wrapped within a function: `function(input, output, session){}` 
+  - This contains the code for the app 'back-end'
+- ui.R
+  - This is the layout of the graphical user interface (GUI)
+  - This contains the code for the app 'front-end'
+
+---
+### &lt;br&gt;Shiny reactivity
+
+Having your R code as a shiny app enables users to interact with the R code without seeing the R code. This works by the app 'front-end' changes causing reactions in the 'back-end' calculations.
+
+--
+
+1. The user interacts with the input boxes defined in the `ui.R` script &lt;br&gt;&lt;br&gt;
+
+--
+
+2. The functions which are reactive to front-end changes are wrapped in reactive functions (e.g. reactive(), observe()) in `server.R` &lt;br&gt;&lt;br&gt;
+
+--
+
+3. The reactive functions are always 'listening' for changes - when they detect a change the function will re-run &lt;br&gt;&lt;br&gt;
+
+--
+
+4. The re-running of the reactive functions causes a change in the output, which the user can then see &lt;br&gt;&lt;br&gt;
+
+--
+
+An object that is reactive (created using reactive()) is a function. This means that when referring to it later in the script, the syntax changes and brackets are needed (e.g. ictstm in the standard script becomes ictstm() in the server.R script)
+
+---
+### &lt;br&gt;Defining shiny inputs and outputs
+
+There are two major lists that enable communication between the front-end and back-end:
+
+**input list**
+  - These are mostly defined in the UI
+  - There are many different types, depending on the type of input
+  - Each has an id, which can then be used within functions to reference the input value. For example, a numeric input with an id = 'number' can be referenced in a function but using `input$number`
+  - Examples of inputs can be found here: https://shiny.rstudio.com/tutorial/written-tutorial/lesson3/
+
+
+```r
+#Input example:
+#This is written in the ui
+numericInputIcon(
+  inputId = "Input_discount_Costs",
+  label = "Discount for Costs:",
+  min = 0,
+  max = 100,
+  value = 3.5,
+  icon = list(NULL, icon("percent"))
+)
+```
+
+---
+### &lt;br&gt;Defining shiny inputs and outputs
+
+**output list**
+  - The results of your functions that you want to then display front-end are defined in the outputs list
+  - As with inputs, there are a variety of functions that can be used depending on the type of output you want to display
+  - Each has an id. The location of the output is defined in the ui, and then the output content is defined in the server
+
+
+```r
+#Output example:
+#This is written in the ui
+plotOutput("Results_graph")
+
+#This is written in the server
+output$Results_graph &lt;- renderPlot({
+    autoplot(ictstm()$stateprobs_, labels = labs_indiv,
+             ci = FALSE) + theme_bw()
+  })
+```
+  
+
+---
+### &lt;br&gt;Summary of shiny
+
+&lt;center&gt;&lt;img src="www/Picture5.png" width="900"&gt;&lt;/center&gt;
+
+---
+
+### &lt;br&gt;server.R
+
+Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *server.R* script.
+
+The server script has all the model functionality
+
+Click the document outline toggle in the top right corner of console to see server.R layout  &lt;img src="www/Picture4.png" width="40"&gt;
+
+Compare this with the layout of the *hesim example model.R* script
+
+--
+
+You should notice that the two scripts are very similar: 
+  - Layout and headings are the same
+  - Functions are similar within the headings
+
+--
+
+&lt;br&gt;
+The main differences are the 'output to shiny' sections, where the images that were printed in the script are now wrapped in 'render' functions
+
+---
+### &lt;br&gt;app.R
+Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *app.R* script.
+
+If you have all the packages previously installed, you should be able to run the app either by clicking the 'Run App' button in the top right hand corner, &lt;img src="www/Picture6.png" width="150"&gt; or by highlighting all the text and pressing **Ctrl + Enter**
+
+--
+
+&lt;br&gt;&lt;br&gt;
+Familiarize yourself with the layout of the app, looking at all the functionality and graphs we generated in the *hesim example model* 
+
+---
+
+### &lt;br&gt;ui.R
+Please open the *hesim shiny app* folder within the *Advanced functionality of R* folder. Open the *ui.R* script.
+
+The ui script has all the front-end layout.
+
+&lt;br&gt;&lt;br&gt;
+The ui uses the `shinydashboard` package, allowing users to define a 'header', a 'sidebar' and a 'body'. This package is well documented with good examples and tutorials https://rstudio.github.io/shinydashboard/
+
+&lt;img src="www/Picture7.png" width="200"&gt;
+
+--
+
+Note that the full width of any area in shiny is 12 (e.g. box(), column()).
+
+---
+## &lt;br&gt;Designing an app: Layout
+
+There should always be a 'design stage' for any application. 
+
+--
+
+The questions you need to ask yourself (and your project team) when designing an application are:
+
+1. What do you want to show?
+
+  - Graphs and tables
+  - Intermediate calculations
+  - Explanatory text
+
+--
+
+2. What do you want the user to be able to interact with?
+
+  - Settings
+  - Analyses
+  - Outputs
+
+---
+## &lt;br&gt;Designing an app: Reactivity
+
+Once you know 1) what you want to present and 2) what you want your user to react with, you should then plan out your reactivity:
+
+- Map out your code visually, indicating where reactive inputs feed into functions&lt;br&gt;&lt;br&gt;
+  - Which code sections or functions need to be dependent on particular events (e.g. the push of a button), and which sections do not need controlled reactivity?&lt;br&gt;&lt;br&gt;
+  - Often, downstream sections of code in models are dependent on numerous inputs. Therefore, to prevent these functions firing every time a model input is amended (which will slow the model). These can use eventReactive() to link these larger downstream functionalities to a button.
+
+---
+## &lt;br&gt;Designing an app: Reactivity
+
+&lt;center&gt;&lt;img src="www/Picture8.png" width="600"&gt;&lt;/center&gt;
+
+---
+## &lt;br&gt;Designing an app: Reactivity
+
+&lt;center&gt;&lt;img src="www/Picture9.png" width="600"&gt;&lt;/center&gt;
+
+---
+## &lt;br&gt;Exporting RMarkdown documents from shiny
+
+It is possible to output graphs and tables from an active model directly into a shiny application.
+
+--
+
+
+```r
+output$Create_htmlreport &lt;- downloadHandler(
+  filename = "hesim-html-report_shiny.html",
+  content = function(file) {
+    ce_sim_ictstm &lt;- ictstm()$summarize()
+    
+    Export_params &lt;- list(
+      Stateprobs            = ictstm()$stateprobs_,
+      Summarisedf           = ce_sim_ictstm,
+      labs_indiv            = labs_indiv)
+    
+    rmarkdown::render(
+      input = file.path(Markdown_location, "hesim html report.Rmd"),
+      output_format = 'bookdown::html_document2',
+      output_file = file,
+      params = Export_params,
+      envir = environment()
+      )})
+```
+
+---
+## &lt;br&gt;Making shiny apps accessible
+
+Shiny apps can be made available and deployed in a variety of ways, for example:
+
+--
+
+1. R Studio (or equivalent)
+
+  - Local or online environment to view code and run app
+
+--
+
+2. shinyapps.io - https://www.shinyapps.io/
+ 
+  - Online environment to deploy app publicly (free) or make available with log-in (paid), hosted on R Studio servers
+
+--
+
+3. R Studio Connect - https://www.rstudio.com/products/connect/
+
+  - Hosting environment software to download on privately owned server (paid subscription)
+
+
+
+---
+
+## &lt;br&gt;Now you have a go!
+
+The 'utilities' tab in the shiny app is currently left blank. Print the utility table to this tab with a label or text.
+- Go into the ui, find the tab (use the navigation pane)
+- Add the graph using the `tableOutput` function. Call the output `"Utility_out"`, and add an underlined title using tags$u() - remember the commas! (use the Costs tab tables as an example)
+- Go to the server, render the graph using renderTable()
+- Run the app!
+
+Add the model diagram to the RMarkdown (either PDF or html), to be called from the shiny app
+- Identify the data that you want to export to the RMarkdown script, add it to the `params` list in the code
+- Add the data to the params list in RMarkdown.
+- Make a title using `#` or `##` before the Results section then add some text
+- Add a code chunk and render the model diagram
+
+The app and RMarkdown scripts with these changes are in the 'Exercise answers' folder for self-marking.
+
+---
+class:center
+
+## &lt;br&gt;&lt;br&gt;Thank you for joining this &lt;br&gt;Virtual ISPOR 2021 Short Course 
+
+### &lt;br&gt;Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
