@@ -1,5 +1,5 @@
 # Smoking Cessation Markov model - probabilistic analysis
-# Howard Thom 17-September-2022
+# Howard Thom 2024
 
 # Load necessary libraries
 # If not installed use the following line first
@@ -8,6 +8,7 @@ library(BCEA)
 
 # Set a random number seed so results are reproducible
 set.seed(1002435)
+
 
 # Define the number and names of treatments
 # These are Standard of Care with website
@@ -63,6 +64,7 @@ transition_matrices["SoC", , "Smoking", ] <- matrix(c(temp, 1 - temp), ncol = 2)
 # as the website has no impact on probability of relapse
 transition_matrices["SoC", , "Not smoking", ] <- transition_matrices["SoC with website", , "Not smoking", ]
 
+
 # Now define the QALYS associated with the states per cycle
 # There is one for each  sample and each state
 # Store in an NA array and then fill in below
@@ -105,7 +107,7 @@ cohort_vectors <- array(dim = c(n_treatments, n_samples, n_cycles, n_states),
                         dimnames = list(treatment_names, NULL, NULL, state_names))
 
 # Assume that everyone starts in the smoking state no matter the treatment
-cohort_vectors[, , 1, "Smoking"] <- 1 
+cohort_vectors[, , 1, "Smoking"] <- 1
 cohort_vectors[, , 1, "Not smoking"] <- 0
 
 # Build an array to store the costs and QALYs accrued per cycle
@@ -223,7 +225,9 @@ smoking_bcea <- bcea(e = t(total_qalys), c = t(total_costs), ref = 1, interventi
 #get summary statistics
 summary(smoking_bcea, wtp = 20000)
 #plot the cost-effectiveness plane
-ceplane.plot(smoking_bcea, wtp = 20000)
+ceplane.plot(smoking_bcea, wtp = 20000,
+             ylim = c(-70, 70))
+
 #plot a CEAC
 smoking_multi_ce <- multi.ce(smoking_bcea)
 ceac.plot(smoking_multi_ce)

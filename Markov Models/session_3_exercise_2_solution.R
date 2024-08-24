@@ -178,7 +178,7 @@ summary(smoking_bcea, wtp = 20000)
 #SoC with website vs SoC 431.13 0.518 2078.4
 
 #plot the cost-effectiveness plane
-ceplane.plot(smoking_bcea, wtp = 20000)
+ceplane.plot(smoking_bcea, wtp = 20000, ylim = c(-70, 70))
 #plot a CEAC
 smoking_multi_ce <- multi.ce(smoking_bcea)
 ceac.plot(smoking_multi_ce)
