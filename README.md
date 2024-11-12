@@ -2,7 +2,7 @@
  
 This repository contains the materials for the ISPOR short course entitled 'Health Economic Modeling in R: A Hands-on Introduction'
 
-We are going to be repeating this short course (in-person) at ISPOR Europe 2024 in Copenhagen on 17th November, taking in feedback from our virtual session. 
+We are going to be repeating this short course (in-person) at ISPOR Europe 2024 in Barcelona on 17th November, taking in feedback from our virtual session. 
 [(https://www.ispor.org/conferences-education/event/2024/11/17/default-calendar/november-17--health-economic-modeling-in-r--a-hands-on-introduction---in-person-at-ispor-europe-2024)]
 
 Hope to see you there!
