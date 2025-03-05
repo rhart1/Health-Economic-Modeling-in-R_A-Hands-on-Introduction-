@@ -4,7 +4,7 @@ This repository contains the materials for the ISPOR short course entitled 'Heal
 
 We are going to be repeating this short course (in-person) at ISPOR 2025 in Montreal on 13th May, taking in feedback from our prior virtual and in-person sessions. 
 
-All details can be found [here](https://portal.ispor.org/eweb/DynamicPage.aspx?webcode=SesDetails&ses_key=b9379c9d-a4e3-4fdd-b9c1-6e3d4d39f015).
+All details can be found [here](https://www.ispor.org/conferences-education/conferences/upcoming-conferences/ispor-2025/program/program/session/ispor-2025/health-economic-modeling-in-r-a-hands-on-introduction).
 
 Hope to see you there!
 

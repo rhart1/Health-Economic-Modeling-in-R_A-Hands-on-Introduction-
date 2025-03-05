@@ -38,7 +38,7 @@ knitr::opts_chunk$set(
 
 This document outlines course the structure and pre-read materials for the ISPOR 2025 in-person short course entitled "Health Economic Modeling in R: A Hands-on Introduction".
 
-The planned itinerary for the course will can be found on [\textcolor{colourblue}{ISPOR short course}](https://portal.ispor.org/eweb/DynamicPage.aspx?webcode=SesDetails&ses_key=b9379c9d-a4e3-4fdd-b9c1-6e3d4d39f015) once it has been made available
+The planned itinerary for the course will can be found on [\textcolor{colourblue}{ISPOR short course}](https://www.ispor.org/conferences-education/conferences/upcoming-conferences/ispor-2025/program/program/session/ispor-2025/health-economic-modeling-in-r-a-hands-on-introduction).
 
 - 8.00-8.05: Welcome & introductions [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
 - 8.05-9.00: Introduction to R for Health Economics using [BCEA](https://github.com/giabaio/BCEA) [Petros Pechlivanoglou](https://www.sickkids.ca/en/staff/p/petros-pechlivanoglou/)
