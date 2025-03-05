@@ -76,14 +76,14 @@ You may find this book useful for continued post-course learning, as it has many
 
 ## Introduction to R coding
 
-We recommend that attendees are familiar with the syntax and basic methods of R coding, such as how to assign variables and knowing the basic data types. Therefore, all attendees who are using R for the first time should undertake a practical introduction to R via DataCamp's [\textcolor{colourblue}{'Intro to basics'}](https://www.datacamp.com/courses/free-introduction-to-r) module for hands-on exercises prior to the short course.
+We recommend that attendees are familiar with the syntax and basic methods of R coding, such as how to assign variables and knowing the basic data types. Therefore, all attendees who are using R for the first time should undertake a practical introduction to R via DataCamp's [\textcolor{colourblue}{`Intro to basics'}](https://www.datacamp.com/courses/free-introduction-to-r) module for hands-on exercises prior to the short course.
 
 ## Accessing the course materials
 
 ### Downloading materials
-The course materials can be found in our [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-) (at <https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction->). It is recommended that materials are accessed after 23rd September 2024 as they will be the most up to date before the session whilst giving you enough time to prepare and install packages ahead of the session.
+The course materials can be found in our [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-) (at <https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction->). It is recommended that materials are accessed after 25th March 2025 as they will be the most up to date before the session whilst giving you enough time to prepare and install packages ahead of the session.
 
-If attendees have a GitHub account and are happy with cloning or forking a project to their own accounts, then feel free to do so. For those without a GitHub account, all project materials can be downloaded via a ZIP folder as indicated in the image below. GitHub is recommended but optional; it is useful for code version control and managing projects in any coding language. Further details can be found in ['Other pre-course materials'](#optionalmaterial).
+If attendees have a GitHub account and are happy with cloning or forking a project to their own accounts, then feel free to do so. For those without a GitHub account, all project materials can be downloaded via a ZIP folder as indicated in the image below. GitHub is recommended but optional; it is useful for code version control and managing projects in any coding language. Further details can be found in [`Other pre-course materials'](#optionalmaterial).
 
 ![These are the options for accessing the materials, which can be found on the GitHub repository page](Images/Picture1.png)
 
