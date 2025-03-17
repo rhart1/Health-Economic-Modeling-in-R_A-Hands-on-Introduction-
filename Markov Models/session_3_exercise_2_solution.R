@@ -1,21 +1,47 @@
-# Solution to Markov models practical
+# Solution to Markov models exercises
+
 
 ###############################################################################################################
 ###############################################################################################################
 ###############################################################################################################
 # Exercise 2
 
+# Load necessary libraries
+# If not installed use the following line first
+# install.packages("BCEA")
+library(BCEA)
+
+
+
 # Run the file "markov_smoking_probabilistic.R" 
 
 # Reset the seed so this sensitivity analysis is reproducible
 set.seed(1002435)
 
-# Exercise 3. Add the 'Death' state
+# Define the number and names of treatments
+# These are Standard of Care with website
+# and Standard of Care without website
+n_treatments <- 2
+treatment_names <- c("SoC with website", "SoC")
 
 # Redefine the number and names of states of the model
 # This is three and they are "Smoking", "Not smoking" and "Death"
 n_states <- 3
 state_names <- c("Smoking", "Not smoking", "Death")
+
+# Define the number of cycles
+# This is 10 as the time horizon is 10 years and cycle length is 1 year
+# The code will work for any even n_cycles 
+n_cycles <- 10
+
+# Define simulation parameters
+# This is the number of  samples to use
+n_samples <- 1000
+
+#############################################################################
+## Input parameters #########################################################
+#############################################################################
+
 
 # There is one transition matrix for each treatment option and each  sample
 # Store them in an array with (before filling in below) NA entries
@@ -66,13 +92,11 @@ transition_matrices["SoC with website", 1, ,]
 state_qalys <- array(dim = c(n_samples, n_states), dimnames = list(NULL, state_names))
 
 # QALY associated with 1-year in the smoking state is Normal(mean = 0_95, SD = 0_01)
-# Divide by 2 as cycle length is 6 months
-state_qalys[, "Smoking"] <- rnorm(n_samples, mean = 0.95, sd = 0.01) /  2
+state_qalys[, "Smoking"] <- rnorm(n_samples, mean = 0.95, sd = 0.01)
 
 # QALY associated with 1-year in the not smoking state is 1 (no uncertainty)
 # So all  samples have the same value
-# Again divide by 2 as cycle length is 6 months
-state_qalys[, "Not smoking"] <- 1 /  2
+state_qalys[, "Not smoking"] <- 1
 
 # QALY associated with 1-year in death state is 0 (no uncertainty)
 state_qalys[, "Death"] <- 0
@@ -82,6 +106,17 @@ state_qalys[, "Death"] <- 0
 # to the smoking cessation website
 state_costs <- array(0, dim = c(n_samples, n_states), dimnames = list(NULL, state_names))
 
+
+# Define the treatment costs
+# One for each  sample and each treatment
+# Treatment costs are actually fixed but this allows flexibility if we
+# want to include uncertainty /  randomness in the cost
+treatment_costs <- array(dim = c(n_treatments, n_samples), dimnames = list(treatment_names, NULL))
+
+# Cost of the smoking cessation website is a one-off subscription fee of ?50
+treatment_costs["SoC with website", ] <- 50
+# Zero cost for standard of care
+treatment_costs["SoC", ] <- 0
 
 #############################################################################
 ## Simulation ###############################################################
@@ -150,17 +185,15 @@ for (i_treatment in 1:n_treatments)
     # Combine the cycle_costs and treatment_costs to get total costs
     # Apply the discount factor 
     # (1 in first year, 1_035 in second, 1_035^2 in third, and so on)
-    # Each year acounts for two cycles so need to repeat the discount values
     total_costs[i_treatment, i_sample] <- treatment_costs[i_treatment, i_sample] + 
       cycle_costs[i_treatment, i_sample, ] %*%
-      (1 /  1.035)^rep(c(0:(n_cycles /  2-1)), each = 2)
+      (1 / 1.035)^c(0:(n_cycles - 1))
     
     # Combine the cycle_qalys to get total qalys
     # Apply the discount factor 
     # (1 in first year, 1_035 in second, 1_035^2 in third, and so on)
-    # Each year acounts for two cycles so need to repeat the discount values
     total_qalys[i_treatment, i_sample] <- cycle_qalys[i_treatment, i_sample, ]%*%
-      (1 / 1.035)^rep(c(0:(n_cycles /  2-1)), each = 2)
+      (1 / 1.035)^c(0:(n_cycles - 1))
   }
 }
 
