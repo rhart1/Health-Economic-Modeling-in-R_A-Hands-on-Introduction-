@@ -16,7 +16,7 @@ RUN echo "Checking for 'apt.txt'..." \
         apt-get clean > /dev/null && \
         rm -rf /var/lib/apt/lists/* \
         ; fi
-USER ${NB_USER}
-
 ## Run an install.R script, if it exists.
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi
+USER ${NB_USER}
+
