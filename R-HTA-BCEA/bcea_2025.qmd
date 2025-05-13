@@ -1,0 +1,707 @@
+---
+#' Dynamic attributes (specific info to the slides being prepared)
+title: "Introduction to `R` for Health Economics using `BCEA`"
+shorttitle: "Intro to `R` in HTA & [`BCEA`](https://gianluca.statistica.it/software/bcea)"
+subtitle: "Heavily based on G. Baio 2024 ISPOR talk"
+date: "13 May 2025"
+conference:
+   title: ISPOR North America 2025
+   location: Montreal
+   session: "Health Economic Modeling in `R`: A Hands-on Introduction"
+shortconference: "ISPOR 2025"
+postit: 
+   random-talks: false
+   social-media: false
+slidesurl: 
+   show: false
+   url: "[https://gianluca.statistica.it/slides/XXX](https://gianluca.statistica.it/slides/XXX)"
+   size: "0.75em"
+thank-you: 
+   show: false
+   file: phoebe
+
+
+#' (Semi-)Fixed attributes (don't need to, but can change these)
+author: 
+  - name: "**Petros Pechlivanoglou**"
+# institute:  
+#    - uni: "Child Health Evaluative Sciences &nbsp; | &nbsp; The Hospital for Sick Children"
+# email: 
+#    text: "[petros.pechlivanoglou@sickkids.ca](mailto:petros.pechlivanoglou@sickkids.ca)"
+#    icon: '`r fontawesome::fa("envelope",fill="#00acee",height="0.8em",prefer_type="solid")`'
+url: 
+  - text: "[https://gianluca.statistica.it](https://gianluca.statistica.it)"
+    icon: '`r fontawesome::fa("firefox",fill="#EA7600",height="0.8em")`'
+  - text: "[https://lab.research.sickkids.ca/pechlivanoglou/](https://lab.research.sickkids.ca/pechlivanoglou/)"
+    icon: '`r fontawesome::fa("firefox",fill="#EA7600",height="0.8em")`'
+  - text: "[https://egon.stats.ucl.ac.uk/research/statistics-health-economics](https://egon.stats.ucl.ac.uk/research/statistics-health-economics)"
+    icon: '`r fontawesome::fa("firefox",fill="#EA7600",height="0.8em")`'
+github: 
+  - text: "[https://github.com/giabaio](https://github.com/giabaio)"
+    icon: '`r fontawesome::fa("github",fill="black",height="0.8em")`'
+  - text: "[https://github.com/StatisticsHealthEconomics](https://github.com/StatisticsHealthEconomics)"
+    icon: '`r fontawesome::fa("github",fill="black",height="0.8em")`'
+social: 
+  - text: '[\@gianlubaio@mas.to](https://mas.to/@gianlubaio)'
+    icon: '`r fontawesome::fa("mastodon",fill="#563acc",height="0.8em")`'
+  - text: '[\@gianlubaio](https://twitter.com/gianlubaio)'
+    icon: '`r fontawesome::fa("x-twitter",fill="black",height="0.8em")`'
+orchid: 
+   show: false
+   url: "[https://orcid.org/0000-0003-4314-2570](https://orcid.org/0000-0003-4314-2570)"
+   icon: '`r fontawesome::fa("orcid",fill="black",height="0.8em")`'
+date-format: "D MMMM YYYY"
+
+
+#' Computed attributes (from other parts of the yml file)
+date-as-string: '`r ifelse((rmarkdown::metadata$date)!="",(rmarkdown::metadata$date |> as.Date(format("%e %B %Y")) |> format("%e %B %Y")),(Sys.Date() |> format("%e %B %Y")))`'
+shortdate: '`r ifelse((rmarkdown::metadata$date)!="",(rmarkdown::metadata$date |> as.Date(format("%e %B %Y")) |> format("%e %b %Y")),(Sys.Date() |> format("%e %b %Y")))`'
+shorttitle-string: '`r ifelse((rmarkdown::metadata$shorttitle)!="",paste(rmarkdown::metadata$shorttitle,"&nbsp; | &nbsp;"),"")`'
+shortconference-string: '`r ifelse((rmarkdown::metadata$shortconference)!="",paste(rmarkdown::metadata$shortconference,"&nbsp; | &nbsp;"),"")`'
+slides-url: |
+   `r ifelse(
+      (rmarkdown::metadata$slidesurl$show)==TRUE,
+      paste("&nbsp; | &nbsp; [{{< fa circle-info >}} Slides available at ",
+      rmarkdown::metadata$slidesurl$url,"]{style=\"font-size:",rmarkdown::metadata$slidesurl$size,";\"}"),""
+   )`
+
+
+#' Format
+from: markdown+emoji
+format:
+  revealjs: 
+  #  template-partials: 
+   #   - assets/title-slide.html
+  #  include-in-header: 
+  #    - assets/latex_macros.html
+    transition: none
+    slide-number: false
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    
+# default width/height: 1050/700; can also try 1200/800 but it's a bit narrow...
+    width: 1200 
+    height: 900
+#    margin: 0.05
+    
+
+#' Filters
+#filters:
+# - code-visibility
+lightbox: auto
+
+#' Title slide attributes
+title-slide-attributes:
+#    data-background-image: "images/ucl-campus.png"
+    data-background-size: stretch
+    data-background-opacity: "0.08"
+#    data-background-color: "#002248"
+pdf-engine: pdflatex
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+#library(slides)
+# This makes the fonts play nicely within the figures
+#knitr::opts_chunk$set(dev = "ragg_png")
+
+# Loads 'tidyverse'
+library(tidyverse, quietly=TRUE)
+
+```
+
+## Health technology assessment (HTA)
+
+**Objective**: Combine [costs]{.red} and [benefits]{.blue} of a given intervention into a rational scheme for allocating resources
+
+::: r-stack
+![](img/hta-scheme1.png){.fragment width="80%"}
+
+![](img/hta-scheme2.png){.fragment width="80%"}
+
+![](img/hta-scheme3.png){.fragment width="80%"}
+
+![](img/hta-scheme4.png){.fragment width="80%"}
+:::
+
+## Health technology assessment (HTA) {transition="fade-in slide-out" transition-speed="slow"}
+
+For each component of the HTA process, we may need/use different/specific packages! (the "R-HTA-verse"?)
+
+::: r-stack
+![](images/bcea_im-01.png){.fragment width="140%"} ![](img/hta-scheme6.png){.fragment width="80%"}
+:::
+
+## R & HTA
+
+### What is `R`?
+
+-   `R` is a very powerful **statistical software**
+    -   Specifically designed for statistical analysis
+    -   **Very** large community of contributors – basically you can find code/packages to do any statistical analysis you need
+    -   [**Open source and free**]{.red}
+
+::: fragment
+### Why use `R`?
+
+-   Everything can be (and almost invariably is) scripted
+-   This helps with:
+    -   Reproducibility
+    -   Sharing your work with colleagues
+    -   Reusing templates for "similar" projects
+    -   ["**Transparency**"]{.myblue}!
+-   **Fantastic** graphical capability
+    -   Especially with new [`tidyverse`](https://www.tidyverse.org/) packages ([`ggplot2`](https://ggplot2.tidyverse.org/))
+-   Generally **fit for purpose**
+    -   You **need** advanced tools for many (most??) of the models you do...
+:::
+
+```{=html}
+<!--
+:::: {.nobar}
+## {background-iframe="https://r-hta.org/" background-interactive=true}
+
+::: footer
+   
+:::
+::::
+-->
+```
+
+## But...
+
+> "*Transparency is in the eye of the beholder*"
+>
+> (Andy Briggs at the [R-HTA workshop](https://www.youtube.com/channel/UCUog4U8cjXuQIvINSDsiEJQ) – October 2020)
+
+{{< video https://youtu.be/HCsJ8nqNttU start="270" width="800" height="300" >}}
+
+. . .
+
+::: {style="position: absolute; left: 0%; top: 70%;"}
+-   There **is** an entry cost
+-   And more importantly, the effort goes hand in hand with sophistication in the statistical modelling associated with the economic evaluation!
+:::
+
+:::: {.nobar visibility="uncounted"}
+#  {background-image="img/chandler.gif" background="#002248"}
+
+::: {.footer style="background-color: transparent"}
+:::
+::::
+
+# `BCEA`
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+### `BCEA` and its use directly in `R` are designed with these objectives in mind
+
+1.  Checking the model assumptions
+
+    -   Do we mean what we mean (eg in terms of PSA simulations)?...
+    -   Simulation error (especially, **but not only**, for a Bayesian approach)
+
+::: fragment
+2.  Produce the base-case economic evaluation
+
+    -   What’s the most cost-effective intervention, given current evidence?
+    -   Cost-effectiveness plane, Expected Incremental Benefit (as a function of $k$), etc
+:::
+
+::: fragment
+3.  Perform uncertainty analysis
+
+    -   Standard PSA (mandatory): Cost-effectiveness Plane, CEAC, etc
+    -   Fairly easy (but not always used): CEAF
+    -   More advanced/"too difficult" (rarely used): EVP(P)I/EVSI
+:::
+
+::: fragment
+4.  Standardised reporting
+
+    -   Graphical tools (use **excellent** `R` facilities)
+    -   Embed code in structured reports (`docx`/`pdf`)
+:::
+
+# `BCEA`
+
+## An `R` package for (Bayesian) cost-effectiveness analysis
+
+![](img/bcea_scheme-1.png){width="75%" fig-align="center"}
+
+# Using `BCEA` to summarise outputs of an economic model
+
+## How does `BCEA` work?
+
+### Installation
+
+```{r}
+# Gets info on BCEA/CRAN
+url = 'https://cran.r-project.org/web/packages/available_packages_by_date.html'
+CRANpage <- rvest::read_html(url)
+tbls <- rvest::html_nodes(CRANpage, "table") # since HTML is in table; no need to scrape td/tr elements
+table1 <- rvest::html_table(tbls[1], fill = TRUE)
+dd <- data.frame(table1[1]) |> as_tibble()
+pubdate=dd |> as_tibble() |> filter(Package=="BCEA") |> pull(Date) |> as.Date() |> format("%d %B %Y")
+```
+
+-   `BCEA` is available from [CRAN](https://cran.r-project.org/)
+    -   Current *stable* version: `r packageVersion("BCEA")` (`r pubdate`)
+-   But it is also under constant development in the [GitHub repository](https://github.com/giabaio/BCEA)
+    -   Current *stable* version: `r packageVersion("BCEA")` (same as `CRAN`)
+    -   Current [*development*](https://github.com/giabaio/BCEA/tree/dev) (ongoing development/fixes, until integrated in the next stable release)
+
+```{r howwork1}
+#| eval: false
+#| echo: true
+
+# Install BCEA (only required once and needs an internet connection!). 
+
+# You can either get the "official" version from CRAN
+install.packages("BCEA")
+
+# Can also install the stable from GitHub
+install.packages("remotes")                            # to install packages from GitHub       
+remotes::install_github("giabaio/BCEA")                # stable version
+
+# And the *development* version (from GitHub)
+remotes::install_github("giabaio/BCEA")                # development version
+```
+
+NB: The beauty of the GitHub version is that it can be updated on the fly and be immediately available for users!
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+### Using `BCEA`
+
+```{r howwork2}
+#| eval: true
+#| echo: false
+options(width = 150)
+library(BCEA)
+library(tidyverse, quietly = TRUE)
+data(Vaccine)
+inp = createInputs(vaccine_mat,print_is_linear_comb=FALSE)
+```
+
+```{r howwork3}
+#| eval: false
+#| echo: true
+library(dplyr)  # (Not necessary - but very helpful for data manipulation!)
+
+library(BCEA)   # Then loads the package (so you can access its functions)
+data(Vaccine)   # Loads an example dataset 
+```
+
+-   The "Vaccine" example is a fictional cost-effectiveness model for and influenza vaccine, based on evidence synthesis (and a real case)
+
+-   2 treatment options ("Standard of care" vs "Vaccination") and overall 63 parameters
+
+-   Discussed in details in [Baio et al, 2017](http://www.statistica.it/gianluca/book/bcea/) and {{< ai pubmed >}} [Baio and Dawid, 2011](https://pubmed.ncbi.nlm.nih.gov/21930515/)
+
+-   In this case, PSA simulations obtained from a full Bayesian model, but could be done in a spreadsheet and imported into `R`
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+### Show. Me. The. Data!
+
+```{r howwork4}
+#| echo: true
+#| eval: true
+
+# The object 'Vaccine' contains a matrix 'vaccine_mat', with all the simulated values for the many model parameters
+# BCEA can create a matrix with the underlying model simulations starting from various formats (BUGS/R/Excel)
+# and can get rid of "redundant" columns (those that are linear combination of each other...)
+inp = createInputs(vaccine_mat,print_is_linear_comb=FALSE)
+
+# Visualise the output
+inp$mat |> as_tibble()                    # "piping" ('%>%' in `tidyverse` or '|>` in newer base `R`) and formatting nicely
+```
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+### Economic model
+
+```{r howwork6}
+#| eval: false
+#| echo: true
+#| code-line-numbers: "1-5|6-15|16-20"
+# Defines the number of simulations considered
+n.sims=inp$mat %>% nrow()                               # applies the function 'nrow' (number of rows) to the object 'inp$mat'
+
+                                                        # NB: in R 4.1.0, can also use 'native' pipe ('|>')
+                                                        # (probably a bit quicker, but in most cases, may be immaterial...)
+
+# Process the model parameters
+QALYs.inf = QALYs.pne <- QALYs.hosp <- QALYs.adv <- QALYs.death <- matrix(0,n.sims,2)
+for (t in 1:2) {
+  QALYs.inf[,t] = ((Infected[,t,1] + Infected[,t,2])*omega[,1]/365)/N
+  QALYs.pne[,t] = ((Pneumonia[,t,1] + Pneumonia[,t,2])*omega[,4]/365)/N
+  QALYs.hosp[,t] = ((Hospital[,t,1] + Hospital[,t,2])*omega[,5]/365)/N
+  QALYs.death[,t] = ((Death[,t,1] + Death[,t,2])*omega[,6])/N
+}
+QALYs.adv[,2] = (Adverse.events*omega[,7]/365)/N
+
+# Aggregates the model inputs to compute (e,c)
+eff = -(QALYs.inf + QALYs.pne + QALYs.adv + QALYs.hosp + QALYs.death) + ...
+cost = cost.GP + cost.hosp + cost.otc + ...
+```
+
+-   NB: The data stored in the `Vaccine` object (built-in in `BCEA`) already contains the objects (`eff,cost`) that can be used to run the decision analysis...
+
+-   So, this step is actually not needed (but documented in [Baio et al, 2017](https://gianluca.statistica.it/book/bcea/))
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+### Cost & effects
+
+```{r}
+options(width=150)
+```
+
+```{r howwork8}
+#| echo: true
+#| eval: true
+cbind(eff,cost) %>% as_tibble(.name_repair="universal")       # ensures that the columns are named
+```
+
+-   These calculations *can* be done also in a spreadsheet (nothing more than algebra, **once you have the simulations**)
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+-   At this point, we are ready to call the function `bcea` that runs the economic analysis, for example something like
+
+```{r howwork9}
+#| echo: true
+treats = c("Status quo","Vaccination")
+m = bcea(e=eff,c=cost,ref=2,interventions=treats,Kmax=50000)
+```
+
+-   The inputs to the function are
+    -   `eff`: a **matrix** containing the simulations for the clinical benefits (that is $n_{\rm{sim}}\times n_{\rm{int}}$ values)
+    -   `cost`: a **matrix** containing the simulations for the costs (that is $n_{\rm{sim}}\times n_{\rm{int}}$ values)
+    -   `ref`: an indication of which intervention is to be taken as reference (default: the intervention in the first column of `eff` or `cost`)
+    -   `interventions`: a vector of labels for the interventions being compared
+    -   `Kmax`: the maximum value of $k$, the parameter of willingness to pay
+
+. . .
+
+-   The output is an object `m` containing several elements
+
+```{r howwork10}
+#| echo: true
+names(m)
+```
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+Can visualise the output in various formats (tables/graphs)
+
+```{r howwork11}
+#| echo: true
+# The 'summary' "method" produces a tabular output
+summary(m)
+```
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+Can visualise the output in various formats (tables/graphs)
+
+::::: {.columns style="margin-top: 1em;"}
+::: {.column width="50%"}
+```{r howwork12}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+# The 'plot' "method" produces a *specific* version of graphical output
+plot(m)
+```
+:::
+
+::: {.column width="50%"}
+```{r howwork13}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+ceplane.plot(m,wtp=20000,xlim=c(-.002,.002),ylim=c(-10,20))
+```
+:::
+:::::
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+```{r howwork14}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+# Using 'ggplot', you can go crazy with customisation...
+ceplane.plot(m,wtp=10000,graph="gg",point=list(color="blue",size=1.8),area=list(fill="springgreen3"))
+```
+
+::: {style="position: absolute; left: 60%; top: 85%; font-size: 1.5rem; font-family: Ubuntu Mono"}
+<https://ggplot2.tidyverse.org/>
+
+<https://n8thangreen.github.io/BCEA/>
+:::
+
+```{=html}
+<!--
+:::: {.nobar}
+## {background-iframe="https://n8thangreen.github.io/BCEA" background-interactive=true}
+
+::: footer
+   
+:::
+::::
+-->
+```
+
+## How does `BCEA` work? {visibility="uncounted"}
+
+::::: columns
+::: {.column width="50%"}
+```{r howwork15}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+# Plots the Cost-Effectiveness Acceptability Curve
+ceac.plot(m)
+```
+:::
+
+::: {.column width="50%"}
+```{r howwork16}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+# Plots the Expected Value of Partial Information (EVPI)
+evi.plot(m)
+```
+:::
+:::::
+
+## Specialised plots
+
+-   Can generate a *contour* plot of the cost-effectiveness plane and estimate the proportion of points in each quadrant
+
+::::: columns
+::: {.column width="30%"}
+```{r howwork17}
+#| echo: true
+#| eval: false
+#| fig-height: 7
+#| fig-width: 7
+# "Basic" contourplot
+contour(m)
+```
+:::
+
+::: {.column width="65%"}
+```{r howwork18}
+#| echo: false
+#| fig-height: 7
+#| fig-width: 7
+# "Basic" contourplot
+contour(m)
+```
+:::
+:::::
+
+## Specialised plots {visibility="uncounted"}
+
+The specialised function `contour2` also shows the **sustainability area**
+
+::::: columns
+::: {.column width="50%"}
+```{r howwork19}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+contour2(m)
+```
+:::
+
+::: {.column width="50%"}
+```{r howwork20}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+contour2(m,wtp=100,xlim=c(-.0005,0.0015))
+```
+:::
+:::::
+
+## Specialised plots {visibility="uncounted"}
+
+**Cost-effectiveness efficiency frontier**
+
+::::: columns
+::: {.column width="50%"}
+```{r howwork20bis}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+ceef.plot(m,print.plot=FALSE)
+```
+:::
+
+::: {.column width="50%"}
+```{r howwork20tris}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+ceef.plot(m,print.summary=FALSE)
+```
+:::
+:::::
+
+## Exporting graphical output
+
+-   `R` has excellent graphical facilities and the graphs produced by `BCEA` can be easily exported to many different formats
+
+```{r howwork21}
+#| eval: false
+#| echo: true
+# "Opens" the graphical device
+pdf("NAME_OF_THE_FILE",width=`8`,height=`8`)      `# for 'pdf', units are in inches`
+# Makes the plot
+ceplane.plot(`BCEA_OBJECT`)                     `# of course, specify whatever name you've chosen when creating the object...`
+# "Closes" the graphical device
+dev.off()
+
+
+# "Open" the graphical device"
+jpeg("NAME_OF_FILE.jpg",width=`480`,height=`480`)  `# for 'jpeg' units are in px`
+# Makes the plot
+ceplane.plot(BCEA_OBJECT)
+# "Closes" the graphical device
+dev.off()
+```
+
+**NB**: `Rstudio` and [`rmarkdown`](https://rmarkdown.rstudio.com/) can do even more – that's for another time...
+
+# Advanced use of `BCEA`
+
+## Hip replacement
+
+::::: columns
+::: {.column width="55%"}
+-   Four interventions: Cemented, Uncemented, Hybrid and Reverse Hybrid
+
+    -   Cemented: Cemented Metal-on-Plastic Small head
+    -   Uncemented: Uncemented Ceramic-on-Plastic Small head
+    -   Hybrid: Hybrid Ceramic-on-Plastic Large head
+    -   Reverse hybrid: Reverse hybrid Ceramic-on-Plastic Small head
+
+-   Only consider males aged 65-74 years old (choose start at 65 years old)
+
+-   1-year cycle length, 30-year time horizon
+
+-   Probability of death increases with time as cohort ages
+
+-   Built on real model in {{< ai pubmed >}} [Fawsitt 2019](https://pubmed.ncbi.nlm.nih.gov/30832968/)
+:::
+
+::: {.column width="45%"}
+![](images/hip-model.png)
+:::
+:::::
+
+## Hip replacement
+
+### Quick exercise...
+
+a.  Use the `R` function `read.csv` to load the costs and effects matrices and apply as.matrix to ensure correct format for `BCEA`
+
+```{r}
+#| echo: true
+costs <- as.matrix(read.csv("total_costs.csv"))
+effects <- as.matrix(read.csv("total_effects.csv"))
+```
+
+b.  Use the `BCEA` function `bcea` to create a `BCEA` object and then `summary` method to try to identify the most cost-effective implant for hip replacement at £20,000/QALY (include the `wtp=...` argument). You will need to define a treatment names vector
+
+```{r}
+#| echo: true
+treats = c("cemented", "uncemented", "hybrid", "reverse_hybrid")
+```
+
+c.  Use the `BCEA` function `ceplane.plot` to plot the cost-effectiveness plane. Try changing the $x$ and $y$ axes with the arguments `xlim` and `ylim` to improve visualisation.
+
+d.  Apply the `BCEA` function `multi.ce` to your `BCEA` object and then apply the function `ceac.plot` to the resulting multiple comparison `BCEA` object. Which implant has the highest probability of being cost-effective at £20,000/QALY and £30,000/QALY?
+
+## Hip replacement --- Solutions (b)
+
+::: {style="overflow: visible; font-size: .75em;"}
+```{r}
+#| echo: true
+#| output-location: column
+# Creates the BCEA object
+hips_bcea = bcea(
+  # Selects the object containing the simulations for the effects
+  e = effects,
+  # Selects the object containing the simulations for the costs
+  c = costs,
+  # Selects the "reference" intervention
+  ref = 1,
+  # Specifies the vector of treatment lables
+  interventions = treats,
+  # Specifies the maximum value in the grid of wtp-s
+  Kmax = 50000
+)
+
+# Prints the summary table for the economic analysis
+summary(hips_bcea)
+```
+:::
+
+-   Net benefits are very similar but hybrid had highest net benefit
+-   ICER of cemented vs hybrid is lowest
+
+## Hip replacement --- Solutions (c) {visibility="uncounted"}
+
+```{r}
+#| echo: true
+#| output-location: column
+#| fig-height: 6.5
+#| fig-width: 6.5
+# Plots the cost-effectiveness plane
+ceplane.plot(
+  hips_bcea,
+  wtp = 20000, 
+  xlim = c(-0.1, 0.1), 
+  ylim = c(-2000, 2000)
+)
+```
+
+-   Limits chosen manually
+
+-   Note that comparisons are references vs intervention
+
+-   Appears there is some probability that each intervention is cost-effective compared to cemented (higher effects but also higher costs)
+
+## Hip replacement --- Solutions (d) {visibility="uncounted"}
+
+```{r}
+#| echo: true
+#| fig-height: 7
+#| fig-width: 7
+#| output-location: column
+# Plots a CEAC
+hips_multi_ce = multi.ce(hips_bcea)
+ceac.plot(
+  hips_multi_ce,
+  graph = "ggplot",
+  line = list(
+    color = c("red", "green", "blue", "orange")
+  ),
+  pos = c(0, 0.50)
+)
+```
+
+-   Hybrid is most cost-effective in the £20,000/QALY to £30,000/QALY range
+
+-   If more willing to spend more money, uncemented becomes most cost-effective :::::::::::::::::::::::
