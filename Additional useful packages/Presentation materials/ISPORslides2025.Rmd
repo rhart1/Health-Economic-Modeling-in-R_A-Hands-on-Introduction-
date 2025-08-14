@@ -1,9 +1,9 @@
 ---
 title: "<br/><br/>Additional useful packages for R modelling"
-subtitle: "ISPOR 2025 - In-person short course"
+subtitle: "ISPOR EU 2025 - In-person short course"
 author: "Rose Hart"
-institute: "Dark Peak Analytics, Sheffield, UK"
-date: "13 May 2025"
+institute: "Health Economics Consultant, Sheffield, UK"
+date: "9 November 2025"
 output:
   xaringan::moon_reader:
     css: ["default", "my-theme.css"]
