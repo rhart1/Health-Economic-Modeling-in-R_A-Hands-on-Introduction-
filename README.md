@@ -2,16 +2,16 @@
  
 This repository contains the materials for the ISPOR short course entitled 'Health Economic Modeling in R: A Hands-on Introduction'
 
-We are going to be repeating this short course (in-person) at ISPOR 2025 in Montreal on 13th May, taking in feedback from our prior virtual and in-person sessions. 
+We are going to be repeating this short course (in-person) at ISPOR EU 2025 in Glasgow on 9th November, taking in feedback from our prior virtual and in-person sessions. 
 
-All details can be found [here](https://www.ispor.org/conferences-education/conferences/upcoming-conferences/ispor-2025/program/program/session/ispor-2025/health-economic-modeling-in-r-a-hands-on-introduction).
+All details can be found [here]https://www.ispor.org/conferences-education/event/2025/11/09/default-calendar/november-9----health-economic-modeling-in-r--a-hands-on-introduction---in-person-at-ispor-europe-2025).
 
 Hope to see you there!
 
 ## Outline
 
 - 8.00-8.05: Welcome & introductions [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
-- 8.05-9.00: Introduction to R for Health Economics using [BCEA](https://github.com/giabaio/BCEA) [Petros Pechlivanoglou](https://www.sickkids.ca/en/staff/p/petros-pechlivanoglou/)
+- 8.05-9.00: Introduction to R for Health Economics using [BCEA](https://github.com/giabaio/BCEA) [Gianluca Baio](https://www.ucl.ac.uk/statistics/people/gianlucabaio)
 - 9.00-10.00: Discrete time Markov models (deterministic) [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
 - 10.00-10.15: **Coffee break**
 - 10.15-11.15: Discrete time Markov models (probabilistic) [Howard Thom](https://www.bristol.ac.uk/people/person/Howard-Thom-7d5ace0c-a4eb-4fa0-8c0b-37dc141c0e9f/)
