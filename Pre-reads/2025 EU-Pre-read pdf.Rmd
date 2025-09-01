@@ -40,18 +40,21 @@ This document outlines course the structure and pre-read materials for the ISPOR
 
 The planned itinerary for the course can be found at [\textcolor{colourblue}{ISPOR short course}](https://www.ispor.org/conferences-education/event/2025/11/09/default-calendar/november-9----health-economic-modeling-in-r--a-hands-on-introduction---in-person-at-ispor-europe-2025).
 
-- 8.00-8.05: Welcome & introductions [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
-- 8.05-9.00: Introduction to R for Health Economics using [BCEA](https://github.com/giabaio/BCEA) [Gianluca Baio](https://www.sickkids.ca/en/staff/p/petros-pechlivanoglou/)
-- 9.00-10.00: Discrete time Markov models (deterministic) [Felicity Lamrock](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
+- 8.00-8.05: Welcome & introductions [***\textcolor{colourblue}{Felicity Lamrock}***](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
+- 8.05-9.00: Introduction to R for Health Economics using ([\textcolor{colourblue}{BCEA}](https://github.com/giabaio/BCEA)) [***\textcolor{colourblue}{Gianluca Baio}***](https://www.ucl.ac.uk/statistics/people/gianlucabaio)
+- 9.00-10.00: Discrete time Markov models (deterministic) [***\textcolor{colourblue}{Felicity Lamrock}***](https://pure.qub.ac.uk/en/persons/felicity-lamrock)
 - 10.00-10.15: **Coffee break**
-- 10.15-11.15: Discrete time Markov models (probabilistic) [Howard Thom](https://www.bristol.ac.uk/people/person/Howard-Thom-7d5ace0c-a4eb-4fa0-8c0b-37dc141c0e9f/)
-- 11.15-12.00: Additional Useful Packages for R Modelling ([shiny](https://shiny.rstudio.com/), [heesim](https://hesim-dev.github.io/hesim/), [rmarkdown](https://rmarkdown.rstudio.com/)) [Rose Hart](https://github.com/rhart1)
+- 10.15-11.15: Discrete time Markov models (probabilistic) [***\textcolor{colourblue}{Howard Thom}***](https://www.bristol.ac.uk/people/person/Howard-Thom-7d5ace0c-a4eb-4fa0-8c0b-37dc141c0e9f/)
+- 11.15-12.00: Additional Useful Packages for R Modelling ([\textcolor{colourblue}{shiny}](https://shiny.rstudio.com/), [\textcolor{colourblue}{hesim}](https://hesim-dev.github.io/hesim/), [\textcolor{colourblue}{rmarkdown}](https://rmarkdown.rstudio.com/)) [***\textcolor{colourblue}{Rose Hart}***](https://github.com/rhart1)
 
 
 
 All parts of the course will have practical demonstrations and exercises for attendees to view in-session and will be available post-session via our combined [\textcolor{colourblue}{GitHub repository}](https://github.com/rhart1/Health-Economic-Modeling-in-R_A-Hands-on-Introduction-)</u>.
 
 It is recommended that you read through this document prior to attending the short course, and action the necessary points. There are further recommended materials provided; these will be discussed in the course but can be completed after the session by attendees. 
+
+These course materials, as well as extensive extended reading, can also be found in our book [\textcolor{colourblue}{R for Health Technology Assessment}](https://www.routledge.com/R-for-Health-Technology-Assessment/Baio-Thom-Pechlivanoglou/p/book/9780367468910?srsltid=AfmBOoqlQCE_8xvu09TIHd__5Teb-GfuQiRxZYj0T5lAn4AISQDO9DTb), which can also be accessed online [\textcolor{colourblue}{here}](https://gianluca.statistica.it/books/online/r-hta/).
+
 
 # Objectives of short course
 
@@ -70,9 +73,12 @@ This highly practical course will outline the computational and transparency adv
 
 ## Download R and RStudio{#DownloadR}
 
-This online book [\textcolor{colourblue}{"An introduction to R"}](https://alexd106.github.io/intro2R/index.html) is a great place to start with learning R and is not specific to health economics. Please view the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) page to go through installing R and R Studio on your machines. Please install R version 4.2.0 or higher and RStudio version 1.1.0 or higher. Also, please look at the 'Introducing RStudio' video to familiarize yourself with the RStudio layout. 
+This online book [\textcolor{colourblue}{An introduction to R}](https://alexd106.github.io/intro2R/index.html) is a great place to learn to setup your R environment and start with learning R. It is not specific to health economics. Please view the [\textcolor{colourblue}{setup}](https://alexd106.github.io/intro2R/setup.html) page to go through installing R and R Studio on your machines. Please install R version 4.2.0 or higher and RStudio version 1.1.0 or higher. Also, please look at the 'Introducing RStudio' video to familiarize yourself with the RStudio layout. 
 
 You may find this book useful for continued post-course learning, as it has many great (and free) [\textcolor{colourblue}{tutorials}](https://alexd106.github.io/intro2R/howto.html) and [\textcolor{colourblue}{exercises}](https://alexd106.github.io/intro2R/exercises.html) for beginners.
+
+After setup, our book, [\textcolor{colourblue}{R for Health Technology Assessment}](https://gianluca.statistica.it/books/online/r-hta/), offers HTA-specific teachings and exercises to build and extend on the skills learned in this course. This resource combines health economic principles with practical examples in R, and the online version is updated periodically.
+
 
 ## Introduction to R coding
 
