@@ -1,13 +1,21 @@
-FROM rocker/binder:4.2.1
+FROM rocker/binder:latest
 
-## Declares build arguments
-ARG NB_USER
-ARG NB_UID
+## Declare build arguments with defaults for your custom user
+ARG NB_USER=joyvan
+##### ARG git_personal_token
 
-COPY --chown=${NB_USER} . ${HOME}
+USER root
+
+# Create user bmhe if not exists
+RUN id -u ${NB_USER} 2>/dev/null || \
+    useradd -m -s /bin/bash ${NB_USER}
+
+# Copy your project files to /home/bmhe with ownership
+COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
 
 ENV DEBIAN_FRONTEND=noninteractive
-USER root
+
+# Install apt packages if apt.txt exists
 RUN echo "Checking for 'apt.txt'..." \
         ; if test -f "apt.txt" ; then \
         rm -rf /var/lib/apt/lists && mkdir /var/lib/apt/lists && \ 
