@@ -6,7 +6,7 @@
     "rmd_viewer_type": "pane",
     "default_sweave_engine": "knitr",
     "jobs_tab_visibility": "shown",
-    "initial_working_directory": "/home/joyvan/practical/",
+    "initial_working_directory": "/home/jovyan/practical/",
     "visual_markdown_editing_show_doc_outline": false,
     "latex_preview_on_cursor_idle": "never"
 }
