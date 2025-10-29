@@ -1,0 +1,12 @@
+# This command runs the image named 'bmhe' (created using the script 'build_docker') with some specific options
+# (see: https://docs-stage.docker.com/engine/reference/commandline/run/)
+# --rm: removes the container when it's turned off
+# -it: instructs Docker to allocate a pseudo-TTY (terminal) connected to the container
+# -p sets up the port (NB: *must* be 8888:8888 to run the rstudio container)
+# -v: add a "volume". Basically allows you to "mount" a local folder (in this case 'practical' under the current directory)
+#     to the container. This means that the folder 'practical' becomes "persistent", meaning that changes made while running
+#     the container will be saved in the original directory on your local machine. This is mounted as '/home/rstudio/practical'
+#     in the container virtual hard drive.
+# sh -c: executes the command to open the "Jupyter Lab" from which the rstudio window can be open
+
+docker run --rm -it -p 8888:8888 r-hta-ispor sh -c "jupyter lab --ip 0.0.0.0 --no-browser"

@@ -12,4 +12,3 @@ libicu-dev
 libeigen3-dev
 gcc-multilib 
 g++-multilib
-jags

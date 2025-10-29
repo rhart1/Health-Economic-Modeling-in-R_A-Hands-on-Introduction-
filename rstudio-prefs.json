@@ -1,0 +1,12 @@
+{
+    "save_workspace": "never",
+    "always_save_history": false,
+    "reuse_sessions_for_project_links": true,
+    "posix_terminal_shell": "bash",
+    "rmd_viewer_type": "pane",
+    "default_sweave_engine": "knitr",
+    "jobs_tab_visibility": "shown",
+    "initial_working_directory": "/home/joyvan/practical/",
+    "visual_markdown_editing_show_doc_outline": false,
+    "latex_preview_on_cursor_idle": "never"
+}
