@@ -1,6 +1,0 @@
-# See here: https://forums.docker.com/t/issue-with-github-access-tokens/127723
-# If the build process complains about the API rates being exceeded,. then modify
-# the command by adding 
-# '--build-arg git_personal_token=XXXXX'
-# where XXXXX is the git token (stored securely in 'token.asc')
-docker build . -t "r-hta-ispor"
