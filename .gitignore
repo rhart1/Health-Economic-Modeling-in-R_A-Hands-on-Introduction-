@@ -15,3 +15,5 @@ R-HTA-BCEA/petros/
 R-HTA-BCEA/bcea.zip
 R-HTA-BCEA/Copenhagen2023.qmd
 .Rproj.user
+run_rstudio
+build_docker
