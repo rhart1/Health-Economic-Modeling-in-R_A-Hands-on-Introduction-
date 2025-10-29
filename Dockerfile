@@ -1,12 +1,12 @@
 FROM rocker/binder:latest
 
 ## Declare build arguments with defaults for your custom user
-ARG NB_USER=joyvan
+ARG NB_USER=jovyan
 
 # Switch to root to do the main installation
 USER root
 
-# Create user joyvan if not exists
+# Create user jovyan if not exists
 RUN id -u ${NB_USER} 2>/dev/null || \
     useradd -m -s /bin/bash ${NB_USER}
 
@@ -29,8 +29,8 @@ RUN echo "Checking for 'apt.txt'..." && \
 # Run R install script if it exists
 RUN if [ -f install.R  ]; then R --quiet -f install.R; fi
 
-# Switch to joyvan user
+# Switch to jovyan user
 USER ${NB_USER}
 
-# Copy RStudio prefs to joyvan's config folder
+# Copy RStudio prefs to jovyan's config folder
 COPY --chown=${NB_USER}:${NB_USER} rstudio-prefs.json /home/${NB_USER}/.config/rstudio/rstudio-prefs.json
