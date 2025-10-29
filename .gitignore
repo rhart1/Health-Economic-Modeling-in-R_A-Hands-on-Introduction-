@@ -4,3 +4,6 @@ practical
 .Rproj.user
 .RData
 .Ruserdata
+build_docker
+run_rstudio
+
