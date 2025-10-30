@@ -8,7 +8,7 @@ options(repos=c(BCEA="https://giabaio.r-universe.dev",CRAN="https://cran.r-proje
 # Sets the timeout duration
 options(timeout=600)
 # Install packages
-install.packages("BCEA",repos=c(BCEA="https://giabaio.r-universe.dev",CRAN="https://cran.r-project.org"))
+install.packages("BCEA",repos=c("https://giabaio.r-universe.dev","https://cran.r-project.org"))
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")
