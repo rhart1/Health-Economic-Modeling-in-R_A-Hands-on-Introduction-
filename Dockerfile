@@ -17,6 +17,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Move to the /home/${NB_USER} folder where all the local files have been copied
 WORKDIR /home/${NB_USER}
+
+# Prevent apt from installing r-cran-bcea
+RUN echo "Package: r-cran-bcea" > /etc/apt/preferences.d/no-bcea && \
+    echo "Pin: release *" >> /etc/apt/preferences.d/no-bcea && \
+    echo "Pin-Priority: -1" >> /etc/apt/preferences.d/no-bcea
+
 # Install apt packages if apt.txt exists
 RUN echo "Checking for 'apt.txt'..." && \
     if [ -f "apt.txt" ]; then \
