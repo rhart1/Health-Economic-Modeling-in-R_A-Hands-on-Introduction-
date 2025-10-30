@@ -4,7 +4,6 @@
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 # Sets the repos from which to install the packages
 options(repos="https://cran.r-project.org")
-
 # Sets the timeout duration
 options(timeout=600)
 # Install packages
