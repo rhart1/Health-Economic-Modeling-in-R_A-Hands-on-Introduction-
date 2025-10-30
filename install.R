@@ -3,10 +3,11 @@
 # Sets the paths
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 # Sets the repos from which to install the packages
-options(repos=c(CRAN="https://cran.r-project.org",giabaio='https://giabaio.r-universe.dev'))
+options(repos=c(BCEA="https://giabaio.r-universe.dev",CRAN="https://cran.r-project.org"))
 # Sets the timeout duration
 options(timeout=600)
 # Install packages
+install.packages("BCEA",type="source",dependencies=TRUE)
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")
@@ -23,4 +24,3 @@ install.packages("heemod")
 install.packages("shinycssloaders")
 install.packages("DT")
 install.packages("shinyjs")
-install.packages('BCEA',repos=c('https://giabaio.r-universe.dev'))
