@@ -29,14 +29,13 @@ RUN echo "Checking for 'apt.txt'..." && \
     fi
 
 # Run R install script if it exists
-RUN echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /etc/R/Rprofile.site
 RUN if [ -f install.R  ]; then R --quiet -f install.R; fi
 
 # Switch to jovyan user
 USER ${NB_USER}
 
 # Now install BCEA from universe
-#RUN echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /home/${NB_USER}/.Rprofile
+RUN echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /home/${NB_USER}/.Rprofile
 RUN /usr/lib/R/site-library/littler/examples/installRub.r -r noble BCEA@giabaio
 
 # Copy RStudio prefs to jovyan's config folder
