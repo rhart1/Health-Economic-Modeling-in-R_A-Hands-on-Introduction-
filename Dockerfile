@@ -31,7 +31,7 @@ RUN echo "Checking for 'apt.txt'..." && \
 RUN if [ -f install.R  ]; then R --quiet -f install.R; fi
 
 # Now install BCEA from universe
-RUN Rscript /home/${NB_USER}/installRub.r -r noble -u giabaio -m FALSE -d BCEA
+RUN Rscript /home/${NB_USER}/installRub.r -r noble BCEA@giabaio
 
 # Switch to jovyan user
 USER ${NB_USER}
