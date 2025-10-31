@@ -9,7 +9,7 @@ options(
 )
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
-###install.packages("BCEA")
+install.packages("BCEA")
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")
