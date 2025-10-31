@@ -29,5 +29,6 @@ install.packages("shinycssloaders")
 install.packages("DT")
 install.packages("shinyjs")
 
-bspm::disable()
+# Now disable bspm (to avoid going to apt binaries) and install BCEA from r-universe
+# bspm::disable()
 install.packages("BCEA")
