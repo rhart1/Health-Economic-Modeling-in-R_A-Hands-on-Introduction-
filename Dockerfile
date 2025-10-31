@@ -15,8 +15,6 @@ COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV R_DISABLE_R2U=true
-
 # Move to the /home/${NB_USER} folder where all the local files have been copied
 WORKDIR /home/${NB_USER}
 
