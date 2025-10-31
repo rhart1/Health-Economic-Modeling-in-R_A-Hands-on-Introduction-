@@ -1,12 +1,14 @@
 ### Install the relevant packages 
 
-# Sets the paths
-.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
+# Gets repos for r-universe too
+linux_binary_repo <- function(universe){
+  sprintf('https://%s.r-universe.dev/bin/linux/noble-%s/%s/', 
+    universe,
+    R.version$arch, 
+    substr(getRversion(), 1, 3))
+}
+options(repos = linux_binary_repo(c('giabaio', 'cran')),timeout=600)
 
-options(
-  repos = c(giabaio="https://giabaio.r-universe.dev",CRAN="https://cran.r-project.org"),
-  timeout = 600
-)
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
 ###install.packages("BCEA")
@@ -26,5 +28,6 @@ install.packages("heemod")
 install.packages("shinycssloaders")
 install.packages("DT")
 install.packages("shinyjs")
-install.packages("docopt")
-install.packages("littler")
+
+bspm::disable()
+install.packages("BCEA")
