@@ -3,25 +3,17 @@
 # Sets the paths
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
-Sys.setenv(R_BSPM_ENABLE = "FALSE")
-options(bspm.enable = FALSE, bspm.sudo = FALSE,
-        repos = c("https://giabaio.r-universe.dev", "https://cran.r-project.org"),
-        timeout = 600)
-if ("bspm" %in% loadedNamespaces()) {
-  try(unloadNamespace("bspm"), silent = TRUE)
-  if ("package:bspm" %in% search()) try(detach("package:bspm", unload = TRUE, character.only = TRUE), silent = TRUE)
-}
+options(
+  repos = c("https://giabaio.r-universe.dev", "https://cran.r-project.org"),
+  timeout = 600
+)
+.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
-# install from r-universe first
+# install BCEA from r-universe (bspm disabled system-wide)
 install.packages("BCEA", ,repos=c("https://giabaio.r-universe.dev"),dependencies=TRUE)
 
-# re-enable bspm for later installs (optional)
-Sys.setenv(R_BSPM_ENABLE = "TRUE")
-options(bspm.enable = TRUE)
-if (!"bspm" %in% loadedNamespaces()) try(library(bspm), silent = TRUE)
-
-# Re-enables bspm so the other packages can be installed via apt
-options(bspm.enable=TRUE)
+# optionally re-enable bspm for later installs
+try(bspm::enable(), silent = TRUE)
 
 install.packages("shiny")
 install.packages("shinydashboard")

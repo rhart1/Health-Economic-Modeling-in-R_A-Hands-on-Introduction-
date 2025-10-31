@@ -6,6 +6,9 @@ ARG NB_USER=jovyan
 # Switch to root to do the main installation
 USER root
 
+# disable bspm globally before R starts
+RUN echo 'options(bspm.enable = FALSE, bspm.sudo = FALSE)' >> /etc/R/Rprofile.site
+
 # Create user jovyan if not exists
 RUN id -u ${NB_USER} 2>/dev/null || \
     useradd -m -s /bin/bash ${NB_USER}
