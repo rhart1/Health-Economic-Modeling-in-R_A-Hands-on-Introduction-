@@ -7,8 +7,8 @@ ARG NB_USER=jovyan
 USER root
 
 # Create user jovyan if not exists
-RUN id -u ${NB_USER} 2>/dev/null || true
-RUN useradd -m -s /bin/bash ${NB_USER}
+#RUN id -u ${NB_USER} 2>/dev/null || true
+#RUN useradd -m -s /bin/bash ${NB_USER}
 
 # Copy your project files to /home/joyvan with ownership
 COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
