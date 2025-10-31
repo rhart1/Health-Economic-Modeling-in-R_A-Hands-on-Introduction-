@@ -8,10 +8,12 @@ options(repos="https://cran.r-project.org")
 options(timeout=600)
 # Install packages
 # Disable bspm so the package is installed from the r-universe.dev repo
-bspm::disable()
+options(bspm.sudo = FALSE)
+options(bspm.enable = FALSE)
 install.packages("BCEA",repos=c("https://giabaio.r-universe.dev","https://cran.r-project.org"),dependencies=TRUE)
 # Then re-enables it so the others can be installed quickil
-bspm::enable()
+options(bspm.sudo = FALSE)
+options(bspm.enable = TRUE)
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")
