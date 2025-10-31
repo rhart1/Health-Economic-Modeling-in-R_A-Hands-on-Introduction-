@@ -4,7 +4,7 @@
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
 options(
-  repos = c("https://giabaio.r-universe.dev", "https://cran.r-project.org"),
+  repos = c(giabaio="https://giabaio.r-universe.dev",CRAN="https://cran.r-project.org"),
   timeout = 600
 )
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
