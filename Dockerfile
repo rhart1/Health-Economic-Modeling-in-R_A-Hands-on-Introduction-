@@ -3,11 +3,6 @@ FROM rocker/binder:latest
 ## Declare build arguments with defaults for your custom user
 ARG NB_USER=jovyan
 
-# Now install BCEA from universe
-RUN echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /home/${NB_USER}/.Rprofile
-RUN /usr/lib/R/site-library/littler/examples/installRub.r -r noble BCEA@giabaio
-
-
 # Switch to root to do the main installation
 USER root
 
@@ -38,6 +33,10 @@ RUN if [ -f install.R  ]; then R --quiet -f install.R; fi
 
 # Switch to jovyan user
 USER ${NB_USER}
+
+# Now install BCEA from universe
+RUN echo 'options(repos = c(CRAN="https://cloud.r-project.org"))' >> /home/${NB_USER}/.Rprofile
+RUN /usr/lib/R/site-library/littler/examples/installRub.r -r noble BCEA@giabaio
 
 # Copy RStudio prefs to jovyan's config folder
 COPY --chown=${NB_USER}:${NB_USER} rstudio-prefs.json /home/${NB_USER}/.config/rstudio/rstudio-prefs.json
