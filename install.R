@@ -9,12 +9,7 @@ options(
 )
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
-# install BCEA from r-universe (bspm disabled system-wide)
-install.packages("BCEA", ,repos=c("https://giabaio.r-universe.dev"),dependencies=TRUE)
-
-# optionally re-enable bspm for later installs
-try(bspm::enable(), silent = TRUE)
-
+###install.packages("BCEA", repos=c("https://giabaio.r-universe.dev"),dependencies=TRUE)
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")

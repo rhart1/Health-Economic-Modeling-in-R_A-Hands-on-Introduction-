@@ -6,12 +6,9 @@ ARG NB_USER=jovyan
 # Switch to root to do the main installation
 USER root
 
-# disable bspm globally before R starts
-RUN echo 'options(bspm.enable = FALSE, bspm.sudo = FALSE)' >> /etc/R/Rprofile.site
-
 # Create user jovyan if not exists
-RUN id -u ${NB_USER} 2>/dev/null || \
-    useradd -m -s /bin/bash ${NB_USER}
+RUN id -u ${NB_USER} 2>/dev/null || true
+RUN useradd -m -s /bin/bash ${NB_USER}
 
 # Copy your project files to /home/joyvan with ownership
 COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
@@ -32,6 +29,9 @@ RUN echo "Checking for 'apt.txt'..." && \
     fi
 # Run R install script if it exists
 RUN if [ -f install.R  ]; then R --quiet -f install.R; fi
+
+# Now install BCEA from universe
+RUN installRub.r -r noble BCEA@giabaio
 
 # Switch to jovyan user
 USER ${NB_USER}
