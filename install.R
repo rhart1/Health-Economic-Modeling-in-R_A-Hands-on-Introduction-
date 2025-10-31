@@ -10,7 +10,7 @@ options(timeout=600)
 # Disable bspm so the package is installed from the r-universe.dev repo
 options(bspm.sudo = FALSE)
 options(bspm.enable = FALSE)
-install.packages("BCEA",repos=c("https://giabaio.r-universe.dev","https://cran.r-project.org"),dependencies=TRUE)
+install.packages("BCEA",repos=c("https://giabaio.r-universe.dev"),dependencies=TRUE)
 # Then re-enables it so the others can be installed quickil
 options(bspm.sudo = FALSE)
 options(bspm.enable = TRUE)
