@@ -11,7 +11,7 @@ options(repos = linux_binary_repo(c('giabaio', 'cran')),timeout=600)
 
 .libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
 
-###install.packages("BCEA")
+install.packages("BCEA")
 install.packages("shiny")
 install.packages("shinydashboard")
 install.packages("hesim")
@@ -31,4 +31,4 @@ install.packages("shinyjs")
 
 # Now disable bspm (to avoid going to apt binaries) and install BCEA from r-universe
 # bspm::disable()
-install.packages("BCEA")
+#install.packages("BCEA")
