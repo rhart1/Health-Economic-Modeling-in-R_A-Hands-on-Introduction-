@@ -120,8 +120,8 @@ print(params$Stateprobs)
 Figures can be printed into the document within the r chunks in exactly the same way as they are called in the main R script.
 
 ```{r FigStateTransitionPlot, echo = TRUE, fig.cap="State transition probabilities over time"}
-autoplot(params$Stateprobs, labels = params$labs_indiv,
-            ci = FALSE) + theme_bw() + ggplot2::theme(legend.position = "bottom")
+hesim::autoplot(params$Stateprobs, labels = params$labs_indiv,
+            ci = FALSE) + ggplot2::theme_bw() + ggplot2::theme(legend.position = "bottom")
 
 ```
 

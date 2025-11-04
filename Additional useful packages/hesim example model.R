@@ -241,8 +241,8 @@ head(ictstm$disprog_)
 ictstm$sim_stateprobs(t = seq(0, 30 , 1/12))
 head(ictstm$stateprobs_)
 
-Results_plot <- autoplot(ictstm$stateprobs_, labels = labs_indiv,
-            ci = FALSE) + theme_bw()
+Results_plot <- hesim::autoplot(ictstm$stateprobs_, labels = labs_indiv,
+            ci = FALSE) + ggplot2::theme_bw() + ggplot2::theme(legend.position = "bottom")
 
 Results_plot 
 
