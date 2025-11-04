@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 ### Rose Hart
 ]
 .institute[
-### Health Economics Consultant, Sheffield, UK
+### Senior Health Economist, Covalence Research, UK
 ]
 .date[
 ### 9 November 2025
@@ -308,8 +308,8 @@ plotOutput("Results_graph")
 
 #This is written in the server
 output$Results_graph &lt;- renderPlot({
-    autoplot(ictstm()$stateprobs_, labels = labs_indiv,
-             ci = FALSE) + theme_bw()
+    hesim::autoplot(ictstm()$stateprobs_, labels = labs_indiv,
+             ci = FALSE) + ggplot2::theme_bw()
   })
 ```
   
@@ -378,7 +378,7 @@ Shiny apps can be made available and deployed in a variety of ways, for example:
 
 --
 
-3. R Studio Connect - https://www.rstudio.com/products/connect/
+3. Posit Connect - https://posit.co/products/enterprise/connect/
 
   - Hosting environment software to download on privately owned server (paid subscription)
 
@@ -410,9 +410,9 @@ By the end of this session you should:
 ---
 class:center
 
-## &lt;br&gt;&lt;br&gt;Thank you for joining this &lt;br&gt;ISPOR 2025 Short Course, Montreal 
+## &lt;br&gt;&lt;br&gt;Thank you for joining this &lt;br&gt;ISPOR EU 2025 Short Course, Glasgow 
 
-### &lt;br&gt;Felicity Lamrock, PhD; Howard Thom, PhD; Petros Pechlivanoglou, PhD; Gianluca Baio, PhD; Rose Hart, PhD
+### &lt;br&gt;Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

@@ -2,7 +2,7 @@
 title: "<br/><br/>Additional useful packages for R modelling"
 subtitle: "ISPOR EU 2025 - In-person short course"
 author: "Rose Hart"
-institute: "Health Economics Consultant, Sheffield, UK"
+institute: "Senior Health Economist, Covalence Research, UK"
 date: "9 November 2025"
 output:
   xaringan::moon_reader:
@@ -291,8 +291,8 @@ plotOutput("Results_graph")
 
 #This is written in the server
 output$Results_graph <- renderPlot({
-    autoplot(ictstm()$stateprobs_, labels = labs_indiv,
-             ci = FALSE) + theme_bw()
+    hesim::autoplot(ictstm()$stateprobs_, labels = labs_indiv,
+             ci = FALSE) + ggplot2::theme_bw()
   })
 ```
   
@@ -361,7 +361,7 @@ Shiny apps can be made available and deployed in a variety of ways, for example:
 
 --
 
-3. R Studio Connect - https://www.rstudio.com/products/connect/
+3. Posit Connect - https://posit.co/products/enterprise/connect/
 
   - Hosting environment software to download on privately owned server (paid subscription)
 
@@ -393,7 +393,7 @@ By the end of this session you should:
 ---
 class:center
 
-## <br><br>Thank you for joining this <br>ISPOR 2025 Short Course, Montreal 
+## <br><br>Thank you for joining this <br>ISPOR EU 2025 Short Course, Glasgow 
 
-### <br>Felicity Lamrock, PhD; Howard Thom, PhD; Petros Pechlivanoglou, PhD; Gianluca Baio, PhD; Rose Hart, PhD
+### <br>Felicity Lamrock, PhD; Howard Thom, PhD; Gianluca Baio, PhD; Rose Hart, PhD
 
